@@ -4,8 +4,8 @@ use lightyear::prelude::AppComponentExt;
 pub use crate::protocol_snapshots::*;
 
 use crate::components::{
-    CombatStatus, EquipmentAppearance, Gold, GuildMembership, Health, Mana, ModelDisplay, Mounted,
-    MovementSpeed, Npc, Player, Position, PresenceStatus, Rotation, Zone,
+    CharacterAppearance, CombatStatus, EquipmentAppearance, GuildMembership, Health, Mana,
+    ModelDisplay, Mounted, MovementSpeed, Npc, Player, Position, Rotation, Zone,
 };
 
 mod channels;

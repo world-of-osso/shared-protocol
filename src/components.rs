@@ -267,23 +267,6 @@ pub struct MovementSpeed(pub f32);
 )]
 pub struct CombatStatus(pub bool);
 
-/// Vertical velocity in yards/sec (positive = upward).
-#[derive(
-    Component,
-    Reflect,
-    Serialize,
-    Deserialize,
-    bitcode::Encode,
-    bitcode::Decode,
-    Debug,
-    Clone,
-    Copy,
-    PartialEq,
-    Default,
-)]
-pub struct VerticalVelocity(pub f32);
-
-/// Player is currently mounted. Removed on dismount.
 #[derive(
     Component,
     Reflect,
