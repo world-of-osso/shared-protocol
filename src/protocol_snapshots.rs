@@ -142,12 +142,12 @@ pub struct ProfessionRecipeSnapshot {
 
 // -- Currency snapshots --
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct CurrencySnapshot {
     pub entries: Vec<CurrencyEntrySnapshot>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct CurrencyEntrySnapshot {
     pub id: u32,
     pub name: String,

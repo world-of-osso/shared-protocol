@@ -43,6 +43,9 @@ pub struct ProfessionChannel;
 /// Reliable ordered channel for reputation updates, bidirectional.
 pub struct ReputationChannel;
 
+/// Reliable ordered channel for currency updates, bidirectional.
+pub struct CurrencyChannel;
+
 /// Reliable ordered channel for inspect operations, bidirectional.
 pub struct InspectChannel;
 
@@ -639,6 +642,25 @@ pub struct ProfessionStateUpdate {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct EarnCurrency {
+    pub currency_id: u32,
+    pub amount: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SpendCurrency {
+    pub currency_id: u32,
+    pub amount: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct CurrencyStateUpdate {
+    pub snapshot: Option<CurrencySnapshot>,
+    pub message: Option<String>,
+    pub error: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ReputationStateUpdate {
     pub snapshot: Option<ReputationSnapshot>,
     pub message: Option<String>,
@@ -683,6 +705,7 @@ fn register_messages(app: &mut App) {
     register_duel_messages(app);
     register_profession_messages(app);
     register_reputation_messages(app);
+    register_currency_messages(app);
     crate::protocol_snapshots::register_snapshot_messages(app);
 }
 
@@ -867,6 +890,15 @@ fn register_reputation_messages(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
 }
 
+fn register_currency_messages(app: &mut App) {
+    app.register_message::<EarnCurrency>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<SpendCurrency>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<CurrencyStateUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+}
+
 fn register_channels(app: &mut App) {
     app.add_channel::<MovementChannel>(ChannelSettings {
         mode: ChannelMode::UnorderedUnreliable,
@@ -941,6 +973,12 @@ fn register_channels(app: &mut App) {
     .add_direction(NetworkDirection::Bidirectional);
 
     app.add_channel::<ReputationChannel>(ChannelSettings {
+        mode: ChannelMode::OrderedReliable(default()),
+        ..default()
+    })
+    .add_direction(NetworkDirection::Bidirectional);
+
+    app.add_channel::<CurrencyChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
         ..default()
     })
@@ -1156,6 +1194,24 @@ mod tests {
         };
         let encoded = serde_json::to_string(&update).unwrap();
         let decoded: ReputationStateUpdate = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(update, decoded);
+    }
+
+    #[test]
+    fn currency_state_update_round_trip() {
+        let update = CurrencyStateUpdate {
+            snapshot: Some(CurrencySnapshot {
+                entries: vec![CurrencyEntrySnapshot {
+                    id: 1,
+                    name: "Honor".into(),
+                    amount: 125,
+                }],
+            }),
+            message: Some("earned 125 Honor".into()),
+            error: None,
+        };
+        let encoded = serde_json::to_string(&update).unwrap();
+        let decoded: CurrencyStateUpdate = serde_json::from_str(&encoded).unwrap();
         assert_eq!(update, decoded);
     }
 
