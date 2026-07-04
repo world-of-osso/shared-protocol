@@ -43,6 +43,9 @@ pub struct ProfessionChannel;
 /// Reliable ordered channel for reputation updates, bidirectional.
 pub struct ReputationChannel;
 
+/// Reliable ordered channel for achievement updates, bidirectional.
+pub struct AchievementChannel;
+
 /// Reliable ordered channel for collection updates, bidirectional.
 pub struct CollectionChannel;
 
@@ -693,6 +696,14 @@ pub struct ReputationStateUpdate {
     pub error: Option<String>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct AchievementStateUpdate {
+    pub snapshot: Option<AchievementSnapshot>,
+    pub completed: Option<AchievementToastSnapshot>,
+    pub message: Option<String>,
+    pub error: Option<String>,
+}
+
 /// Registers shared protocol: components for replication and channels.
 /// Must be added AFTER `ServerPlugins`/`ClientPlugins` but BEFORE any entity is spawned.
 pub struct ProtocolPlugin;
@@ -731,6 +742,7 @@ fn register_messages(app: &mut App) {
     register_duel_messages(app);
     register_profession_messages(app);
     register_reputation_messages(app);
+    register_achievement_messages(app);
     register_collection_messages(app);
     register_currency_messages(app);
     crate::protocol_snapshots::register_snapshot_messages(app);
@@ -917,6 +929,11 @@ fn register_reputation_messages(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
 }
 
+fn register_achievement_messages(app: &mut App) {
+    app.register_message::<AchievementStateUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+}
+
 fn register_collection_messages(app: &mut App) {
     app.register_message::<SummonMount>()
         .add_direction(NetworkDirection::ClientToServer);
@@ -1013,6 +1030,12 @@ fn register_channels(app: &mut App) {
     .add_direction(NetworkDirection::Bidirectional);
 
     app.add_channel::<ReputationChannel>(ChannelSettings {
+        mode: ChannelMode::OrderedReliable(default()),
+        ..default()
+    })
+    .add_direction(NetworkDirection::Bidirectional);
+
+    app.add_channel::<AchievementChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
         ..default()
     })
@@ -1283,6 +1306,31 @@ mod tests {
         };
         let encoded = serde_json::to_string(&update).unwrap();
         let decoded: CollectionStateUpdate = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(update, decoded);
+    }
+
+    #[test]
+    fn achievement_state_update_round_trip() {
+        let update = AchievementStateUpdate {
+            snapshot: Some(AchievementSnapshot {
+                earned_ids: vec![1, 2],
+                progress: vec![AchievementProgressSnapshot {
+                    achievement_id: 3,
+                    current: 37,
+                    required: 40,
+                    completed: false,
+                }],
+            }),
+            completed: Some(AchievementToastSnapshot {
+                achievement_id: 2,
+                name: "Level 20".into(),
+                points: 10,
+            }),
+            message: Some("achievement progress updated".into()),
+            error: None,
+        };
+        let encoded = serde_json::to_string(&update).unwrap();
+        let decoded: AchievementStateUpdate = serde_json::from_str(&encoded).unwrap();
         assert_eq!(update, decoded);
     }
 
