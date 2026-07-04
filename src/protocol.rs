@@ -55,6 +55,9 @@ pub struct RestChannel;
 /// Reliable ordered channel for friends updates, bidirectional.
 pub struct FriendsChannel;
 
+/// Reliable ordered channel for who-list updates, bidirectional.
+pub struct WhoChannel;
+
 /// Reliable ordered channel for ignore list updates, bidirectional.
 pub struct IgnoreChannel;
 
@@ -810,6 +813,18 @@ pub struct FriendsStateUpdate {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct QueryWho {
+    pub query: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct WhoStateUpdate {
+    pub snapshot: Option<WhoSnapshot>,
+    pub message: Option<String>,
+    pub error: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct QueryIgnoreList;
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -969,6 +984,7 @@ fn register_messages(app: &mut App) {
     register_world_map_messages(app);
     register_rest_messages(app);
     register_friends_messages(app);
+    register_who_messages(app);
     register_ignore_messages(app);
     register_lfg_messages(app);
     register_pvp_messages(app);
@@ -1193,6 +1209,13 @@ fn register_friends_messages(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
 }
 
+fn register_who_messages(app: &mut App) {
+    app.register_message::<QueryWho>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<WhoStateUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+}
+
 fn register_ignore_messages(app: &mut App) {
     app.register_message::<QueryIgnoreList>()
         .add_direction(NetworkDirection::ClientToServer);
@@ -1375,6 +1398,12 @@ fn register_channels(app: &mut App) {
     .add_direction(NetworkDirection::Bidirectional);
 
     app.add_channel::<FriendsChannel>(ChannelSettings {
+        mode: ChannelMode::OrderedReliable(default()),
+        ..default()
+    })
+    .add_direction(NetworkDirection::Bidirectional);
+
+    app.add_channel::<WhoChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
         ..default()
     })
@@ -1827,6 +1856,26 @@ mod tests {
         };
         let encoded = serde_json::to_string(&update).unwrap();
         let decoded: FriendsStateUpdate = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(update, decoded);
+    }
+
+    #[test]
+    fn who_state_update_round_trip() {
+        let update = WhoStateUpdate {
+            snapshot: Some(WhoSnapshot {
+                query: "ther".into(),
+                entries: vec![WhoCharacterSnapshot {
+                    name: "Theron".into(),
+                    level: 12,
+                    class_name: "Paladin".into(),
+                    area: "Elwynn Forest".into(),
+                }],
+            }),
+            message: Some("who: 1 result(s)".into()),
+            error: None,
+        };
+        let encoded = serde_json::to_string(&update).unwrap();
+        let decoded: WhoStateUpdate = serde_json::from_str(&encoded).unwrap();
         assert_eq!(update, decoded);
     }
 

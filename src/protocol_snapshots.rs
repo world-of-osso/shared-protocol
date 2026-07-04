@@ -235,6 +235,22 @@ pub struct FriendsSnapshot {
     pub entries: Vec<FriendCharacterSnapshot>,
 }
 
+// -- Who snapshots --
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct WhoCharacterSnapshot {
+    pub name: String,
+    pub level: u16,
+    pub class_name: String,
+    pub area: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct WhoSnapshot {
+    pub query: String,
+    pub entries: Vec<WhoCharacterSnapshot>,
+}
+
 // -- Ignore snapshots --
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
