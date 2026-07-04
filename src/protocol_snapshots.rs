@@ -1,6 +1,7 @@
 use crate::components::{CharacterAppearance, EquipmentVisualSlot};
 use bevy::prelude::*;
 use lightyear::prelude::*;
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
 // -- Quest snapshots --
@@ -143,8 +144,6 @@ pub struct ProfessionRecipeSnapshot {
     pub cooldown: Option<String>,
 }
 
-// -- Currency snapshots --
-
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct CurrencySnapshot {
     pub entries: Vec<CurrencyEntrySnapshot>,
@@ -156,8 +155,6 @@ pub struct CurrencyEntrySnapshot {
     pub name: String,
     pub amount: u64,
 }
-
-// -- Reputation snapshots --
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ReputationSnapshot {
@@ -171,8 +168,6 @@ pub struct ReputationEntrySnapshot {
     pub standing: String,
     pub value: i32,
 }
-
-// -- Achievement snapshots --
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct AchievementSnapshot {
@@ -195,14 +190,10 @@ pub struct AchievementToastSnapshot {
     pub points: u32,
 }
 
-// -- World map snapshots --
-
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct WorldMapSnapshot {
     pub discovered_zone_ids: Vec<u32>,
 }
-
-// -- Resting snapshots --
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum RestAreaKindSnapshot {
@@ -218,8 +209,6 @@ pub struct RestSnapshot {
     pub rested_xp_max: u32,
 }
 
-// -- Friends snapshots --
-
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct FriendCharacterSnapshot {
     pub name: String,
@@ -234,8 +223,6 @@ pub struct FriendCharacterSnapshot {
 pub struct FriendsSnapshot {
     pub entries: Vec<FriendCharacterSnapshot>,
 }
-
-// -- Guild snapshots --
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct GuildMemberSnapshot {
@@ -257,8 +244,6 @@ pub struct GuildSnapshot {
     pub members: Vec<GuildMemberSnapshot>,
 }
 
-// -- Who snapshots --
-
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct WhoCharacterSnapshot {
     pub name: String,
@@ -272,8 +257,6 @@ pub struct WhoSnapshot {
     pub query: String,
     pub entries: Vec<WhoCharacterSnapshot>,
 }
-
-// -- Calendar snapshots --
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum CalendarSignupStatusSnapshot {
@@ -304,14 +287,10 @@ pub struct CalendarSnapshot {
     pub events: Vec<CalendarEventSnapshot>,
 }
 
-// -- Ignore snapshots --
-
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct IgnoreListSnapshot {
     pub names: Vec<String>,
 }
-
-// -- LFG snapshots --
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct LfgRoleCheckSnapshot {
@@ -347,8 +326,6 @@ pub struct LfgSnapshot {
     pub role_check: Option<LfgRoleCheckSnapshot>,
     pub match_found: Option<LfgMatchFoundSnapshot>,
 }
-
-// -- PVP snapshots --
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum PvpBracketSnapshot {
@@ -389,15 +366,11 @@ pub struct PvpSnapshot {
     pub queue: Option<PvpQueueSnapshot>,
 }
 
-// -- Barber shop snapshots --
-
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct BarberShopSnapshot {
     pub appearance: CharacterAppearance,
     pub gold: u32,
 }
-
-// -- Death snapshots --
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum DeathStateSnapshot {
@@ -424,8 +397,6 @@ pub struct DeathSnapshot {
     pub spirit_healer_available: bool,
 }
 
-// -- Durability snapshots --
-
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct DurabilitySlotSnapshot {
     pub slot: EquipmentVisualSlot,
@@ -440,87 +411,35 @@ pub struct DurabilitySnapshot {
     pub slots: Vec<DurabilitySlotSnapshot>,
 }
 
-// -- Storage snapshots (guild vault, warbank) --
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct StorageItemSnapshot {
-    pub slot: u32,
-    pub item_guid: u64,
-    pub item_id: u32,
-    pub name: String,
-    pub stack_count: u32,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct GuildVaultSnapshot {
-    pub entries: Vec<StorageItemSnapshot>,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct WarbankSnapshot {
-    pub entries: Vec<StorageItemSnapshot>,
-}
-
-// -- Inventory search snapshot --
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct InventorySearchResultSnapshot {
-    pub entries: Vec<InventorySearchItemSnapshot>,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct InventorySearchItemSnapshot {
-    pub storage: String,
-    pub slot: u32,
-    pub item_guid: u64,
-    pub item_id: u32,
-    pub name: String,
-    pub stack_count: u32,
-}
-
 pub fn register_snapshot_messages(app: &mut App) {
-    app.register_message::<QuestLogSnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<GroupRosterSnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<GroupCommandResponse>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<CombatLogSnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<CollectionSnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<ProfessionSnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<CurrencySnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<ReputationSnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<AchievementSnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<AchievementToastSnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<WorldMapSnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<FriendsSnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<GuildSnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<IgnoreListSnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<LfgSnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<PvpSnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<BarberShopSnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<DeathSnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<DurabilitySnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<GuildVaultSnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<WarbankSnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<InventorySearchResultSnapshot>()
+    register_server_snapshot::<QuestLogSnapshot>(app);
+    register_server_snapshot::<GroupRosterSnapshot>(app);
+    register_server_snapshot::<GroupCommandResponse>(app);
+    register_server_snapshot::<CombatLogSnapshot>(app);
+    register_server_snapshot::<CollectionSnapshot>(app);
+    register_server_snapshot::<ProfessionSnapshot>(app);
+    register_server_snapshot::<CurrencySnapshot>(app);
+    register_server_snapshot::<ReputationSnapshot>(app);
+    register_server_snapshot::<AchievementSnapshot>(app);
+    register_server_snapshot::<AchievementToastSnapshot>(app);
+    register_server_snapshot::<WorldMapSnapshot>(app);
+    register_server_snapshot::<RestSnapshot>(app);
+    register_server_snapshot::<FriendsSnapshot>(app);
+    register_server_snapshot::<GuildSnapshot>(app);
+    register_server_snapshot::<WhoSnapshot>(app);
+    register_server_snapshot::<CalendarSnapshot>(app);
+    register_server_snapshot::<IgnoreListSnapshot>(app);
+    register_server_snapshot::<LfgSnapshot>(app);
+    register_server_snapshot::<PvpSnapshot>(app);
+    register_server_snapshot::<BarberShopSnapshot>(app);
+    register_server_snapshot::<DeathSnapshot>(app);
+    register_server_snapshot::<DurabilitySnapshot>(app);
+}
+
+fn register_server_snapshot<M>(app: &mut App)
+where
+    M: lightyear::prelude::Message + Serialize + DeserializeOwned,
+{
+    app.register_message::<M>()
         .add_direction(NetworkDirection::ServerToClient);
 }
