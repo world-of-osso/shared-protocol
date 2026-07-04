@@ -79,6 +79,13 @@ pub struct DuelChannel;
 /// Reliable ordered channel for death and respawn operations, bidirectional.
 pub struct DeathChannel;
 
+/// Social emote animation kind.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub enum EmoteKind {
+    Dance,
+    Wave,
+}
+
 /// Chat message type.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub enum ChatType {
@@ -87,6 +94,7 @@ pub enum ChatType {
     Party,
     Guild,
     Whisper(String),
+    Emote,
 }
 
 /// A chat message sent between client and server.
@@ -143,6 +151,20 @@ pub struct GroupInviteIntent {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct GroupUninviteIntent {
     pub name: String,
+}
+
+/// Client requests a social emote animation and chat broadcast.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct EmoteIntent {
+    pub emote: EmoteKind,
+}
+
+/// Server broadcasts a social emote animation for a player entity.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct EmoteEvent {
+    pub player_entity: u64,
+    pub sender: String,
+    pub emote: EmoteKind,
 }
 
 /// Server tells clients which terrain map and initial tile to load.
@@ -918,6 +940,10 @@ fn register_core_messages(app: &mut App) {
         .add_direction(NetworkDirection::ClientToServer);
     app.register_message::<StopSpellCast>()
         .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<EmoteIntent>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<EmoteEvent>()
+        .add_direction(NetworkDirection::ServerToClient);
     app.register_message::<GroupInviteIntent>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_message::<GroupUninviteIntent>()
@@ -1341,6 +1367,7 @@ mod tests {
             ChatType::Party,
             ChatType::Guild,
             ChatType::Whisper("TargetPlayer".into()),
+            ChatType::Emote,
         ];
         for ct in types {
             let serialized = serde_json::to_string(&ct).unwrap();
@@ -1418,6 +1445,25 @@ mod tests {
         assert_eq!(resp.messages[0].sender, decoded.messages[0].sender);
         assert_eq!(resp.messages[1].channel, decoded.messages[1].channel);
         assert_eq!(resp.error, decoded.error);
+    }
+
+    #[test]
+    fn emote_messages_round_trip() {
+        let intent = EmoteIntent {
+            emote: EmoteKind::Dance,
+        };
+        let encoded = serde_json::to_string(&intent).unwrap();
+        let decoded: EmoteIntent = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(intent, decoded);
+
+        let event = EmoteEvent {
+            player_entity: 77,
+            sender: "Alice".into(),
+            emote: EmoteKind::Wave,
+        };
+        let encoded = serde_json::to_string(&event).unwrap();
+        let decoded: EmoteEvent = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(event, decoded);
     }
 
     #[test]
