@@ -40,6 +40,9 @@ pub struct TalentChannel;
 /// Reliable ordered channel for profession operations, bidirectional.
 pub struct ProfessionChannel;
 
+/// Reliable ordered channel for reputation updates, bidirectional.
+pub struct ReputationChannel;
+
 /// Reliable ordered channel for inspect operations, bidirectional.
 pub struct InspectChannel;
 
@@ -635,6 +638,13 @@ pub struct ProfessionStateUpdate {
     pub error: Option<String>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ReputationStateUpdate {
+    pub snapshot: Option<ReputationSnapshot>,
+    pub message: Option<String>,
+    pub error: Option<String>,
+}
+
 /// Registers shared protocol: components for replication and channels.
 /// Must be added AFTER `ServerPlugins`/`ClientPlugins` but BEFORE any entity is spawned.
 pub struct ProtocolPlugin;
@@ -672,6 +682,7 @@ fn register_messages(app: &mut App) {
     register_inspect_messages(app);
     register_duel_messages(app);
     register_profession_messages(app);
+    register_reputation_messages(app);
     crate::protocol_snapshots::register_snapshot_messages(app);
 }
 
@@ -851,6 +862,11 @@ fn register_profession_messages(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
 }
 
+fn register_reputation_messages(app: &mut App) {
+    app.register_message::<ReputationStateUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+}
+
 fn register_channels(app: &mut App) {
     app.add_channel::<MovementChannel>(ChannelSettings {
         mode: ChannelMode::UnorderedUnreliable,
@@ -919,6 +935,12 @@ fn register_channels(app: &mut App) {
     .add_direction(NetworkDirection::Bidirectional);
 
     app.add_channel::<ProfessionChannel>(ChannelSettings {
+        mode: ChannelMode::OrderedReliable(default()),
+        ..default()
+    })
+    .add_direction(NetworkDirection::Bidirectional);
+
+    app.add_channel::<ReputationChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
         ..default()
     })
@@ -1107,6 +1129,33 @@ mod tests {
         };
         let encoded = serde_json::to_string(&update).unwrap();
         let decoded: ProfessionStateUpdate = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(update, decoded);
+    }
+
+    #[test]
+    fn reputation_state_update_round_trip() {
+        let update = ReputationStateUpdate {
+            snapshot: Some(ReputationSnapshot {
+                entries: vec![
+                    ReputationEntrySnapshot {
+                        faction_id: 72,
+                        faction_name: "Stormwind".into(),
+                        standing: "Friendly".into(),
+                        value: 21_010,
+                    },
+                    ReputationEntrySnapshot {
+                        faction_id: 47,
+                        faction_name: "Ironforge".into(),
+                        standing: "Friendly".into(),
+                        value: 21_002,
+                    },
+                ],
+            }),
+            message: Some("gained 10 reputation with Stormwind".into()),
+            error: None,
+        };
+        let encoded = serde_json::to_string(&update).unwrap();
+        let decoded: ReputationStateUpdate = serde_json::from_str(&encoded).unwrap();
         assert_eq!(update, decoded);
     }
 

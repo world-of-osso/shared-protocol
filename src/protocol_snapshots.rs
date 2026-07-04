@@ -156,12 +156,12 @@ pub struct CurrencyEntrySnapshot {
 
 // -- Reputation snapshots --
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ReputationSnapshot {
     pub entries: Vec<ReputationEntrySnapshot>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ReputationEntrySnapshot {
     pub faction_id: u32,
     pub faction_name: String,
