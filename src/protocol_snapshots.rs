@@ -54,7 +54,7 @@ pub struct GroupMemberSnapshot {
     pub subgroup: u8,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum GroupRoleSnapshot {
     Tank,
     Healer,
@@ -225,6 +225,43 @@ pub struct IgnoreListSnapshot {
     pub names: Vec<String>,
 }
 
+// -- LFG snapshots --
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct LfgRoleCheckSnapshot {
+    pub dungeon_id: u32,
+    pub dungeon_name: String,
+    pub assigned_role: GroupRoleSnapshot,
+    pub accepted_count: u8,
+    pub total_count: u8,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct LfgMatchMemberSnapshot {
+    pub name: String,
+    pub role: GroupRoleSnapshot,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct LfgMatchFoundSnapshot {
+    pub dungeon_id: u32,
+    pub dungeon_name: String,
+    pub assigned_role: GroupRoleSnapshot,
+    pub members: Vec<LfgMatchMemberSnapshot>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct LfgSnapshot {
+    pub queued: bool,
+    pub selected_role: Option<GroupRoleSnapshot>,
+    pub dungeon_ids: Vec<u32>,
+    pub queue_size: u16,
+    pub average_wait_secs: u32,
+    pub in_demand_roles: Vec<GroupRoleSnapshot>,
+    pub role_check: Option<LfgRoleCheckSnapshot>,
+    pub match_found: Option<LfgMatchFoundSnapshot>,
+}
+
 // -- Storage snapshots (guild vault, warbank) --
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -289,6 +326,8 @@ pub fn register_snapshot_messages(app: &mut App) {
     app.register_message::<FriendsSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_message::<IgnoreListSnapshot>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<LfgSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_message::<GuildVaultSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);

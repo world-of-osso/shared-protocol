@@ -55,6 +55,9 @@ pub struct FriendsChannel;
 /// Reliable ordered channel for ignore list updates, bidirectional.
 pub struct IgnoreChannel;
 
+/// Reliable ordered channel for LFG updates, bidirectional.
+pub struct LfgChannel;
+
 /// Reliable ordered channel for collection updates, bidirectional.
 pub struct CollectionChannel;
 
@@ -760,6 +763,30 @@ pub struct IgnoreListStateUpdate {
     pub error: Option<String>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct QueryLfgStatus;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct QueueForLfg {
+    pub role: GroupRoleSnapshot,
+    pub dungeon_ids: Vec<u32>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct DequeueFromLfg;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct RespondToLfgRoleCheck {
+    pub accepted: bool,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct LfgStateUpdate {
+    pub snapshot: Option<LfgSnapshot>,
+    pub message: Option<String>,
+    pub error: Option<String>,
+}
+
 /// Registers shared protocol: components for replication and channels.
 /// Must be added AFTER `ServerPlugins`/`ClientPlugins` but BEFORE any entity is spawned.
 pub struct ProtocolPlugin;
@@ -802,6 +829,7 @@ fn register_messages(app: &mut App) {
     register_world_map_messages(app);
     register_friends_messages(app);
     register_ignore_messages(app);
+    register_lfg_messages(app);
     register_collection_messages(app);
     register_currency_messages(app);
     crate::protocol_snapshots::register_snapshot_messages(app);
@@ -1020,6 +1048,19 @@ fn register_ignore_messages(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
 }
 
+fn register_lfg_messages(app: &mut App) {
+    app.register_message::<QueryLfgStatus>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<QueueForLfg>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<DequeueFromLfg>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<RespondToLfgRoleCheck>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<LfgStateUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+}
+
 fn register_collection_messages(app: &mut App) {
     app.register_message::<SummonMount>()
         .add_direction(NetworkDirection::ClientToServer);
@@ -1140,6 +1181,12 @@ fn register_channels(app: &mut App) {
     .add_direction(NetworkDirection::Bidirectional);
 
     app.add_channel::<IgnoreChannel>(ChannelSettings {
+        mode: ChannelMode::OrderedReliable(default()),
+        ..default()
+    })
+    .add_direction(NetworkDirection::Bidirectional);
+
+    app.add_channel::<LfgChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
         ..default()
     })
@@ -1484,6 +1531,41 @@ mod tests {
         };
         let encoded = serde_json::to_string(&update).unwrap();
         let decoded: IgnoreListStateUpdate = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(update, decoded);
+    }
+
+    #[test]
+    fn lfg_state_update_round_trip() {
+        let update = LfgStateUpdate {
+            snapshot: Some(LfgSnapshot {
+                queued: true,
+                selected_role: Some(GroupRoleSnapshot::Tank),
+                dungeon_ids: vec![100],
+                queue_size: 3,
+                average_wait_secs: 42,
+                in_demand_roles: vec![GroupRoleSnapshot::Healer],
+                role_check: Some(LfgRoleCheckSnapshot {
+                    dungeon_id: 100,
+                    dungeon_name: "Deadmines".into(),
+                    assigned_role: GroupRoleSnapshot::Tank,
+                    accepted_count: 2,
+                    total_count: 5,
+                }),
+                match_found: Some(LfgMatchFoundSnapshot {
+                    dungeon_id: 100,
+                    dungeon_name: "Deadmines".into(),
+                    assigned_role: GroupRoleSnapshot::Tank,
+                    members: vec![LfgMatchMemberSnapshot {
+                        name: "Theron".into(),
+                        role: GroupRoleSnapshot::Tank,
+                    }],
+                }),
+            }),
+            message: Some("role check started".into()),
+            error: None,
+        };
+        let encoded = serde_json::to_string(&update).unwrap();
+        let decoded: LfgStateUpdate = serde_json::from_str(&encoded).unwrap();
         assert_eq!(update, decoded);
     }
 
