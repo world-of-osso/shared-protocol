@@ -236,6 +236,13 @@ pub struct LoginResponse {
     pub error: Option<String>,
 }
 
+/// Server tells the client it is being disconnected intentionally.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ForcedDisconnect {
+    pub message: String,
+    pub reconnect_allowed: bool,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct CharacterListUpdate {
     pub character: CharacterListEntry,
@@ -1087,6 +1094,8 @@ fn register_account_messages(app: &mut App) {
     app.register_message::<LoginRequest>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_message::<LoginResponse>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<ForcedDisconnect>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_message::<RegisterRequest>()
         .add_direction(NetworkDirection::ClientToServer);
@@ -2326,6 +2335,17 @@ mod tests {
         assert_eq!(decoded.results[0].auction_id, 7);
         assert_eq!(decoded.results[0].item.name, "Linen Cloth");
         assert_eq!(decoded.results[0].time_left, AuctionTimeLeft::Long);
+    }
+
+    #[test]
+    fn forced_disconnect_round_trip() {
+        let notice = ForcedDisconnect {
+            message: "You were kicked: testing".to_string(),
+            reconnect_allowed: false,
+        };
+        let encoded = serde_json::to_string(&notice).unwrap();
+        let decoded: ForcedDisconnect = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(decoded, notice);
     }
 
     #[test]
