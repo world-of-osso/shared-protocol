@@ -155,15 +155,7 @@ pub enum EquipmentVisualSlot {
 }
 
 #[derive(
-    Reflect,
-    Serialize,
-    Deserialize,
-    bitcode::Encode,
-    bitcode::Decode,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
+    Reflect, Serialize, Deserialize, bitcode::Encode, bitcode::Decode, Debug, Clone, PartialEq, Eq,
 )]
 pub struct EquippedAppearanceEntry {
     pub slot: EquipmentVisualSlot,
