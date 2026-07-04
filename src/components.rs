@@ -105,6 +105,22 @@ pub struct Mana {
     Clone,
     Copy,
     PartialEq,
+    Eq,
+    Default,
+)]
+pub struct Gold(pub u32);
+
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
 )]
 pub struct MovementSpeed(pub f32);
 

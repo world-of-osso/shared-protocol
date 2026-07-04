@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 pub use crate::protocol_snapshots::*;
 
 use crate::components::{
-    CharacterAppearance, CombatStatus, EquipmentAppearance, GuildMembership, Health, Mana,
+    CharacterAppearance, CombatStatus, EquipmentAppearance, Gold, GuildMembership, Health, Mana,
     ModelDisplay, Mounted, MovementSpeed, Npc, Player, Position, PresenceStatus, Rotation, Zone,
 };
 
@@ -926,6 +926,7 @@ fn register_replicated_components(app: &mut App) {
     app.register_component::<Position>();
     app.register_component::<Health>();
     app.register_component::<Mana>();
+    app.register_component::<Gold>();
     app.register_component::<Player>();
     app.register_component::<Npc>();
     app.register_component::<ModelDisplay>();
