@@ -6,8 +6,8 @@ use serde::{Deserialize, Serialize};
 pub use crate::protocol_snapshots::*;
 
 use crate::components::{
-    CharacterAppearance, EquipmentAppearance, GuildMembership, Health, Mana, ModelDisplay, Mounted,
-    MovementSpeed, Npc, Player, Position, Rotation, Zone,
+    CharacterAppearance, CombatStatus, EquipmentAppearance, GuildMembership, Health, Mana,
+    ModelDisplay, Mounted, MovementSpeed, Npc, Player, Position, Rotation, Zone,
 };
 
 /// Unreliable movement position updates, server-to-client only.
@@ -906,6 +906,7 @@ fn register_replicated_components(app: &mut App) {
     app.register_component::<ModelDisplay>();
     app.register_component::<Rotation>();
     app.register_component::<MovementSpeed>();
+    app.register_component::<CombatStatus>();
     app.register_component::<Mounted>();
     app.register_component::<Zone>();
     app.register_component::<GuildMembership>();
