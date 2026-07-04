@@ -263,6 +263,47 @@ pub struct LfgSnapshot {
     pub match_found: Option<LfgMatchFoundSnapshot>,
 }
 
+// -- PVP snapshots --
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
+pub enum PvpBracketSnapshot {
+    Arena2v2,
+    Arena3v3,
+    RatedBattleground,
+    SoloShuffle,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct PvpBracketStatsSnapshot {
+    pub bracket: PvpBracketSnapshot,
+    pub rating: u32,
+    pub season_wins: u32,
+    pub season_losses: u32,
+    pub weekly_wins: u32,
+    pub weekly_losses: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub enum PvpQueueKindSnapshot {
+    Battleground { battleground_id: u32, name: String },
+    RatedBracket { bracket: PvpBracketSnapshot },
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct PvpQueueSnapshot {
+    pub kind: PvpQueueKindSnapshot,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct PvpSnapshot {
+    pub honor: u32,
+    pub honor_max: u32,
+    pub conquest: u32,
+    pub conquest_max: u32,
+    pub brackets: Vec<PvpBracketStatsSnapshot>,
+    pub queue: Option<PvpQueueSnapshot>,
+}
+
 // -- Barber shop snapshots --
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -337,6 +378,8 @@ pub fn register_snapshot_messages(app: &mut App) {
     app.register_message::<IgnoreListSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_message::<LfgSnapshot>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<PvpSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_message::<BarberShopSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);

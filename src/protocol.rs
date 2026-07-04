@@ -58,6 +58,9 @@ pub struct IgnoreChannel;
 /// Reliable ordered channel for LFG updates, bidirectional.
 pub struct LfgChannel;
 
+/// Reliable ordered channel for PVP updates, bidirectional.
+pub struct PvpChannel;
+
 /// Reliable ordered channel for barber shop updates, bidirectional.
 pub struct BarberShopChannel;
 
@@ -791,6 +794,29 @@ pub struct LfgStateUpdate {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct QueryPvpStatus;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct QueueForBattleground {
+    pub battleground_id: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct QueueForRatedPvp {
+    pub bracket: PvpBracketSnapshot,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct DequeueFromPvp;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct PvpStateUpdate {
+    pub snapshot: Option<PvpSnapshot>,
+    pub message: Option<String>,
+    pub error: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct QueryBarberShopStatus;
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -848,6 +874,7 @@ fn register_messages(app: &mut App) {
     register_friends_messages(app);
     register_ignore_messages(app);
     register_lfg_messages(app);
+    register_pvp_messages(app);
     register_barber_shop_messages(app);
     register_collection_messages(app);
     register_currency_messages(app);
@@ -1080,6 +1107,19 @@ fn register_lfg_messages(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
 }
 
+fn register_pvp_messages(app: &mut App) {
+    app.register_message::<QueryPvpStatus>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<QueueForBattleground>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<QueueForRatedPvp>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<DequeueFromPvp>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<PvpStateUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+}
+
 fn register_barber_shop_messages(app: &mut App) {
     app.register_message::<QueryBarberShopStatus>()
         .add_direction(NetworkDirection::ClientToServer);
@@ -1215,6 +1255,12 @@ fn register_channels(app: &mut App) {
     .add_direction(NetworkDirection::Bidirectional);
 
     app.add_channel::<LfgChannel>(ChannelSettings {
+        mode: ChannelMode::OrderedReliable(default()),
+        ..default()
+    })
+    .add_direction(NetworkDirection::Bidirectional);
+
+    app.add_channel::<PvpChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
         ..default()
     })
@@ -1600,6 +1646,47 @@ mod tests {
         };
         let encoded = serde_json::to_string(&update).unwrap();
         let decoded: LfgStateUpdate = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(update, decoded);
+    }
+
+    #[test]
+    fn pvp_state_update_round_trip() {
+        let update = PvpStateUpdate {
+            snapshot: Some(PvpSnapshot {
+                honor: 750,
+                honor_max: 15_000,
+                conquest: 120,
+                conquest_max: 1_800,
+                brackets: vec![
+                    PvpBracketStatsSnapshot {
+                        bracket: PvpBracketSnapshot::Arena2v2,
+                        rating: 1516,
+                        season_wins: 1,
+                        season_losses: 0,
+                        weekly_wins: 1,
+                        weekly_losses: 0,
+                    },
+                    PvpBracketStatsSnapshot {
+                        bracket: PvpBracketSnapshot::RatedBattleground,
+                        rating: 1500,
+                        season_wins: 0,
+                        season_losses: 0,
+                        weekly_wins: 0,
+                        weekly_losses: 0,
+                    },
+                ],
+                queue: Some(PvpQueueSnapshot {
+                    kind: PvpQueueKindSnapshot::Battleground {
+                        battleground_id: 1,
+                        name: "Warsong Gulch".into(),
+                    },
+                }),
+            }),
+            message: Some("queued for Warsong Gulch".into()),
+            error: None,
+        };
+        let encoded = serde_json::to_string(&update).unwrap();
+        let decoded: PvpStateUpdate = serde_json::from_str(&encoded).unwrap();
         assert_eq!(update, decoded);
     }
 
