@@ -87,6 +87,9 @@ pub struct DeathChannel;
 pub enum EmoteKind {
     Dance,
     Wave,
+    Sit,
+    Sleep,
+    Kneel,
 }
 
 /// Chat message type.
@@ -1543,7 +1546,7 @@ mod tests {
     #[test]
     fn emote_messages_round_trip() {
         let intent = EmoteIntent {
-            emote: EmoteKind::Dance,
+            emote: EmoteKind::Sit,
         };
         let encoded = serde_json::to_string(&intent).unwrap();
         let decoded: EmoteIntent = serde_json::from_str(&encoded).unwrap();
@@ -1552,7 +1555,7 @@ mod tests {
         let event = EmoteEvent {
             player_entity: 77,
             sender: "Alice".into(),
-            emote: EmoteKind::Wave,
+            emote: EmoteKind::Kneel,
         };
         let encoded = serde_json::to_string(&event).unwrap();
         let decoded: EmoteEvent = serde_json::from_str(&encoded).unwrap();
