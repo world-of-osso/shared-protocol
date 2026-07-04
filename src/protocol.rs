@@ -43,6 +43,9 @@ pub struct ProfessionChannel;
 /// Reliable ordered channel for reputation updates, bidirectional.
 pub struct ReputationChannel;
 
+/// Reliable ordered channel for collection updates, bidirectional.
+pub struct CollectionChannel;
+
 /// Reliable ordered channel for currency updates, bidirectional.
 pub struct CurrencyChannel;
 
@@ -642,6 +645,29 @@ pub struct ProfessionStateUpdate {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SummonMount {
+    pub mount_id: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct DismissMount;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SummonPet {
+    pub pet_id: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct DismissPet;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct CollectionStateUpdate {
+    pub snapshot: Option<CollectionSnapshot>,
+    pub message: Option<String>,
+    pub error: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct EarnCurrency {
     pub currency_id: u32,
     pub amount: u32,
@@ -705,6 +731,7 @@ fn register_messages(app: &mut App) {
     register_duel_messages(app);
     register_profession_messages(app);
     register_reputation_messages(app);
+    register_collection_messages(app);
     register_currency_messages(app);
     crate::protocol_snapshots::register_snapshot_messages(app);
 }
@@ -890,6 +917,19 @@ fn register_reputation_messages(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
 }
 
+fn register_collection_messages(app: &mut App) {
+    app.register_message::<SummonMount>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<DismissMount>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<SummonPet>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<DismissPet>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<CollectionStateUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+}
+
 fn register_currency_messages(app: &mut App) {
     app.register_message::<EarnCurrency>()
         .add_direction(NetworkDirection::ClientToServer);
@@ -973,6 +1013,12 @@ fn register_channels(app: &mut App) {
     .add_direction(NetworkDirection::Bidirectional);
 
     app.add_channel::<ReputationChannel>(ChannelSettings {
+        mode: ChannelMode::OrderedReliable(default()),
+        ..default()
+    })
+    .add_direction(NetworkDirection::Bidirectional);
+
+    app.add_channel::<CollectionChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
         ..default()
     })
@@ -1212,6 +1258,31 @@ mod tests {
         };
         let encoded = serde_json::to_string(&update).unwrap();
         let decoded: CurrencyStateUpdate = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(update, decoded);
+    }
+
+    #[test]
+    fn collection_state_update_round_trip() {
+        let update = CollectionStateUpdate {
+            snapshot: Some(CollectionSnapshot {
+                mounts: vec![CollectionMountSnapshot {
+                    mount_id: 101,
+                    name: "Swift Brown Steed".into(),
+                    known: true,
+                    active: true,
+                }],
+                pets: vec![CollectionPetSnapshot {
+                    pet_id: 202,
+                    name: "Brown Rabbit".into(),
+                    known: true,
+                    active: false,
+                }],
+            }),
+            message: Some("summoned Swift Brown Steed".into()),
+            error: None,
+        };
+        let encoded = serde_json::to_string(&update).unwrap();
+        let decoded: CollectionStateUpdate = serde_json::from_str(&encoded).unwrap();
         assert_eq!(update, decoded);
     }
 
