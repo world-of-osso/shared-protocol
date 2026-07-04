@@ -1,4 +1,4 @@
-use crate::components::CharacterAppearance;
+use crate::components::{CharacterAppearance, EquipmentVisualSlot};
 use bevy::prelude::*;
 use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -355,6 +355,22 @@ pub struct DeathSnapshot {
     pub spirit_healer_available: bool,
 }
 
+// -- Durability snapshots --
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct DurabilitySlotSnapshot {
+    pub slot: EquipmentVisualSlot,
+    pub current: u32,
+    pub max: u32,
+    pub repair_cost: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct DurabilitySnapshot {
+    pub total_repair_cost: u32,
+    pub slots: Vec<DurabilitySlotSnapshot>,
+}
+
 // -- Storage snapshots (guild vault, warbank) --
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -427,6 +443,8 @@ pub fn register_snapshot_messages(app: &mut App) {
     app.register_message::<BarberShopSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_message::<DeathSnapshot>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<DurabilitySnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_message::<GuildVaultSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);

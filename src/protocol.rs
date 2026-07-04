@@ -82,6 +82,9 @@ pub struct DuelChannel;
 /// Reliable ordered channel for death and respawn operations, bidirectional.
 pub struct DeathChannel;
 
+/// Reliable ordered channel for equipment durability updates, bidirectional.
+pub struct DurabilityChannel;
+
 /// Social emote animation kind.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum EmoteKind {
@@ -910,6 +913,16 @@ pub struct DeathStateUpdate {
     pub error: Option<String>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct QueryDurabilityStatus;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct DurabilityStateUpdate {
+    pub snapshot: Option<DurabilitySnapshot>,
+    pub message: Option<String>,
+    pub error: Option<String>,
+}
+
 /// Registers shared protocol: components for replication and channels.
 /// Must be added AFTER `ServerPlugins`/`ClientPlugins` but BEFORE any entity is spawned.
 pub struct ProtocolPlugin;
@@ -961,6 +974,7 @@ fn register_messages(app: &mut App) {
     register_pvp_messages(app);
     register_barber_shop_messages(app);
     register_death_messages(app);
+    register_durability_messages(app);
     register_collection_messages(app);
     register_currency_messages(app);
     crate::protocol_snapshots::register_snapshot_messages(app);
@@ -1240,6 +1254,13 @@ fn register_death_messages(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
 }
 
+fn register_durability_messages(app: &mut App) {
+    app.register_message::<QueryDurabilityStatus>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<DurabilityStateUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+}
+
 fn register_collection_messages(app: &mut App) {
     app.register_message::<SummonMount>()
         .add_direction(NetworkDirection::ClientToServer);
@@ -1384,6 +1405,12 @@ fn register_channels(app: &mut App) {
     .add_direction(NetworkDirection::Bidirectional);
 
     app.add_channel::<DeathChannel>(ChannelSettings {
+        mode: ChannelMode::OrderedReliable(default()),
+        ..default()
+    })
+    .add_direction(NetworkDirection::Bidirectional);
+
+    app.add_channel::<DurabilityChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
         ..default()
     })
@@ -1941,6 +1968,34 @@ mod tests {
         };
         let encoded = serde_json::to_string(&update).unwrap();
         let decoded: DeathStateUpdate = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(update, decoded);
+    }
+
+    #[test]
+    fn durability_state_update_round_trip() {
+        let update = DurabilityStateUpdate {
+            snapshot: Some(DurabilitySnapshot {
+                total_repair_cost: 1_250,
+                slots: vec![
+                    DurabilitySlotSnapshot {
+                        slot: EquipmentVisualSlot::Head,
+                        current: 72,
+                        max: 80,
+                        repair_cost: 400,
+                    },
+                    DurabilitySlotSnapshot {
+                        slot: EquipmentVisualSlot::Chest,
+                        current: 45,
+                        max: 100,
+                        repair_cost: 850,
+                    },
+                ],
+            }),
+            message: Some("durability updated".into()),
+            error: None,
+        };
+        let encoded = serde_json::to_string(&update).unwrap();
+        let decoded: DurabilityStateUpdate = serde_json::from_str(&encoded).unwrap();
         assert_eq!(update, decoded);
     }
 
