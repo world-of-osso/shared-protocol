@@ -46,6 +46,9 @@ pub struct ReputationChannel;
 /// Reliable ordered channel for achievement updates, bidirectional.
 pub struct AchievementChannel;
 
+/// Reliable ordered channel for world map updates, bidirectional.
+pub struct WorldMapChannel;
+
 /// Reliable ordered channel for collection updates, bidirectional.
 pub struct CollectionChannel;
 
@@ -704,6 +707,13 @@ pub struct AchievementStateUpdate {
     pub error: Option<String>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct WorldMapStateUpdate {
+    pub snapshot: Option<WorldMapSnapshot>,
+    pub message: Option<String>,
+    pub error: Option<String>,
+}
+
 /// Registers shared protocol: components for replication and channels.
 /// Must be added AFTER `ServerPlugins`/`ClientPlugins` but BEFORE any entity is spawned.
 pub struct ProtocolPlugin;
@@ -743,6 +753,7 @@ fn register_messages(app: &mut App) {
     register_profession_messages(app);
     register_reputation_messages(app);
     register_achievement_messages(app);
+    register_world_map_messages(app);
     register_collection_messages(app);
     register_currency_messages(app);
     crate::protocol_snapshots::register_snapshot_messages(app);
@@ -934,6 +945,11 @@ fn register_achievement_messages(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
 }
 
+fn register_world_map_messages(app: &mut App) {
+    app.register_message::<WorldMapStateUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+}
+
 fn register_collection_messages(app: &mut App) {
     app.register_message::<SummonMount>()
         .add_direction(NetworkDirection::ClientToServer);
@@ -1036,6 +1052,12 @@ fn register_channels(app: &mut App) {
     .add_direction(NetworkDirection::Bidirectional);
 
     app.add_channel::<AchievementChannel>(ChannelSettings {
+        mode: ChannelMode::OrderedReliable(default()),
+        ..default()
+    })
+    .add_direction(NetworkDirection::Bidirectional);
+
+    app.add_channel::<WorldMapChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
         ..default()
     })
@@ -1331,6 +1353,20 @@ mod tests {
         };
         let encoded = serde_json::to_string(&update).unwrap();
         let decoded: AchievementStateUpdate = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(update, decoded);
+    }
+
+    #[test]
+    fn world_map_state_update_round_trip() {
+        let update = WorldMapStateUpdate {
+            snapshot: Some(WorldMapSnapshot {
+                discovered_zone_ids: vec![12, 1519, 1537],
+            }),
+            message: Some("world map discovery updated".into()),
+            error: None,
+        };
+        let encoded = serde_json::to_string(&update).unwrap();
+        let decoded: WorldMapStateUpdate = serde_json::from_str(&encoded).unwrap();
         assert_eq!(update, decoded);
     }
 
