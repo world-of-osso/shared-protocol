@@ -883,6 +883,9 @@ pub struct ResurrectAtCorpse;
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct AcceptSpiritHealerResurrection;
 
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct UseStuckEscape;
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct DeathStateUpdate {
     pub snapshot: Option<DeathSnapshot>,
@@ -1212,6 +1215,8 @@ fn register_death_messages(app: &mut App) {
     app.register_message::<ResurrectAtCorpse>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_message::<AcceptSpiritHealerResurrection>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<UseStuckEscape>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_message::<DeathStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
