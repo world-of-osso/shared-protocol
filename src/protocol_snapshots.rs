@@ -251,6 +251,37 @@ pub struct WhoSnapshot {
     pub entries: Vec<WhoCharacterSnapshot>,
 }
 
+// -- Calendar snapshots --
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub enum CalendarSignupStatusSnapshot {
+    Confirmed,
+    Tentative,
+    Declined,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct CalendarSignupSnapshot {
+    pub character_name: String,
+    pub status: CalendarSignupStatusSnapshot,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct CalendarEventSnapshot {
+    pub event_id: u64,
+    pub title: String,
+    pub organizer_name: String,
+    pub starts_at_unix_secs: u64,
+    pub max_signups: u8,
+    pub is_raid: bool,
+    pub signups: Vec<CalendarSignupSnapshot>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct CalendarSnapshot {
+    pub events: Vec<CalendarEventSnapshot>,
+}
+
 // -- Ignore snapshots --
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]

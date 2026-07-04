@@ -58,6 +58,9 @@ pub struct FriendsChannel;
 /// Reliable ordered channel for who-list updates, bidirectional.
 pub struct WhoChannel;
 
+/// Reliable ordered channel for calendar updates, bidirectional.
+pub struct CalendarChannel;
+
 /// Reliable ordered channel for ignore list updates, bidirectional.
 pub struct IgnoreChannel;
 
@@ -825,6 +828,30 @@ pub struct WhoStateUpdate {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct QueryCalendar;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ScheduleCalendarEvent {
+    pub title: String,
+    pub starts_at_unix_secs: u64,
+    pub max_signups: u8,
+    pub is_raid: bool,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct RespondCalendarSignup {
+    pub event_id: u64,
+    pub status: CalendarSignupStatusSnapshot,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct CalendarStateUpdate {
+    pub snapshot: Option<CalendarSnapshot>,
+    pub message: Option<String>,
+    pub error: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct QueryIgnoreList;
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -985,6 +1012,7 @@ fn register_messages(app: &mut App) {
     register_rest_messages(app);
     register_friends_messages(app);
     register_who_messages(app);
+    register_calendar_messages(app);
     register_ignore_messages(app);
     register_lfg_messages(app);
     register_pvp_messages(app);
@@ -1216,6 +1244,17 @@ fn register_who_messages(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
 }
 
+fn register_calendar_messages(app: &mut App) {
+    app.register_message::<QueryCalendar>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<ScheduleCalendarEvent>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<RespondCalendarSignup>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<CalendarStateUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+}
+
 fn register_ignore_messages(app: &mut App) {
     app.register_message::<QueryIgnoreList>()
         .add_direction(NetworkDirection::ClientToServer);
@@ -1404,6 +1443,12 @@ fn register_channels(app: &mut App) {
     .add_direction(NetworkDirection::Bidirectional);
 
     app.add_channel::<WhoChannel>(ChannelSettings {
+        mode: ChannelMode::OrderedReliable(default()),
+        ..default()
+    })
+    .add_direction(NetworkDirection::Bidirectional);
+
+    app.add_channel::<CalendarChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
         ..default()
     })
@@ -1876,6 +1921,31 @@ mod tests {
         };
         let encoded = serde_json::to_string(&update).unwrap();
         let decoded: WhoStateUpdate = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(update, decoded);
+    }
+
+    #[test]
+    fn calendar_state_update_round_trip() {
+        let update = CalendarStateUpdate {
+            snapshot: Some(CalendarSnapshot {
+                events: vec![CalendarEventSnapshot {
+                    event_id: 7,
+                    title: "Karazhan".into(),
+                    organizer_name: "Theron".into(),
+                    starts_at_unix_secs: 1_710_000_000,
+                    max_signups: 10,
+                    is_raid: true,
+                    signups: vec![CalendarSignupSnapshot {
+                        character_name: "Alice".into(),
+                        status: CalendarSignupStatusSnapshot::Confirmed,
+                    }],
+                }],
+            }),
+            message: Some("calendar updated".into()),
+            error: None,
+        };
+        let encoded = serde_json::to_string(&update).unwrap();
+        let decoded: CalendarStateUpdate = serde_json::from_str(&encoded).unwrap();
         assert_eq!(update, decoded);
     }
 
