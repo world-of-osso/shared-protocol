@@ -118,6 +118,21 @@ pub struct MovementSpeed(pub f32);
     Clone,
     PartialEq,
 )]
+pub struct Mounted {
+    pub mount_display_id: u32,
+}
+
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    PartialEq,
+)]
 pub struct Player {
     pub name: String,
     pub race: u8,
