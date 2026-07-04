@@ -43,6 +43,9 @@ pub struct ProfessionChannel;
 /// Reliable ordered channel for inspect operations, bidirectional.
 pub struct InspectChannel;
 
+/// Reliable ordered channel for duel operations, bidirectional.
+pub struct DuelChannel;
+
 /// Chat message type.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub enum ChatType {
@@ -563,6 +566,55 @@ pub struct InspectStateUpdate {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct InitiateDuel {
+    pub target_entity: Option<u64>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct AcceptDuel;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct DeclineDuel;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub enum DuelPhaseSnapshot {
+    PendingOutgoing,
+    PendingIncoming,
+    Active,
+    Completed,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct DuelBoundarySnapshot {
+    pub center_x: f32,
+    pub center_z: f32,
+    pub radius: f32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub enum DuelResultSnapshot {
+    Won,
+    Lost,
+    Declined,
+    Cancelled,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct DuelSnapshot {
+    pub phase: DuelPhaseSnapshot,
+    pub opponent_name: String,
+    pub boundary: Option<DuelBoundarySnapshot>,
+    pub result: Option<DuelResultSnapshot>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct DuelStateUpdate {
+    pub snapshot: Option<DuelSnapshot>,
+    pub message: Option<String>,
+    pub error: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct QueryProfessions;
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -618,6 +670,7 @@ fn register_messages(app: &mut App) {
     register_trade_messages(app);
     register_talent_messages(app);
     register_inspect_messages(app);
+    register_duel_messages(app);
     register_profession_messages(app);
     crate::protocol_snapshots::register_snapshot_messages(app);
 }
@@ -776,6 +829,17 @@ fn register_inspect_messages(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
 }
 
+fn register_duel_messages(app: &mut App) {
+    app.register_message::<InitiateDuel>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<AcceptDuel>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<DeclineDuel>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<DuelStateUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+}
+
 fn register_profession_messages(app: &mut App) {
     app.register_message::<QueryProfessions>()
         .add_direction(NetworkDirection::ClientToServer);
@@ -843,6 +907,12 @@ fn register_channels(app: &mut App) {
     .add_direction(NetworkDirection::Bidirectional);
 
     app.add_channel::<InspectChannel>(ChannelSettings {
+        mode: ChannelMode::OrderedReliable(default()),
+        ..default()
+    })
+    .add_direction(NetworkDirection::Bidirectional);
+
+    app.add_channel::<DuelChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
         ..default()
     })
@@ -1074,6 +1144,27 @@ mod tests {
         };
         let encoded = serde_json::to_string(&update).unwrap();
         let decoded: InspectStateUpdate = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(update, decoded);
+    }
+
+    #[test]
+    fn duel_state_update_round_trip() {
+        let update = DuelStateUpdate {
+            snapshot: Some(DuelSnapshot {
+                phase: DuelPhaseSnapshot::Active,
+                opponent_name: "Alice".into(),
+                boundary: Some(DuelBoundarySnapshot {
+                    center_x: 10.0,
+                    center_z: 15.0,
+                    radius: 30.0,
+                }),
+                result: None,
+            }),
+            message: Some("duel started".into()),
+            error: None,
+        };
+        let encoded = serde_json::to_string(&update).unwrap();
+        let decoded: DuelStateUpdate = serde_json::from_str(&encoded).unwrap();
         assert_eq!(update, decoded);
     }
 
