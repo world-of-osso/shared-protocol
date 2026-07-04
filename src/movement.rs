@@ -15,6 +15,12 @@ pub const RUN_SPEED: f32 = 7.0;
 /// Walk speed in yards/sec.
 pub const WALK_SPEED: f32 = 2.5;
 
+/// Backward movement speed multiplier.
+pub const BACKPEDAL_MULTIPLIER: f32 = 0.6;
+
+/// Strafing movement speed multiplier.
+pub const STRAFE_MULTIPLIER: f32 = 0.8;
+
 /// Jump impulse velocity in yards/sec.
 pub const JUMP_IMPULSE: f32 = 9.0;
 
