@@ -7,7 +7,7 @@ pub use crate::protocol_snapshots::*;
 
 use crate::components::{
     CharacterAppearance, CombatStatus, EquipmentAppearance, GuildMembership, Health, Mana,
-    ModelDisplay, Mounted, MovementSpeed, Npc, Player, Position, Rotation, Zone,
+    ModelDisplay, Mounted, MovementSpeed, Npc, Player, Position, PresenceStatus, Rotation, Zone,
 };
 
 /// Unreliable movement position updates, server-to-client only.
@@ -777,6 +777,11 @@ pub struct RemoveFriend {
     pub name: String,
 }
 
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct SetPresenceStatus {
+    pub status: PresenceStatus,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct FriendsStateUpdate {
     pub snapshot: Option<FriendsSnapshot>,
@@ -910,6 +915,7 @@ fn register_replicated_components(app: &mut App) {
     app.register_component::<Mounted>();
     app.register_component::<Zone>();
     app.register_component::<GuildMembership>();
+    app.register_component::<PresenceStatus>();
     app.register_component::<EquipmentAppearance>();
 }
 
@@ -1145,6 +1151,8 @@ fn register_friends_messages(app: &mut App) {
     app.register_message::<AddFriend>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_message::<RemoveFriend>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<SetPresenceStatus>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_message::<FriendsStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
@@ -1717,7 +1725,7 @@ mod tests {
                     level: 12,
                     class_name: "Paladin".into(),
                     area: "Elwynn Forest".into(),
-                    online: true,
+                    presence: PresenceStatus::Online,
                     note: String::new(),
                 }],
             }),

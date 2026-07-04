@@ -277,3 +277,25 @@ pub struct GuildMembership {
     pub guild_id: u32,
     pub guild_name: String,
 }
+
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Default,
+)]
+pub enum PresenceStatus {
+    #[default]
+    Online,
+    Afk,
+    Dnd,
+    Offline,
+}
