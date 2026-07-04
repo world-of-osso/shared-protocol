@@ -76,6 +76,9 @@ pub struct InspectChannel;
 /// Reliable ordered channel for duel operations, bidirectional.
 pub struct DuelChannel;
 
+/// Reliable ordered channel for death and respawn operations, bidirectional.
+pub struct DeathChannel;
+
 /// Chat message type.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub enum ChatType {
@@ -831,6 +834,25 @@ pub struct BarberShopStateUpdate {
     pub error: Option<String>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct QueryDeathStatus;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ReleaseSpirit;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ResurrectAtCorpse;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct AcceptSpiritHealerResurrection;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct DeathStateUpdate {
+    pub snapshot: Option<DeathSnapshot>,
+    pub message: Option<String>,
+    pub error: Option<String>,
+}
+
 /// Registers shared protocol: components for replication and channels.
 /// Must be added AFTER `ServerPlugins`/`ClientPlugins` but BEFORE any entity is spawned.
 pub struct ProtocolPlugin;
@@ -876,6 +898,7 @@ fn register_messages(app: &mut App) {
     register_lfg_messages(app);
     register_pvp_messages(app);
     register_barber_shop_messages(app);
+    register_death_messages(app);
     register_collection_messages(app);
     register_currency_messages(app);
     crate::protocol_snapshots::register_snapshot_messages(app);
@@ -1129,6 +1152,19 @@ fn register_barber_shop_messages(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
 }
 
+fn register_death_messages(app: &mut App) {
+    app.register_message::<QueryDeathStatus>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<ReleaseSpirit>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<ResurrectAtCorpse>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<AcceptSpiritHealerResurrection>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<DeathStateUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+}
+
 fn register_collection_messages(app: &mut App) {
     app.register_message::<SummonMount>()
         .add_direction(NetworkDirection::ClientToServer);
@@ -1267,6 +1303,12 @@ fn register_channels(app: &mut App) {
     .add_direction(NetworkDirection::Bidirectional);
 
     app.add_channel::<BarberShopChannel>(ChannelSettings {
+        mode: ChannelMode::OrderedReliable(default()),
+        ..default()
+    })
+    .add_direction(NetworkDirection::Bidirectional);
+
+    app.add_channel::<DeathChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
         ..default()
     })
@@ -1710,6 +1752,34 @@ mod tests {
         };
         let encoded = serde_json::to_string(&update).unwrap();
         let decoded: BarberShopStateUpdate = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(update, decoded);
+    }
+
+    #[test]
+    fn death_state_update_round_trip() {
+        let update = DeathStateUpdate {
+            snapshot: Some(DeathSnapshot {
+                state: DeathStateSnapshot::Ghost,
+                corpse: Some(DeathPositionSnapshot {
+                    map_id: 0,
+                    x: 1.0,
+                    y: 2.0,
+                    z: 3.0,
+                }),
+                graveyard: Some(DeathPositionSnapshot {
+                    map_id: 0,
+                    x: 4.0,
+                    y: 5.0,
+                    z: 6.0,
+                }),
+                can_resurrect_at_corpse: true,
+                spirit_healer_available: false,
+            }),
+            message: Some("released spirit".into()),
+            error: None,
+        };
+        let encoded = serde_json::to_string(&update).unwrap();
+        let decoded: DeathStateUpdate = serde_json::from_str(&encoded).unwrap();
         assert_eq!(update, decoded);
     }
 
