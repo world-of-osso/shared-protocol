@@ -202,6 +202,22 @@ pub struct WorldMapSnapshot {
     pub discovered_zone_ids: Vec<u32>,
 }
 
+// -- Resting snapshots --
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub enum RestAreaKindSnapshot {
+    City,
+    Inn,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct RestSnapshot {
+    pub in_rest_area: bool,
+    pub rest_area_kind: Option<RestAreaKindSnapshot>,
+    pub rested_xp: u32,
+    pub rested_xp_max: u32,
+}
+
 // -- Friends snapshots --
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]

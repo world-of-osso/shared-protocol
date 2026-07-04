@@ -49,6 +49,9 @@ pub struct AchievementChannel;
 /// Reliable ordered channel for world map updates, bidirectional.
 pub struct WorldMapChannel;
 
+/// Reliable ordered channel for resting state updates, bidirectional.
+pub struct RestChannel;
+
 /// Reliable ordered channel for friends updates, bidirectional.
 pub struct FriendsChannel;
 
@@ -755,6 +758,13 @@ pub struct WorldMapStateUpdate {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct RestStateUpdate {
+    pub snapshot: Option<RestSnapshot>,
+    pub message: Option<String>,
+    pub error: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct QueryFriends;
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -916,6 +926,7 @@ fn register_messages(app: &mut App) {
     register_reputation_messages(app);
     register_achievement_messages(app);
     register_world_map_messages(app);
+    register_rest_messages(app);
     register_friends_messages(app);
     register_ignore_messages(app);
     register_lfg_messages(app);
@@ -1119,6 +1130,11 @@ fn register_achievement_messages(app: &mut App) {
 
 fn register_world_map_messages(app: &mut App) {
     app.register_message::<WorldMapStateUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+}
+
+fn register_rest_messages(app: &mut App) {
+    app.register_message::<RestStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
@@ -1352,6 +1368,12 @@ fn register_channels(app: &mut App) {
         ..default()
     })
     .add_direction(NetworkDirection::Bidirectional);
+
+    app.add_channel::<RestChannel>(ChannelSettings {
+        mode: ChannelMode::OrderedReliable(default()),
+        ..default()
+    })
+    .add_direction(NetworkDirection::ServerToClient);
 }
 
 #[cfg(test)]
@@ -1665,6 +1687,23 @@ mod tests {
         };
         let encoded = serde_json::to_string(&update).unwrap();
         let decoded: WorldMapStateUpdate = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(update, decoded);
+    }
+
+    #[test]
+    fn rest_state_update_round_trip() {
+        let update = RestStateUpdate {
+            snapshot: Some(RestSnapshot {
+                in_rest_area: true,
+                rest_area_kind: Some(RestAreaKindSnapshot::Inn),
+                rested_xp: 240,
+                rested_xp_max: 600,
+            }),
+            message: Some("rest state updated".into()),
+            error: None,
+        };
+        let encoded = serde_json::to_string(&update).unwrap();
+        let decoded: RestStateUpdate = serde_json::from_str(&encoded).unwrap();
         assert_eq!(update, decoded);
     }
 
