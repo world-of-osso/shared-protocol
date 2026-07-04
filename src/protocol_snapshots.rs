@@ -132,6 +132,73 @@ pub struct ProfessionRecipeSnapshot {
     pub cooldown: Option<String>,
 }
 
+// -- Currency snapshots --
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct CurrencySnapshot {
+    pub entries: Vec<CurrencyEntrySnapshot>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct CurrencyEntrySnapshot {
+    pub id: u32,
+    pub name: String,
+    pub amount: u64,
+}
+
+// -- Reputation snapshots --
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ReputationSnapshot {
+    pub entries: Vec<ReputationEntrySnapshot>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ReputationEntrySnapshot {
+    pub faction_id: u32,
+    pub faction_name: String,
+    pub standing: String,
+    pub value: i32,
+}
+
+// -- Storage snapshots (guild vault, warbank) --
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct StorageItemSnapshot {
+    pub slot: u32,
+    pub item_guid: u64,
+    pub item_id: u32,
+    pub name: String,
+    pub stack_count: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct GuildVaultSnapshot {
+    pub entries: Vec<StorageItemSnapshot>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct WarbankSnapshot {
+    pub entries: Vec<StorageItemSnapshot>,
+}
+
+// -- Inventory search snapshot --
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct InventorySearchResultSnapshot {
+    pub entries: Vec<InventorySearchItemSnapshot>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct InventorySearchItemSnapshot {
+    pub storage: String,
+    pub slot: u32,
+    pub item_guid: u64,
+    pub item_id: u32,
+    pub name: String,
+    pub stack_count: u32,
+}
+
 pub fn register_snapshot_messages(app: &mut App) {
     app.register_message::<QuestLogSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
@@ -144,5 +211,15 @@ pub fn register_snapshot_messages(app: &mut App) {
     app.register_message::<CollectionSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_message::<ProfessionSnapshot>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<CurrencySnapshot>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<ReputationSnapshot>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<GuildVaultSnapshot>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<WarbankSnapshot>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<InventorySearchResultSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
 }
