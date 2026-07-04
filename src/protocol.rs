@@ -115,10 +115,21 @@ pub struct SetTarget {
     pub target_entity: Option<u64>,
 }
 
-/// Combat event type for damage/death/respawn notifications.
+/// Combat event type for damage/heal/death/respawn/avoidance notifications.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub enum CombatEventType {
     MeleeDamage,
+    SpellDamage,
+    SpellHeal,
+    PeriodicDamage,
+    PeriodicHeal,
+    Absorb,
+    Miss,
+    Dodge,
+    Parry,
+    Block,
+    CriticalHit,
+    Interrupt,
     Death,
     Respawn,
 }
@@ -128,7 +139,10 @@ pub enum CombatEventType {
 pub struct CombatEvent {
     pub attacker: u64,
     pub target: u64,
-    pub damage: f32,
+    /// Damage dealt, healing done, or amount absorbed. Context depends on `event_type`.
+    pub amount: f32,
+    /// Spell ID for spell-related events (0 for melee/death/respawn).
+    pub spell_id: u32,
     pub event_type: CombatEventType,
 }
 
@@ -1424,6 +1438,49 @@ mod tests {
         assert_eq!(msg.sender, deserialized.sender);
         assert_eq!(msg.content, deserialized.content);
         assert_eq!(msg.channel, deserialized.channel);
+    }
+
+    #[test]
+    fn combat_event_type_all_variants_round_trip() {
+        let variants = [
+            CombatEventType::MeleeDamage,
+            CombatEventType::SpellDamage,
+            CombatEventType::SpellHeal,
+            CombatEventType::PeriodicDamage,
+            CombatEventType::PeriodicHeal,
+            CombatEventType::Absorb,
+            CombatEventType::Miss,
+            CombatEventType::Dodge,
+            CombatEventType::Parry,
+            CombatEventType::Block,
+            CombatEventType::CriticalHit,
+            CombatEventType::Interrupt,
+            CombatEventType::Death,
+            CombatEventType::Respawn,
+        ];
+        for variant in variants {
+            let encoded = serde_json::to_string(&variant).unwrap();
+            let decoded: CombatEventType = serde_json::from_str(&encoded).unwrap();
+            assert_eq!(decoded, variant);
+        }
+    }
+
+    #[test]
+    fn combat_event_round_trip() {
+        let event = CombatEvent {
+            attacker: 42,
+            target: 99,
+            amount: 1500.0,
+            spell_id: 12345,
+            event_type: CombatEventType::SpellDamage,
+        };
+        let encoded = serde_json::to_string(&event).unwrap();
+        let decoded: CombatEvent = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(decoded.attacker, 42);
+        assert_eq!(decoded.target, 99);
+        assert_eq!(decoded.amount, 1500.0);
+        assert_eq!(decoded.spell_id, 12345);
+        assert_eq!(decoded.event_type, CombatEventType::SpellDamage);
     }
 
     #[test]
