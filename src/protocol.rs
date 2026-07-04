@@ -58,6 +58,9 @@ pub struct IgnoreChannel;
 /// Reliable ordered channel for LFG updates, bidirectional.
 pub struct LfgChannel;
 
+/// Reliable ordered channel for barber shop updates, bidirectional.
+pub struct BarberShopChannel;
+
 /// Reliable ordered channel for collection updates, bidirectional.
 pub struct CollectionChannel;
 
@@ -787,6 +790,21 @@ pub struct LfgStateUpdate {
     pub error: Option<String>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct QueryBarberShopStatus;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ApplyBarberShopChanges {
+    pub appearance: CharacterAppearance,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct BarberShopStateUpdate {
+    pub snapshot: Option<BarberShopSnapshot>,
+    pub message: Option<String>,
+    pub error: Option<String>,
+}
+
 /// Registers shared protocol: components for replication and channels.
 /// Must be added AFTER `ServerPlugins`/`ClientPlugins` but BEFORE any entity is spawned.
 pub struct ProtocolPlugin;
@@ -830,6 +848,7 @@ fn register_messages(app: &mut App) {
     register_friends_messages(app);
     register_ignore_messages(app);
     register_lfg_messages(app);
+    register_barber_shop_messages(app);
     register_collection_messages(app);
     register_currency_messages(app);
     crate::protocol_snapshots::register_snapshot_messages(app);
@@ -1061,6 +1080,15 @@ fn register_lfg_messages(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
 }
 
+fn register_barber_shop_messages(app: &mut App) {
+    app.register_message::<QueryBarberShopStatus>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<ApplyBarberShopChanges>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<BarberShopStateUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+}
+
 fn register_collection_messages(app: &mut App) {
     app.register_message::<SummonMount>()
         .add_direction(NetworkDirection::ClientToServer);
@@ -1187,6 +1215,12 @@ fn register_channels(app: &mut App) {
     .add_direction(NetworkDirection::Bidirectional);
 
     app.add_channel::<LfgChannel>(ChannelSettings {
+        mode: ChannelMode::OrderedReliable(default()),
+        ..default()
+    })
+    .add_direction(NetworkDirection::Bidirectional);
+
+    app.add_channel::<BarberShopChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
         ..default()
     })
@@ -1566,6 +1600,29 @@ mod tests {
         };
         let encoded = serde_json::to_string(&update).unwrap();
         let decoded: LfgStateUpdate = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(update, decoded);
+    }
+
+    #[test]
+    fn barber_shop_state_update_round_trip() {
+        let update = BarberShopStateUpdate {
+            snapshot: Some(BarberShopSnapshot {
+                appearance: CharacterAppearance {
+                    sex: 0,
+                    skin_color: 2,
+                    face: 3,
+                    eye_color: 4,
+                    hair_style: 5,
+                    hair_color: 6,
+                    facial_style: 1,
+                },
+                gold: 87_500,
+            }),
+            message: Some("barber shop ready".into()),
+            error: None,
+        };
+        let encoded = serde_json::to_string(&update).unwrap();
+        let decoded: BarberShopStateUpdate = serde_json::from_str(&encoded).unwrap();
         assert_eq!(update, decoded);
     }
 

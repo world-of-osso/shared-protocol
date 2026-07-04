@@ -1,3 +1,4 @@
+use crate::components::CharacterAppearance;
 use bevy::prelude::*;
 use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -262,6 +263,14 @@ pub struct LfgSnapshot {
     pub match_found: Option<LfgMatchFoundSnapshot>,
 }
 
+// -- Barber shop snapshots --
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct BarberShopSnapshot {
+    pub appearance: CharacterAppearance,
+    pub gold: u32,
+}
+
 // -- Storage snapshots (guild vault, warbank) --
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -328,6 +337,8 @@ pub fn register_snapshot_messages(app: &mut App) {
     app.register_message::<IgnoreListSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_message::<LfgSnapshot>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<BarberShopSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_message::<GuildVaultSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
