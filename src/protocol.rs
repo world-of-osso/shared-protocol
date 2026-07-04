@@ -55,6 +55,9 @@ pub struct RestChannel;
 /// Reliable ordered channel for friends updates, bidirectional.
 pub struct FriendsChannel;
 
+/// Reliable ordered channel for guild updates, bidirectional.
+pub struct GuildChannel;
+
 /// Reliable ordered channel for who-list updates, bidirectional.
 pub struct WhoChannel;
 
@@ -322,6 +325,37 @@ pub struct GuildAcceptInviteResponse {
     pub success: bool,
     pub guild_id: Option<u32>,
     pub guild_name: Option<String>,
+    pub error: Option<String>,
+}
+
+/// Client requests the current guild snapshot.
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct QueryGuild;
+
+/// Client updates the guild message of the day.
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SetGuildMotd {
+    pub text: String,
+}
+
+/// Client updates the guild info text.
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SetGuildInfo {
+    pub text: String,
+}
+
+/// Client updates a guild member's officer note.
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct SetGuildOfficerNote {
+    pub character_name: String,
+    pub note: String,
+}
+
+/// Server sends the current guild snapshot plus optional status text.
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct GuildStateUpdate {
+    pub guild: Option<GuildSnapshot>,
+    pub message: Option<String>,
     pub error: Option<String>,
 }
 
@@ -1086,6 +1120,16 @@ fn register_guild_and_chat_messages(app: &mut App) {
         .add_direction(NetworkDirection::ClientToServer);
     app.register_message::<GuildAcceptInviteResponse>()
         .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<QueryGuild>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<SetGuildMotd>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<SetGuildInfo>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<SetGuildOfficerNote>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<GuildStateUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
     app.register_message::<ChatHistoryRequest>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_message::<ChatHistoryResponse>()
@@ -1442,6 +1486,12 @@ fn register_channels(app: &mut App) {
     })
     .add_direction(NetworkDirection::Bidirectional);
 
+    app.add_channel::<GuildChannel>(ChannelSettings {
+        mode: ChannelMode::OrderedReliable(default()),
+        ..default()
+    })
+    .add_direction(NetworkDirection::Bidirectional);
+
     app.add_channel::<WhoChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
         ..default()
@@ -1618,6 +1668,60 @@ mod tests {
         assert_eq!(accept_resp.guild_id, decoded.guild_id);
         assert_eq!(accept_resp.guild_name, decoded.guild_name);
         assert_eq!(accept_resp.error, decoded.error);
+
+        let query = QueryGuild;
+        let encoded = serde_json::to_string(&query).unwrap();
+        let _: QueryGuild = serde_json::from_str(&encoded).unwrap();
+
+        let set_motd = SetGuildMotd {
+            text: "Raid tonight".into(),
+        };
+        let encoded = serde_json::to_string(&set_motd).unwrap();
+        let decoded: SetGuildMotd = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(set_motd.text, decoded.text);
+
+        let set_info = SetGuildInfo {
+            text: "Wed/Sun raids".into(),
+        };
+        let encoded = serde_json::to_string(&set_info).unwrap();
+        let decoded: SetGuildInfo = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(set_info.text, decoded.text);
+
+        let set_note = SetGuildOfficerNote {
+            character_name: "Alice".into(),
+            note: "Reliable healer".into(),
+        };
+        let encoded = serde_json::to_string(&set_note).unwrap();
+        let decoded: SetGuildOfficerNote = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(set_note.character_name, decoded.character_name);
+        assert_eq!(set_note.note, decoded.note);
+
+        let state = GuildStateUpdate {
+            guild: Some(GuildSnapshot {
+                guild_id: 3,
+                guild_name: "Raid Team".into(),
+                motd: "Bring flasks".into(),
+                info_text: "Wed/Sun raids".into(),
+                members: vec![GuildMemberSnapshot {
+                    character_name: "Alice".into(),
+                    level: 60,
+                    class_name: "Priest".into(),
+                    rank_name: "Member".into(),
+                    is_online: true,
+                    officer_note: "Reliable healer".into(),
+                    last_online: "Online".into(),
+                }],
+            }),
+            message: Some("guild updated".into()),
+            error: None,
+        };
+        let encoded = serde_json::to_string(&state).unwrap();
+        let decoded: GuildStateUpdate = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(state.message, decoded.message);
+        assert_eq!(
+            state.guild.as_ref().unwrap().motd,
+            decoded.guild.as_ref().unwrap().motd
+        );
     }
 
     #[test]

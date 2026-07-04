@@ -235,6 +235,28 @@ pub struct FriendsSnapshot {
     pub entries: Vec<FriendCharacterSnapshot>,
 }
 
+// -- Guild snapshots --
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct GuildMemberSnapshot {
+    pub character_name: String,
+    pub level: u16,
+    pub class_name: String,
+    pub rank_name: String,
+    pub is_online: bool,
+    pub officer_note: String,
+    pub last_online: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct GuildSnapshot {
+    pub guild_id: u32,
+    pub guild_name: String,
+    pub motd: String,
+    pub info_text: String,
+    pub members: Vec<GuildMemberSnapshot>,
+}
+
 // -- Who snapshots --
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -480,6 +502,8 @@ pub fn register_snapshot_messages(app: &mut App) {
     app.register_message::<WorldMapSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_message::<FriendsSnapshot>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<GuildSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_message::<IgnoreListSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
