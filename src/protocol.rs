@@ -52,6 +52,9 @@ pub struct WorldMapChannel;
 /// Reliable ordered channel for friends updates, bidirectional.
 pub struct FriendsChannel;
 
+/// Reliable ordered channel for ignore list updates, bidirectional.
+pub struct IgnoreChannel;
+
 /// Reliable ordered channel for collection updates, bidirectional.
 pub struct CollectionChannel;
 
@@ -737,6 +740,26 @@ pub struct FriendsStateUpdate {
     pub error: Option<String>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct QueryIgnoreList;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct AddIgnore {
+    pub name: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct RemoveIgnore {
+    pub name: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct IgnoreListStateUpdate {
+    pub snapshot: Option<IgnoreListSnapshot>,
+    pub message: Option<String>,
+    pub error: Option<String>,
+}
+
 /// Registers shared protocol: components for replication and channels.
 /// Must be added AFTER `ServerPlugins`/`ClientPlugins` but BEFORE any entity is spawned.
 pub struct ProtocolPlugin;
@@ -778,6 +801,7 @@ fn register_messages(app: &mut App) {
     register_achievement_messages(app);
     register_world_map_messages(app);
     register_friends_messages(app);
+    register_ignore_messages(app);
     register_collection_messages(app);
     register_currency_messages(app);
     crate::protocol_snapshots::register_snapshot_messages(app);
@@ -985,6 +1009,17 @@ fn register_friends_messages(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
 }
 
+fn register_ignore_messages(app: &mut App) {
+    app.register_message::<QueryIgnoreList>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<AddIgnore>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<RemoveIgnore>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<IgnoreListStateUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+}
+
 fn register_collection_messages(app: &mut App) {
     app.register_message::<SummonMount>()
         .add_direction(NetworkDirection::ClientToServer);
@@ -1099,6 +1134,12 @@ fn register_channels(app: &mut App) {
     .add_direction(NetworkDirection::Bidirectional);
 
     app.add_channel::<FriendsChannel>(ChannelSettings {
+        mode: ChannelMode::OrderedReliable(default()),
+        ..default()
+    })
+    .add_direction(NetworkDirection::Bidirectional);
+
+    app.add_channel::<IgnoreChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
         ..default()
     })
@@ -1429,6 +1470,20 @@ mod tests {
         };
         let encoded = serde_json::to_string(&update).unwrap();
         let decoded: FriendsStateUpdate = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(update, decoded);
+    }
+
+    #[test]
+    fn ignore_list_state_update_round_trip() {
+        let update = IgnoreListStateUpdate {
+            snapshot: Some(IgnoreListSnapshot {
+                names: vec!["Alice".into(), "Bob".into()],
+            }),
+            message: Some("ignore list updated".into()),
+            error: None,
+        };
+        let encoded = serde_json::to_string(&update).unwrap();
+        let decoded: IgnoreListStateUpdate = serde_json::from_str(&encoded).unwrap();
         assert_eq!(update, decoded);
     }
 

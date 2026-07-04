@@ -218,6 +218,13 @@ pub struct FriendsSnapshot {
     pub entries: Vec<FriendCharacterSnapshot>,
 }
 
+// -- Ignore snapshots --
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct IgnoreListSnapshot {
+    pub names: Vec<String>,
+}
+
 // -- Storage snapshots (guild vault, warbank) --
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -280,6 +287,8 @@ pub fn register_snapshot_messages(app: &mut App) {
     app.register_message::<WorldMapSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_message::<FriendsSnapshot>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<IgnoreListSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_message::<GuildVaultSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
