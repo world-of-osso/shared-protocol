@@ -32,21 +32,21 @@ impl Plugin for ProtocolPlugin {
 }
 
 fn register_replicated_components(app: &mut App) {
-    app.register_component::<Position>();
-    app.register_component::<Health>();
-    app.register_component::<Mana>();
-    app.register_component::<Gold>();
-    app.register_component::<Player>();
-    app.register_component::<Npc>();
-    app.register_component::<ModelDisplay>();
-    app.register_component::<Rotation>();
-    app.register_component::<MovementSpeed>();
-    app.register_component::<CombatStatus>();
-    app.register_component::<Mounted>();
-    app.register_component::<Zone>();
-    app.register_component::<GuildMembership>();
-    app.register_component::<PresenceStatus>();
-    app.register_component::<EquipmentAppearance>();
+    app.component::<Position>().replicate();
+    app.component::<Health>().replicate();
+    app.component::<Mana>().replicate();
+    app.component::<Gold>().replicate();
+    app.component::<Player>().replicate();
+    app.component::<Npc>().replicate();
+    app.component::<ModelDisplay>().replicate();
+    app.component::<Rotation>().replicate();
+    app.component::<MovementSpeed>().replicate();
+    app.component::<CombatStatus>().replicate();
+    app.component::<Mounted>().replicate();
+    app.component::<Zone>().replicate();
+    app.component::<GuildMembership>().replicate();
+    app.component::<PresenceStatus>().replicate();
+    app.component::<EquipmentAppearance>().replicate();
 }
 
 #[cfg(test)]
