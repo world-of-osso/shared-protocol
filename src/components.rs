@@ -384,11 +384,12 @@ pub struct EquipmentAppearance {
     bitcode::Decode,
     Debug,
     Clone,
-    Copy,
     PartialEq,
+    Eq,
 )]
 pub struct Npc {
     pub template_id: u32,
+    pub name: String,
 }
 
 #[derive(
