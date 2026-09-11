@@ -47,6 +47,7 @@ fn register_replicated_components(app: &mut App) {
     app.component::<GuildMembership>().replicate();
     app.component::<PresenceStatus>().replicate();
     app.component::<EquipmentAppearance>().replicate();
+    app.component::<crate::casting::CastState>().replicate();
 }
 
 #[cfg(test)]

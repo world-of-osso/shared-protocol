@@ -18,8 +18,10 @@ pub enum CastType {
 ///
 /// Added as a component when a cast begins, removed on completion,
 /// interruption, or cancellation.
-#[derive(Component, Debug, Clone, PartialEq)]
+#[derive(Component, Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct CastState {
+    /// Server-resolved display name for overhead cast presentation.
+    pub spell_name: String,
     /// Spell being cast.
     pub spell_id: u32,
     /// Target entity bits (0 for self-cast).
@@ -59,6 +61,7 @@ impl CastState {
     /// Create a new normal (non-channel) cast.
     pub fn normal(spell_id: u32, target: u64, duration: f32, interruptible: bool) -> Self {
         Self {
+            spell_name: String::new(),
             spell_id,
             target,
             duration,
@@ -81,6 +84,7 @@ impl CastState {
         interruptible: bool,
     ) -> Self {
         Self {
+            spell_name: String::new(),
             spell_id,
             target,
             duration,
