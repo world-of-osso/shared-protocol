@@ -1,5 +1,5 @@
 use serde_json::json;
-use shared::components::CharacterAppearance;
+use shared::components::{CharacterAppearance, CustomizationChoiceSelection};
 use shared::protocol::{CreateCharacter, LoginResponse};
 
 fn appearance_json() -> serde_json::Value {
@@ -20,6 +20,21 @@ fn customization_choices_survive_appearance_bitcode_roundtrip() {
     let bytes = bitcode::encode(&appearance);
     let decoded: CharacterAppearance = bitcode::decode(&bytes).unwrap();
     assert_eq!(serde_json::to_value(decoded).unwrap(), expected);
+}
+
+#[test]
+fn customization_choices_preserve_u32_ids_and_more_than_byte_sized_counts() {
+    let appearance = CharacterAppearance {
+        customization_choices: (0..300)
+            .map(|index| CustomizationChoiceSelection {
+                option_id: 70_000 + index,
+                choice_id: 4_000_000 + index,
+            })
+            .collect(),
+        ..Default::default()
+    };
+    let decoded: CharacterAppearance = bitcode::decode(&bitcode::encode(&appearance)).unwrap();
+    assert_eq!(decoded, appearance);
 }
 
 #[test]
