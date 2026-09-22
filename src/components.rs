@@ -24,6 +24,23 @@ pub use crate::threat::*;
     Eq,
     Default,
 )]
+pub struct CustomizationChoiceSelection {
+    pub option_id: u32,
+    pub choice_id: u32,
+}
+
+#[derive(
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Default,
+)]
 pub struct CharacterAppearance {
     pub sex: u8,
     pub skin_color: u8,
@@ -32,6 +49,8 @@ pub struct CharacterAppearance {
     pub hair_style: u8,
     pub hair_color: u8,
     pub facial_style: u8,
+    /// Stable option/choice IDs for non-core options; core selectors above remain canonical.
+    pub customization_choices: Vec<CustomizationChoiceSelection>,
 }
 
 #[derive(
