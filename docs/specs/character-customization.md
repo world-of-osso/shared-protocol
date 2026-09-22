@@ -4,9 +4,9 @@
 
 ## What it must do
 
-- [ ] Retain sex and the six existing core selectors unchanged.
-- [ ] Carry additional non-core selections as ordered `customization_choices: Vec<CustomizationChoiceSelection>` with stable `option_id: u32` and `choice_id: u32`, without a fixed cap.
-- [ ] Preserve all additional selections through derived bitcode appearance encoding and serde-based creation/roster payload encoding, without manufacturing duplicates.
+- [x] Retain sex and the six existing core selectors unchanged.
+- [x] Carry additional non-core selections as ordered `customization_choices: Vec<CustomizationChoiceSelection>` with stable `option_id: u32` and `choice_id: u32`, without a fixed cap; the count/width fixture preserves 300 entries and IDs above `u16::MAX`.
+- [x] Preserve all additional selections through derived bitcode appearance encoding and serde-based creation/roster payload encoding, without manufacturing duplicates.
 - [ ] Keep core selectors canonical for their options; clients author additional selections only for other options.
 
 ## How it works
