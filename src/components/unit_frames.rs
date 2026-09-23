@@ -175,3 +175,19 @@ pub struct UnitLevel(pub u8);
     Eq,
 )]
 pub struct UnitFactionTemplate(pub u32);
+
+/// Entity bits of the unit's current target (`None` = no target), for target-of-target.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+)]
+pub struct UnitTarget(pub Option<u64>);

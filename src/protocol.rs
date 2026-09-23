@@ -6,7 +6,7 @@ pub use crate::protocol_snapshots::*;
 use crate::components::{
     CombatStatus, EquipmentAppearance, Gold, GuildMembership, Health, Mana, ModelDisplay, Mounted,
     MovementSpeed, Npc, Player, Position, PresenceStatus, Rotation, UnitAuras, UnitFactionTemplate,
-    UnitLevel, UnitPowers, Zone,
+    UnitLevel, UnitPowers, UnitTarget, Zone,
 };
 
 mod channels;
@@ -55,6 +55,7 @@ fn register_replicated_components(app: &mut App) {
     app.component::<UnitAuras>().replicate();
     app.component::<UnitLevel>().replicate();
     app.component::<UnitFactionTemplate>().replicate();
+    app.component::<UnitTarget>().replicate();
 }
 
 #[cfg(test)]

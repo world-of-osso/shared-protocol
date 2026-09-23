@@ -1,6 +1,7 @@
 use super::*;
 use crate::components::{
     AuraView, PowerEntry, PowerType, UnitAuras, UnitFactionTemplate, UnitLevel, UnitPowers,
+    UnitTarget,
 };
 use crate::spell_data::CastFailReason;
 use bevy_replicon::shared::protocol::ProtocolHasher;
@@ -118,6 +119,8 @@ fn unit_auras_round_trip() {
 fn unit_level_and_faction_template_round_trip() {
     assert_wire_round_trip(&UnitLevel(70));
     assert_wire_round_trip(&UnitFactionTemplate(1_801));
+    assert_wire_round_trip(&UnitTarget(Some(0x0000_0001_0000_002A)));
+    assert_wire_round_trip(&UnitTarget(None));
 }
 
 #[test]
@@ -316,6 +319,7 @@ fn protocol_plugin_registers_spell_components_and_messages() {
     assert!(components.is_registered::<UnitAuras>());
     assert!(components.is_registered::<UnitLevel>());
     assert!(components.is_registered::<UnitFactionTemplate>());
+    assert!(components.is_registered::<UnitTarget>());
 
     assert!(app.is_message_registered::<KnownSpellsSnapshot>());
     assert!(app.is_message_registered::<SpellsLearned>());
