@@ -1,4 +1,3 @@
-use bevy::prelude::*;
 use lightyear::prelude::*;
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 
