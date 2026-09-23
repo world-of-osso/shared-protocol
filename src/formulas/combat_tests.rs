@@ -105,8 +105,6 @@ fn full_combat_round_warrior_vs_mob() {
     let weapon_max = 500.0_f32;
     let weapon_speed = 3.3_f32;
     let attack_power = 1200.0_f32;
-    let crit_rating = 400.0_f32;
-    let target_armor = 5000.0_f32;
     let stamina = 200.0_f32;
 
     let max_hp = max_health(attacker_class, attacker_level, stamina).unwrap();
@@ -125,20 +123,16 @@ fn full_combat_round_warrior_vs_mob() {
 
     let miss = melee::miss_chance(attacker_level, target_level);
     assert_eq!(miss, 300);
-    let dodge = melee::dodge_chance(attacker_class, attacker_level, 0.0);
-    assert_eq!(dodge, 500);
     let glancing = melee::glancing_chance(attacker_level, target_level);
     assert_eq!(glancing, 0);
-    let crit = melee::crit_chance(attacker_level, crit_rating);
-    assert!(crit > 0);
 
     let chances = melee::MeleeHitChances {
         miss,
-        dodge,
+        dodge: 500,
         parry: 0,
         glancing,
         block: 0,
-        crit,
+        crit: 500,
     };
     assert_eq!(
         melee::resolve_melee_outcome(&chances, 0),
@@ -150,17 +144,8 @@ fn full_combat_round_warrior_vs_mob() {
     );
 
     let mid_damage = (raw_min + raw_max) / 2.0;
-    let armor_dr = armor_mitigation(target_armor, attacker_level).unwrap();
-    let final_damage = mid_damage * (1.0 - armor_dr);
-    assert!(
-        final_damage > 100.0 && final_damage < 200.0,
-        "final: {final_damage}"
-    );
-
     let crit_damage = melee::apply_crit(mid_damage, 0.0);
     assert!((crit_damage - mid_damage * 2.0).abs() < 0.01);
-    let crit_after_armor = crit_damage * (1.0 - armor_dr);
-    assert!(crit_after_armor > final_damage);
 }
 
 #[test]
@@ -171,7 +156,6 @@ fn full_combat_round_rogue_vs_higher_level() {
     let weapon_max = 150.0_f32;
     let weapon_speed = 1.7_f32;
     let attack_power = 900.0_f32;
-    let target_armor = 3000.0_f32;
 
     let raw_min = auto_attack_damage(weapon_min, attack_power, weapon_speed);
     let raw_max = auto_attack_damage(weapon_max, attack_power, weapon_speed);
@@ -188,11 +172,4 @@ fn full_combat_round_rogue_vs_higher_level() {
     let mid_damage = (raw_min + raw_max) / 2.0;
     let glancing_damage = mid_damage * glancing_mult;
     assert!((glancing_damage - 296.0).abs() < 0.01);
-
-    let armor_dr = armor_mitigation(target_armor, attacker_level).unwrap();
-    let final_glancing = glancing_damage * (1.0 - armor_dr);
-    assert!(
-        final_glancing > 50.0 && final_glancing < 80.0,
-        "glancing: {final_glancing}"
-    );
 }

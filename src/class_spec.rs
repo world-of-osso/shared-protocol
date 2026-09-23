@@ -642,8 +642,7 @@ pub fn mastery_for_spec(spec_id: u32) -> Option<&'static MasteryDef> {
 
 /// Calculate the effective mastery bonus percentage for a spec.
 ///
-/// `mastery_points` comes from `rating_to_percent(rating, level, Mastery)` +
-/// `apply_secondary_dr()`. The coefficient converts points to an effect %.
+/// The coefficient converts mastery points to an effect %.
 ///
 /// Example: 10 mastery points × 2.0 coefficient = 20% bonus.
 pub fn effective_mastery(spec_id: u32, mastery_points: f32) -> f32 {

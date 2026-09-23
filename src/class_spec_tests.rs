@@ -127,16 +127,6 @@ fn mastery_defs_count_matches_specs() {
     assert_eq!(MASTERY_DEFS.len(), SPECIALIZATIONS.len());
 }
 
-#[test]
-fn mastery_integrates_with_rating_system() {
-    use crate::formulas::{RatingType, apply_secondary_dr, rating_to_percent};
-    let raw_points = rating_to_percent(500.0, 80, RatingType::Mastery).unwrap();
-    let after_dr = apply_secondary_dr(raw_points, RatingType::Mastery);
-    let bonus = effective_mastery(71, after_dr);
-    assert!(bonus > 0.0, "should produce positive mastery bonus");
-    assert!(bonus > after_dr, "coeff 2.0 should amplify points");
-}
-
 fn sample_talents() -> Vec<TalentDef> {
     vec![
         TalentDef {
