@@ -12,12 +12,14 @@ use crate::components::{
 mod channels;
 mod core_messages;
 mod gameplay_messages;
+mod group_messages;
 mod registration;
 mod spell_messages;
 
 pub use channels::*;
 pub use core_messages::*;
 pub use gameplay_messages::*;
+pub use group_messages::*;
 pub use spell_messages::*;
 
 use registration::{register_channels, register_messages};
@@ -65,3 +67,7 @@ mod tests;
 #[cfg(test)]
 #[path = "protocol_spell_tests.rs"]
 mod spell_tests;
+
+#[cfg(test)]
+#[path = "protocol_group_tests.rs"]
+mod group_tests;

@@ -39,21 +39,29 @@ pub enum QuestRepeatability {
 
 // -- Group snapshots --
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+/// Full roster, sent to every member on each change. An empty `members` list means
+/// the recipient is no longer in a group.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct GroupRosterSnapshot {
     pub is_raid: bool,
     pub ready_count: u16,
     pub total_count: u16,
     pub members: Vec<GroupMemberSnapshot>,
+    pub loot_method: crate::loot::LootMode,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct GroupMemberSnapshot {
     pub name: String,
     pub role: GroupRoleSnapshot,
     pub is_leader: bool,
     pub online: bool,
+    /// Raid subgroup 1–8; always 1 in a party.
     pub subgroup: u8,
+    pub class: u8,
+    pub level: u8,
+    /// Player entity bits while the member is in the world.
+    pub entity: Option<u64>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -64,9 +72,10 @@ pub enum GroupRoleSnapshot {
     None,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct GroupCommandResponse {
     pub message: String,
+    pub code: crate::protocol::GroupMessageCode,
 }
 
 // -- Combat log snapshots --

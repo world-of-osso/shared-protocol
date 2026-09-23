@@ -30,6 +30,7 @@ pub(super) fn register_messages(app: &mut App) {
     register_collection_messages(app);
     register_currency_messages(app);
     register_spell_messages(app);
+    super::group_messages::register_group_messages(app);
     crate::protocol_snapshots::register_snapshot_messages(app);
 }
 
