@@ -149,6 +149,12 @@ pub enum CastFailReason {
     NotInFront,
     /// The server cannot execute this spell (unknown spell, unhandled implicit target or power type).
     NotSupported,
+    /// Caster is stunned.
+    Stunned,
+    /// Caster is silenced (spells blocked).
+    Silenced,
+    /// Caster is pacified (physical abilities blocked).
+    Pacified,
 }
 
 /// Context needed to validate a cast attempt.

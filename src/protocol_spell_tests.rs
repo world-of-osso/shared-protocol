@@ -168,6 +168,9 @@ fn cast_failed_round_trips_every_reason() {
         CastFailReason::NoChargesRemain,
         CastFailReason::NotInFront,
         CastFailReason::NotSupported,
+        CastFailReason::Stunned,
+        CastFailReason::Silenced,
+        CastFailReason::Pacified,
     ];
     for reason in reasons {
         assert_wire_round_trip(&CastFailed {
