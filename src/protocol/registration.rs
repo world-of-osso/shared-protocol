@@ -29,6 +29,7 @@ pub(super) fn register_messages(app: &mut App) {
     register_durability_messages(app);
     register_collection_messages(app);
     register_currency_messages(app);
+    register_spell_messages(app);
     crate::protocol_snapshots::register_snapshot_messages(app);
 }
 
@@ -363,6 +364,39 @@ fn register_currency_messages(app: &mut App) {
         .add_direction(NetworkDirection::ClientToServer);
     app.register_message::<CurrencyStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
+}
+
+fn register_spell_messages(app: &mut App) {
+    app.register_message::<KnownSpellsSnapshot>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<SpellsLearned>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<SpellsUnlearned>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<SpellCooldownUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<SpellChargesUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<CastFailed>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<CombatLogEvent>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<ActionBarSnapshot>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<TraitConfigSnapshot>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<TraitCommitResult>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<SpecializationChanged>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<SetActionButton>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<CancelAura>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<CommitTraitConfig>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<SetSpecialization>()
+        .add_direction(NetworkDirection::ClientToServer);
 }
 
 pub(super) fn register_channels(app: &mut App) {

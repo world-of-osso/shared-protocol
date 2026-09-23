@@ -118,8 +118,8 @@ pub struct SpellCost {
 
 // --- Cast validation ---
 
-/// Why a spell cast was rejected.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+/// Why a spell cast was rejected. Sent in `CastFailed`; extend only by appending variants.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum CastFailReason {
     /// No target selected (for targeted spells).
     NoTarget,

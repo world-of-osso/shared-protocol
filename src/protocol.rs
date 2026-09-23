@@ -5,17 +5,20 @@ pub use crate::protocol_snapshots::*;
 
 use crate::components::{
     CombatStatus, EquipmentAppearance, Gold, GuildMembership, Health, Mana, ModelDisplay, Mounted,
-    MovementSpeed, Npc, Player, Position, PresenceStatus, Rotation, Zone,
+    MovementSpeed, Npc, Player, Position, PresenceStatus, Rotation, UnitAuras, UnitFactionTemplate,
+    UnitLevel, UnitPowers, Zone,
 };
 
 mod channels;
 mod core_messages;
 mod gameplay_messages;
 mod registration;
+mod spell_messages;
 
 pub use channels::*;
 pub use core_messages::*;
 pub use gameplay_messages::*;
+pub use spell_messages::*;
 
 use registration::{register_channels, register_messages};
 
@@ -48,8 +51,16 @@ fn register_replicated_components(app: &mut App) {
     app.component::<PresenceStatus>().replicate();
     app.component::<EquipmentAppearance>().replicate();
     app.component::<crate::casting::CastState>().replicate();
+    app.component::<UnitPowers>().replicate();
+    app.component::<UnitAuras>().replicate();
+    app.component::<UnitLevel>().replicate();
+    app.component::<UnitFactionTemplate>().replicate();
 }
 
 #[cfg(test)]
 #[path = "protocol_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "protocol_spell_tests.rs"]
+mod spell_tests;

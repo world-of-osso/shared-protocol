@@ -14,3 +14,7 @@ bitcode = "0.6"
 serde_json = "1"
 # Exercise serde-based character creation/roster wire payloads alongside derived encoding.
 bitcode = { version = "0.6", features = ["serde"] }
+# Same encoder/config lightyear uses for message and component payloads on the wire.
+bincode = { version = "2", features = ["serde"] }
+# Replication rule resources that lightyear's shared plugins normally install.
+bevy_replicon = { version = "0.41", default-features = false }
