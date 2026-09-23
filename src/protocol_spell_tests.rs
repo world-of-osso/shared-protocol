@@ -162,6 +162,12 @@ fn cast_failed_round_trips_every_reason() {
         CastFailReason::OnGlobalCooldown,
         CastFailReason::CasterDead,
         CastFailReason::CantCastWhileMoving,
+        CastFailReason::TooClose,
+        CastFailReason::SchoolLockedOut,
+        CastFailReason::SpellInProgress,
+        CastFailReason::NoChargesRemain,
+        CastFailReason::NotInFront,
+        CastFailReason::NotSupported,
     ];
     for reason in reasons {
         assert_wire_round_trip(&CastFailed {

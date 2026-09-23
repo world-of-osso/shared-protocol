@@ -137,6 +137,18 @@ pub enum CastFailReason {
     CasterDead,
     /// Caster is moving and the spell requires standing still.
     CantCastWhileMoving,
+    /// Target is inside the spell's minimum range.
+    TooClose,
+    /// The spell's school is locked out (e.g. after an interrupt).
+    SchoolLockedOut,
+    /// Another spell is already being cast.
+    SpellInProgress,
+    /// No charges remain.
+    NoChargesRemain,
+    /// Target must be in front of the caster.
+    NotInFront,
+    /// The server cannot execute this spell (unknown spell, unhandled implicit target or power type).
+    NotSupported,
 }
 
 /// Context needed to validate a cast attempt.
