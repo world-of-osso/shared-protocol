@@ -382,9 +382,6 @@ pub fn apply_res_sickness(
 
 // --- Spirit healer ---
 
-/// NPC flag identifying a spirit healer.
-pub const NPC_FLAG_SPIRIT_HEALER: u32 = 0x0800;
-
 /// Maximum distance to interact with a spirit healer (yards).
 pub const SPIRIT_HEALER_RANGE: f32 = 20.0;
 
