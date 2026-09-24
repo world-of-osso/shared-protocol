@@ -11,6 +11,7 @@ use crate::components::{
 
 mod channels;
 mod core_messages;
+mod experience_messages;
 mod gameplay_messages;
 mod group_messages;
 mod interaction_messages;
@@ -21,6 +22,7 @@ mod spell_messages;
 
 pub use channels::*;
 pub use core_messages::*;
+pub use experience_messages::*;
 pub use gameplay_messages::*;
 pub use group_messages::*;
 pub use interaction_messages::*;
@@ -42,6 +44,7 @@ impl Plugin for ProtocolPlugin {
         inventory_messages::register_inventory_protocol(app);
         quest_messages::register_quest_protocol(app);
         interaction_messages::register_interaction_protocol(app);
+        experience_messages::register_experience_protocol(app);
     }
 }
 
@@ -92,3 +95,7 @@ mod quest_tests;
 #[cfg(test)]
 #[path = "protocol_interaction_tests.rs"]
 mod interaction_tests;
+
+#[cfg(test)]
+#[path = "protocol_experience_tests.rs"]
+mod experience_tests;

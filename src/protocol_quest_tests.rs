@@ -112,6 +112,7 @@ fn quest_giver_messages_round_trip() {
         quest_id: 18,
         money: 0,
         items: vec![dagger],
+        xp: 100,
     });
     assert_wire_round_trip(&QuestFailed {
         quest_id: 7,

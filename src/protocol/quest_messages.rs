@@ -180,6 +180,8 @@ pub struct QuestGiverQuestComplete {
     pub quest_id: u32,
     pub money: u32,
     pub items: Vec<QuestRewardItem>,
+    /// Experience granted (0 at the level cap).
+    pub xp: u32,
 }
 
 /// Remove a quest from the log.
