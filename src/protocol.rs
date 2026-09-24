@@ -14,6 +14,7 @@ mod core_messages;
 mod gameplay_messages;
 mod group_messages;
 mod inventory_messages;
+mod quest_messages;
 mod registration;
 mod spell_messages;
 
@@ -22,6 +23,7 @@ pub use core_messages::*;
 pub use gameplay_messages::*;
 pub use group_messages::*;
 pub use inventory_messages::*;
+pub use quest_messages::*;
 pub use spell_messages::*;
 
 use registration::{register_channels, register_messages};
@@ -36,6 +38,7 @@ impl Plugin for ProtocolPlugin {
         register_messages(app);
         register_channels(app);
         inventory_messages::register_inventory_protocol(app);
+        quest_messages::register_quest_protocol(app);
     }
 }
 
@@ -78,3 +81,7 @@ mod group_tests;
 #[cfg(test)]
 #[path = "protocol_inventory_tests.rs"]
 mod inventory_tests;
+
+#[cfg(test)]
+#[path = "protocol_quest_tests.rs"]
+mod quest_tests;

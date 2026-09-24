@@ -6,31 +6,48 @@ use serde::{Deserialize, Serialize};
 
 // -- Quest snapshots --
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct QuestLogSnapshot {
     pub entries: Vec<QuestEntrySnapshot>,
     pub watched_quest_ids: Vec<u32>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct QuestEntrySnapshot {
     pub quest_id: u32,
     pub title: String,
     pub zone: String,
+    /// Objectives done; the quest can be turned in.
     pub completed: bool,
     pub repeatability: QuestRepeatability,
     pub objectives: Vec<QuestObjectiveSnapshot>,
+    /// Quest level; -1 scales to the player's level.
+    pub level: i32,
+    /// `QuestSortID`: positive = `AreaTable` zone id (the log's zone header),
+    /// negative = `QuestSort` id (class, profession, holiday). `zone` is left empty
+    /// because the server has no area names; clients resolve this id.
+    pub sort_id: i32,
+    /// Objective summary (`LogDescription`).
+    pub objectives_text: String,
+    /// Tracker text once objectives are done (`QuestCompletionLog`).
+    pub completion_text: String,
+    /// Shown in the objective tracker.
+    pub watched: bool,
+    pub pois: Vec<crate::protocol::QuestPoiSnapshot>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct QuestObjectiveSnapshot {
     pub text: String,
     pub current: u32,
     pub required: u32,
     pub completed: bool,
+    pub kind: crate::protocol::QuestObjectiveKind,
+    /// Creature, game object or item id the objective counts.
+    pub object_id: u32,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum QuestRepeatability {
     Normal,
     Daily,
