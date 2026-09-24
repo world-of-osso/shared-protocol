@@ -289,6 +289,8 @@ pub enum InventoryErrorReason {
     CantDoRightNow,
     /// `EQUIP_ERR_INTERNAL_BAG_ERROR`
     InternalBagError,
+    /// `EQUIP_ERR_CANT_EQUIP_EVER` (class or race restriction)
+    CantEquipEver,
 }
 
 /// Server rejected an inventory request from the owning client.
