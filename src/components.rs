@@ -357,6 +357,7 @@ pub struct MovementControl {
     Clone,
     PartialEq,
 )]
+#[require(MovementControl)]
 pub struct Player {
     pub name: String,
     pub race: u8,
