@@ -81,7 +81,7 @@ pub struct GroupMemberSnapshot {
     pub entity: Option<u64>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum GroupRoleSnapshot {
     Tank,
     Healer,
