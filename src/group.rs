@@ -15,143 +15,21 @@ pub const RAID_SUBGROUPS: usize = 8;
 /// Members per subgroup.
 pub const SUBGROUP_SIZE: usize = 5;
 
-/// A pending party invite.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct PartyInvite {
-    pub inviter: u64,
-    pub invitee: u64,
-}
-
 /// Why a party operation failed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum PartyError {
-    /// Party is full (5 members).
+    /// No room: party (5), raid (40) or subgroup (5) is full.
     Full,
-    /// Player is already in this party.
+    /// Player is already in this group.
     AlreadyMember,
-    /// Player is already in another group.
-    AlreadyInGroup,
-    /// No pending invite to accept.
-    NoInvite,
-    /// Only the leader can do this.
-    NotLeader,
-    /// Target player not found.
-    PlayerNotFound,
-}
-
-/// A party of up to 5 players.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Party {
-    /// Entity bits of the party leader.
-    pub leader: u64,
-    /// All members including the leader.
-    pub members: Vec<u64>,
-    /// Group loot distribution mode.
-    pub loot_mode: LootMode,
-    /// Round-robin loot rotation index.
-    pub loot_round_robin: usize,
-}
-
-impl Party {
-    /// Create a new party with a single member (the leader).
-    pub fn new(leader: u64) -> Self {
-        Self {
-            leader,
-            members: vec![leader],
-            loot_mode: LootMode::PersonalLoot,
-            loot_round_robin: 0,
-        }
-    }
-
-    /// Invite a player. Returns `Err` if party is full or player already in it.
-    pub fn invite(&self, invitee: u64) -> Result<PartyInvite, PartyError> {
-        if self.members.len() >= MAX_PARTY_SIZE {
-            return Err(PartyError::Full);
-        }
-        if self.members.contains(&invitee) {
-            return Err(PartyError::AlreadyMember);
-        }
-        Ok(PartyInvite {
-            inviter: self.leader,
-            invitee,
-        })
-    }
-
-    /// Accept an invite, adding the player to the party.
-    pub fn accept(&mut self, player: u64) -> Result<(), PartyError> {
-        if self.members.len() >= MAX_PARTY_SIZE {
-            return Err(PartyError::Full);
-        }
-        if self.members.contains(&player) {
-            // bounded: max 5 members
-            return Err(PartyError::AlreadyMember);
-        }
-        self.members.push(player);
-        Ok(())
-    }
-
-    /// Remove a player from the party.
-    ///
-    /// If the leader leaves, the next member becomes leader.
-    /// Returns `true` if the party should be disbanded (0-1 members left).
-    pub fn leave(&mut self, player: u64) -> bool {
-        self.members.retain(|&m| m != player);
-        if player == self.leader {
-            self.leader = self.members.first().copied().unwrap_or(0);
-        }
-        self.members.len() <= 1
-    }
-
-    /// Disband the party (only leader can).
-    pub fn disband(&mut self, requester: u64) -> Result<(), PartyError> {
-        if requester != self.leader {
-            return Err(PartyError::NotLeader);
-        }
-        self.members.clear();
-        Ok(())
-    }
-
-    /// Number of members.
-    pub fn size(&self) -> usize {
-        self.members.len()
-    }
-
-    /// Whether a player is in this party.
-    pub fn contains(&self, player: u64) -> bool {
-        self.members.contains(&player)
-    }
-
-    /// Whether the party is full.
-    pub fn is_full(&self) -> bool {
-        self.members.len() >= MAX_PARTY_SIZE
-    }
-
-    /// Set the loot mode (only leader should call this).
-    pub fn set_loot_mode(&mut self, requester: u64, mode: LootMode) -> Result<(), PartyError> {
-        if requester != self.leader {
-            return Err(PartyError::NotLeader);
-        }
-        self.loot_mode = mode;
-        Ok(())
-    }
-
-    /// Get the next round-robin loot recipient and advance the rotation.
-    pub fn next_round_robin(&mut self) -> u64 {
-        if self.members.is_empty() {
-            return 0;
-        }
-        let member = self.members[self.loot_round_robin % self.members.len()];
-        self.loot_round_robin = (self.loot_round_robin + 1) % self.members.len();
-        member
-    }
 }
 
 // --- Raid ---
 
 /// A raid of up to 40 players in 8 subgroups of 5.
 ///
-/// Raids are formed by converting a party to a raid. Members are assigned
-/// to subgroups (0–7). Subgroup 0 is the "main tank" group by convention.
+/// A party is a `Raid` whose members all sit in subgroup 0. Members are assigned
+/// to subgroups (0–7).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Raid {
     pub leader: u64,
@@ -162,15 +40,27 @@ pub struct Raid {
 }
 
 impl Raid {
-    /// Convert a party into a raid. All party members go into subgroup 0.
-    pub fn from_party(party: &Party) -> Self {
+    /// A new group led by `leader`, who starts in subgroup 0.
+    pub fn new(leader: u64) -> Self {
         let mut subgroups: [Vec<u64>; RAID_SUBGROUPS] = Default::default();
-        subgroups[0] = party.members.clone();
+        subgroups[0].push(leader);
         Self {
-            leader: party.leader,
+            leader,
             subgroups,
-            loot_mode: party.loot_mode,
+            loot_mode: LootMode::PersonalLoot,
         }
+    }
+
+    /// Gathers every member into subgroup 0 (raid to party). Fails when more than a
+    /// party's worth of members remain.
+    pub fn collapse_to_party(&mut self) -> Result<(), PartyError> {
+        if self.total_members() > MAX_PARTY_SIZE {
+            return Err(PartyError::Full);
+        }
+        let members: Vec<u64> = self.all_members().collect();
+        self.subgroups = Default::default();
+        self.subgroups[0] = members;
+        Ok(())
     }
 
     /// Add a member to the first subgroup with space.

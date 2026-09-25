@@ -1,99 +1,41 @@
 use super::*;
 
-#[test]
-fn party_create() {
-    let party = Party::new(1);
-    assert_eq!(party.leader, 1);
-    assert_eq!(party.size(), 1);
-    assert!(party.contains(1));
-}
-
-#[test]
-fn party_invite_and_accept() {
-    let mut party = Party::new(1);
-    let invite = party.invite(2).unwrap();
-    assert_eq!(invite.invitee, 2);
-
-    party.accept(2).unwrap();
-    assert_eq!(party.size(), 2);
-    assert!(party.contains(2));
-}
-
-#[test]
-fn party_reject_duplicate() {
-    let party = Party::new(1);
-    assert_eq!(party.invite(1), Err(PartyError::AlreadyMember));
-}
-
-#[test]
-fn party_full_at_5() {
-    let mut party = Party::new(1);
-    for i in 2..=5 {
-        party.accept(i).unwrap();
-    }
-    assert!(party.is_full());
-    assert_eq!(party.invite(6), Err(PartyError::Full));
-    assert_eq!(party.accept(6), Err(PartyError::Full));
-}
-
-#[test]
-fn party_leave_promotes_leader() {
-    let mut party = Party::new(1);
-    party.accept(2).unwrap();
-    party.accept(3).unwrap();
-
-    let disband = party.leave(1); // leader leaves
-    assert!(!disband);
-    assert_eq!(party.leader, 2); // next member promoted
-    assert!(!party.contains(1));
-}
-
-#[test]
-fn party_leave_last_disbands() {
-    let mut party = Party::new(1);
-    party.accept(2).unwrap();
-    party.leave(1);
-    let disband = party.leave(2);
-    assert!(disband); // 0 members
-}
-
-#[test]
-fn party_disband_only_leader() {
-    let mut party = Party::new(1);
-    party.accept(2).unwrap();
-    assert_eq!(party.disband(2), Err(PartyError::NotLeader));
-    assert!(party.disband(1).is_ok());
-    assert_eq!(party.size(), 0);
-}
-
-#[test]
-fn party_leave_non_leader_keeps_leader() {
-    let mut party = Party::new(1);
-    party.accept(2).unwrap();
-    party.accept(3).unwrap();
-    party.leave(2);
-    assert_eq!(party.leader, 1);
-    assert_eq!(party.size(), 2);
-}
-
 // --- Raid tests ---
 
 #[test]
-fn raid_from_party() {
-    let mut party = Party::new(1);
-    party.accept(2).unwrap();
-    party.accept(3).unwrap();
-    let raid = Raid::from_party(&party);
+fn raid_new_puts_leader_in_first_subgroup() {
+    let raid = Raid::new(1);
     assert_eq!(raid.leader, 1);
-    assert_eq!(raid.total_members(), 3);
+    assert_eq!(raid.total_members(), 1);
     assert_eq!(raid.subgroup_of(1), Some(0));
-    assert_eq!(raid.subgroup_of(2), Some(0));
+    assert_eq!(raid.loot_mode, LootMode::PersonalLoot);
+}
+
+#[test]
+fn collapse_to_party_gathers_members_into_first_subgroup() {
+    let mut raid = Raid::new(1);
+    raid.add_member(2).unwrap();
+    raid.add_member(3).unwrap();
+    raid.move_to_subgroup(2, 4).unwrap();
+    raid.move_to_subgroup(3, 7).unwrap();
+    raid.collapse_to_party().unwrap();
+    assert_eq!(raid.subgroups[0], vec![1, 2, 3]);
+    assert_eq!(raid.total_members(), 3);
+}
+
+#[test]
+fn collapse_to_party_rejects_six_members() {
+    let mut raid = Raid::new(1);
+    for i in 2..=6 {
+        raid.add_member(i).unwrap();
+    }
+    assert_eq!(raid.collapse_to_party(), Err(PartyError::Full));
+    assert_eq!(raid.subgroup_of(6), Some(1));
 }
 
 #[test]
 fn raid_add_fills_subgroups() {
-    let party = Party::new(1);
-    let mut raid = Raid::from_party(&party);
+    let mut raid = Raid::new(1);
     // Fill subgroup 0 (already has 1 member)
     for i in 2..=5 {
         raid.add_member(i).unwrap();
@@ -107,8 +49,7 @@ fn raid_add_fills_subgroups() {
 
 #[test]
 fn raid_full_at_40() {
-    let party = Party::new(1);
-    let mut raid = Raid::from_party(&party);
+    let mut raid = Raid::new(1);
     for i in 2..=40 {
         raid.add_member(i).unwrap();
     }
@@ -118,8 +59,7 @@ fn raid_full_at_40() {
 
 #[test]
 fn raid_move_subgroup() {
-    let party = Party::new(1);
-    let mut raid = Raid::from_party(&party);
+    let mut raid = Raid::new(1);
     raid.add_member(2).unwrap();
     raid.move_to_subgroup(2, 3).unwrap();
     assert_eq!(raid.subgroup_of(2), Some(3));
@@ -128,8 +68,7 @@ fn raid_move_subgroup() {
 
 #[test]
 fn raid_move_to_full_subgroup_fails() {
-    let party = Party::new(1);
-    let mut raid = Raid::from_party(&party);
+    let mut raid = Raid::new(1);
     for i in 2..=5 {
         raid.add_member(i).unwrap();
     }
@@ -139,9 +78,8 @@ fn raid_move_to_full_subgroup_fails() {
 
 #[test]
 fn raid_leave_promotes_leader() {
-    let mut party = Party::new(1);
-    party.accept(2).unwrap();
-    let mut raid = Raid::from_party(&party);
+    let mut raid = Raid::new(1);
+    raid.add_member(2).unwrap();
     raid.leave(1);
     assert_eq!(raid.leader, 2);
     assert!(!raid.contains(1));
@@ -149,8 +87,7 @@ fn raid_leave_promotes_leader() {
 
 #[test]
 fn raid_reject_duplicate() {
-    let party = Party::new(1);
-    let mut raid = Raid::from_party(&party);
+    let mut raid = Raid::new(1);
     assert_eq!(raid.add_member(1), Err(PartyError::AlreadyMember));
 }
 
@@ -256,45 +193,6 @@ fn ready_check_counts() {
 fn ready_check_unknown_player() {
     let mut check = ReadyCheck::new(&[1, 2]);
     assert!(!check.respond(99, ReadyResponse::Ready));
-}
-
-// --- Group loot integration tests ---
-
-#[test]
-fn party_default_loot_mode_personal() {
-    let party = Party::new(1);
-    assert_eq!(party.loot_mode, LootMode::PersonalLoot);
-}
-
-#[test]
-fn party_set_loot_mode_leader_only() {
-    let mut party = Party::new(1);
-    party.accept(2).unwrap();
-    assert!(party.set_loot_mode(1, LootMode::NeedBeforeGreed).is_ok());
-    assert_eq!(party.loot_mode, LootMode::NeedBeforeGreed);
-    assert_eq!(
-        party.set_loot_mode(2, LootMode::FreeForAll),
-        Err(PartyError::NotLeader)
-    );
-}
-
-#[test]
-fn party_round_robin_rotates() {
-    let mut party = Party::new(1);
-    party.accept(2).unwrap();
-    party.accept(3).unwrap();
-    assert_eq!(party.next_round_robin(), 1);
-    assert_eq!(party.next_round_robin(), 2);
-    assert_eq!(party.next_round_robin(), 3);
-    assert_eq!(party.next_round_robin(), 1); // wraps
-}
-
-#[test]
-fn raid_inherits_loot_mode() {
-    let mut party = Party::new(1);
-    party.set_loot_mode(1, LootMode::NeedBeforeGreed).unwrap();
-    let raid = Raid::from_party(&party);
-    assert_eq!(raid.loot_mode, LootMode::NeedBeforeGreed);
 }
 
 // --- Shared threat tests ---

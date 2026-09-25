@@ -9,6 +9,8 @@ use bevy::prelude::*;
 use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
 
+use crate::components::{AuraView, Position, PowerEntry};
+use crate::death::DeathState;
 use crate::loot::LootMode;
 use crate::protocol_snapshots::GroupRoleSnapshot;
 
@@ -39,6 +41,11 @@ pub struct PromoteGroupLeader {
 /// Leader converts the party into a raid (`C_PartyInfo.ConvertToRaid`).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ConvertGroupToRaid;
+
+/// Leader converts a raid of at most 5 members back into a party
+/// (`C_PartyInfo.ConvertToParty`).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ConvertGroupToParty;
 
 /// Leader moves a raid member to subgroup 1–8 (`SetRaidSubgroup`).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -76,6 +83,38 @@ pub struct GroupInvitePrompt {
     pub inviter_name: String,
     pub timeout_secs: f32,
 }
+
+/// The pending invite is gone before the invitee answered: it expired, or the inviter
+/// logged out, joined another group or stopped leading. Closes the `PARTY_INVITE` popup.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct GroupInviteCancelled {
+    pub inviter_name: String,
+}
+
+/// Live unit state of one online group member, the data behind its party/raid frame.
+/// Sent for every member, in range or not, so frames never depend on replication range.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct GroupMemberState {
+    pub name: String,
+    pub health: u32,
+    pub max_health: u32,
+    /// Primary power (first `UnitPowers` entry); `None` for a unit without one.
+    pub power: Option<PowerEntry>,
+    pub death: DeathState,
+    pub position: Position,
+    /// Harmful, visible auras in application order.
+    pub debuffs: Vec<AuraView>,
+}
+
+/// Group member states that changed since the recipient's last update (at most 5 Hz).
+/// A recipient gets every online member's state on its first update after joining.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct GroupMemberStates {
+    pub members: Vec<GroupMemberState>,
+}
+
+/// Seconds between `GroupMemberStates` updates to one recipient.
+pub const GROUP_MEMBER_STATE_INTERVAL_SECS: f32 = 0.2;
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ReadyCheckAnswer {
@@ -126,6 +165,7 @@ pub enum GroupMessageCode {
     NewLeaderYou,
     GroupDisbanded,
     PartyConvertedToRaid,
+    RaidConvertedToParty,
     SetLootFreeForAll,
     SetLootRoundRobin,
     SetLootNeedBeforeGreed,
@@ -163,6 +203,7 @@ impl GroupMessageCode {
             Self::NewLeaderYou => "ERR_NEW_LEADER_YOU",
             Self::GroupDisbanded => "ERR_GROUP_DISBANDED",
             Self::PartyConvertedToRaid => "ERR_PARTY_CONVERTED_TO_RAID",
+            Self::RaidConvertedToParty => "ERR_RAID_CONVERTED_TO_PARTY",
             Self::SetLootFreeForAll => "ERR_SET_LOOT_FREEFORALL",
             Self::SetLootRoundRobin => "ERR_SET_LOOT_ROUNDROBIN",
             Self::SetLootNeedBeforeGreed => "ERR_SET_LOOT_NBG",
@@ -202,6 +243,7 @@ impl GroupMessageCode {
             Self::NewLeaderYou => "You are now the group leader.".into(),
             Self::GroupDisbanded => "Your group has been disbanded.".into(),
             Self::PartyConvertedToRaid => "Party converted to Raid".into(),
+            Self::RaidConvertedToParty => "Raid converted to Party".into(),
             Self::SetLootFreeForAll => "Looting set to Free for All.".into(),
             Self::SetLootRoundRobin => "Looting set to Round Robin.".into(),
             Self::SetLootNeedBeforeGreed => "Looting set to Need Before Greed.".into(),
@@ -219,12 +261,17 @@ pub(super) fn register_group_messages(app: &mut App) {
     for_client::<LeaveGroup>(app);
     for_client::<PromoteGroupLeader>(app);
     for_client::<ConvertGroupToRaid>(app);
+    for_client::<ConvertGroupToParty>(app);
     for_client::<SetRaidSubgroup>(app);
     for_client::<SetGroupRole>(app);
     for_client::<SetGroupLootMethod>(app);
     for_client::<StartReadyCheck>(app);
     for_client::<RespondReadyCheck>(app);
     app.register_message::<GroupInvitePrompt>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<GroupInviteCancelled>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<GroupMemberStates>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_message::<ReadyCheckUpdate>()
         .add_direction(NetworkDirection::ServerToClient);

@@ -26,6 +26,49 @@ fn protocol_plugin_registers_group_messages() {
     assert!(app.is_message_registered::<ReadyCheckUpdate>());
     assert!(app.is_message_registered::<GroupRosterSnapshot>());
     assert!(app.is_message_registered::<GroupCommandResponse>());
+    assert!(app.is_message_registered::<ConvertGroupToParty>());
+    assert!(app.is_message_registered::<GroupInviteCancelled>());
+    assert!(app.is_message_registered::<GroupMemberStates>());
+}
+
+#[test]
+fn group_member_states_round_trip_on_the_wire() {
+    use crate::components::{AuraView, Position, PowerEntry, PowerType};
+    let states = GroupMemberStates {
+        members: vec![GroupMemberState {
+            name: "Alice".into(),
+            health: 812,
+            max_health: 1200,
+            power: Some(PowerEntry {
+                power: PowerType::Rage,
+                current: 35,
+                max: 100,
+            }),
+            death: crate::death::DeathState::Ghost,
+            position: Position {
+                x: -8913.2,
+                y: -130.5,
+                z: 82.1,
+            },
+            debuffs: vec![AuraView {
+                instance_id: 7,
+                spell_id: 589,
+                caster: Some(99),
+                stacks: 1,
+                charges: 0,
+                duration_ms: 18_000,
+                remaining_ms: 12_500,
+                harmful: true,
+                dispel_type: 1,
+                flags: 0,
+            }],
+        }],
+    };
+    let config = bincode::config::standard();
+    let bytes = bincode::serde::encode_to_vec(&states, config).unwrap();
+    let (decoded, _): (GroupMemberStates, usize) =
+        bincode::serde::decode_from_slice(&bytes, config).unwrap();
+    assert_eq!(decoded, states);
 }
 
 #[test]
@@ -70,5 +113,13 @@ fn group_message_codes_use_retail_global_strings() {
     assert_eq!(
         GroupMessageCode::BadPlayerName.format("Nobody"),
         "Cannot find player 'Nobody'."
+    );
+    assert_eq!(
+        GroupMessageCode::RaidConvertedToParty.global_string_key(),
+        "ERR_RAID_CONVERTED_TO_PARTY"
+    );
+    assert_eq!(
+        GroupMessageCode::RaidConvertedToParty.format(""),
+        "Raid converted to Party"
     );
 }
