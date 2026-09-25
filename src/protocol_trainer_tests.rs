@@ -34,6 +34,7 @@ fn trainer_and_profession_messages_round_trip() {
                 req_skill_line: 0,
                 req_skill_rank: 0,
                 req_abilities: vec![],
+                profession: true,
             },
             TrainerService {
                 spell_id: 2393,
@@ -43,6 +44,7 @@ fn trainer_and_profession_messages_round_trip() {
                 req_skill_line: 2540,
                 req_skill_rank: 1,
                 req_abilities: vec![],
+                profession: false,
             },
         ],
     });

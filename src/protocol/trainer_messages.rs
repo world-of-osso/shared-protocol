@@ -36,6 +36,9 @@ pub struct TrainerService {
     pub req_skill_rank: u16,
     /// Spells the player must know; 0 entries omitted.
     pub req_abilities: Vec<u32>,
+    /// Learning it adds a primary profession (Retail `GetTrainerServiceCost`
+    /// `isProfession`): the frame confirms it and needs a free profession slot.
+    pub profession: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
