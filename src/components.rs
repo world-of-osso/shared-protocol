@@ -322,6 +322,30 @@ pub struct Mounted {
     pub mount_display_id: u32,
 }
 
+/// Server-authoritative repositioning of a player (graveyard release, taxi).
+/// The owning client adopts `Position` when `epoch` changes and follows it while
+/// `controlled`, sending no movement input.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Default,
+)]
+pub struct MovementControl {
+    /// Bumped by the server on every teleport.
+    pub epoch: u32,
+    /// The server drives the movement (taxi flight).
+    pub controlled: bool,
+}
+
 #[derive(
     Component,
     Reflect,

@@ -5,8 +5,8 @@ pub use crate::protocol_snapshots::*;
 
 use crate::components::{
     CombatStatus, EquipmentAppearance, Gold, GuildMembership, Health, Mana, ModelDisplay, Mounted,
-    MovementSpeed, Npc, Player, Position, PresenceStatus, Rotation, UnitAuras, UnitFactionTemplate,
-    UnitLevel, UnitPowers, UnitTarget, Zone,
+    MovementControl, MovementSpeed, Npc, Player, Position, PresenceStatus, Rotation, UnitAuras,
+    UnitFactionTemplate, UnitLevel, UnitPowers, UnitTarget, Zone,
 };
 
 mod bank_messages;
@@ -18,11 +18,13 @@ mod group_messages;
 mod guild_bank_messages;
 mod interaction_messages;
 mod inventory_messages;
+mod loot_messages;
 mod merchant_messages;
 mod quest_messages;
 mod registration;
 mod spell_messages;
 mod trainer_messages;
+mod taxi_messages;
 
 pub use bank_messages::*;
 pub use channels::*;
@@ -33,10 +35,12 @@ pub use group_messages::*;
 pub use guild_bank_messages::*;
 pub use interaction_messages::*;
 pub use inventory_messages::*;
+pub use loot_messages::*;
 pub use merchant_messages::*;
 pub use quest_messages::*;
 pub use spell_messages::*;
 pub use trainer_messages::*;
+pub use taxi_messages::*;
 
 use registration::{register_channels, register_messages};
 
@@ -57,6 +61,8 @@ impl Plugin for ProtocolPlugin {
         bank_messages::register_bank_protocol(app);
         guild_bank_messages::register_guild_bank_protocol(app);
         trainer_messages::register_trainer_protocol(app);
+        loot_messages::register_loot_protocol(app);
+        taxi_messages::register_taxi_protocol(app);
     }
 }
 
@@ -72,6 +78,7 @@ fn register_replicated_components(app: &mut App) {
     app.component::<MovementSpeed>().replicate();
     app.component::<CombatStatus>().replicate();
     app.component::<Mounted>().replicate();
+    app.component::<MovementControl>().replicate();
     app.component::<Zone>().replicate();
     app.component::<GuildMembership>().replicate();
     app.component::<PresenceStatus>().replicate();
@@ -123,3 +130,11 @@ mod experience_tests;
 #[cfg(test)]
 #[path = "protocol_bank_tests.rs"]
 mod bank_tests;
+
+#[cfg(test)]
+#[path = "protocol_loot_tests.rs"]
+mod loot_tests;
+
+#[cfg(test)]
+#[path = "protocol_taxi_tests.rs"]
+mod taxi_tests;
