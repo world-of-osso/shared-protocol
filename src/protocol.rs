@@ -16,6 +16,7 @@ mod gameplay_messages;
 mod group_messages;
 mod interaction_messages;
 mod inventory_messages;
+mod merchant_messages;
 mod quest_messages;
 mod registration;
 mod spell_messages;
@@ -27,6 +28,7 @@ pub use gameplay_messages::*;
 pub use group_messages::*;
 pub use interaction_messages::*;
 pub use inventory_messages::*;
+pub use merchant_messages::*;
 pub use quest_messages::*;
 pub use spell_messages::*;
 
@@ -45,6 +47,7 @@ impl Plugin for ProtocolPlugin {
         quest_messages::register_quest_protocol(app);
         interaction_messages::register_interaction_protocol(app);
         experience_messages::register_experience_protocol(app);
+        merchant_messages::register_merchant_protocol(app);
     }
 }
 
@@ -95,6 +98,10 @@ mod quest_tests;
 #[cfg(test)]
 #[path = "protocol_interaction_tests.rs"]
 mod interaction_tests;
+
+#[cfg(test)]
+#[path = "protocol_merchant_tests.rs"]
+mod merchant_tests;
 
 #[cfg(test)]
 #[path = "protocol_experience_tests.rs"]
