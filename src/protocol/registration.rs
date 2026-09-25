@@ -216,14 +216,8 @@ fn register_duel_messages(app: &mut App) {
 }
 
 fn register_profession_messages(app: &mut App) {
-    app.register_message::<QueryProfessions>()
+    app.register_message::<CraftRecipe>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<CraftProfessionRecipe>()
-        .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<GatherProfessionNode>()
-        .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<ProfessionStateUpdate>()
-        .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_reputation_messages(app: &mut App) {

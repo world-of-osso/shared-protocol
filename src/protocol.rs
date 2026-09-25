@@ -22,6 +22,7 @@ mod merchant_messages;
 mod quest_messages;
 mod registration;
 mod spell_messages;
+mod trainer_messages;
 
 pub use bank_messages::*;
 pub use channels::*;
@@ -35,6 +36,7 @@ pub use inventory_messages::*;
 pub use merchant_messages::*;
 pub use quest_messages::*;
 pub use spell_messages::*;
+pub use trainer_messages::*;
 
 use registration::{register_channels, register_messages};
 
@@ -54,6 +56,7 @@ impl Plugin for ProtocolPlugin {
         merchant_messages::register_merchant_protocol(app);
         bank_messages::register_bank_protocol(app);
         guild_bank_messages::register_guild_bank_protocol(app);
+        trainer_messages::register_trainer_protocol(app);
     }
 }
 
@@ -108,6 +111,10 @@ mod interaction_tests;
 #[cfg(test)]
 #[path = "protocol_merchant_tests.rs"]
 mod merchant_tests;
+
+#[cfg(test)]
+#[path = "protocol_trainer_tests.rs"]
+mod trainer_tests;
 
 #[cfg(test)]
 #[path = "protocol_experience_tests.rs"]

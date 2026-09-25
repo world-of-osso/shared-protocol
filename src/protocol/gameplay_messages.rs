@@ -353,25 +353,13 @@ pub struct DuelStateUpdate {
     pub error: Option<String>,
 }
 
+/// Cast a known recipe `casts` times in a row (Retail `C_TradeSkillUI.CraftRecipe`
+/// `numCasts`). Each cast runs through the spell pipeline; the queue stops when a
+/// cast fails or is interrupted.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct QueryProfessions;
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct CraftProfessionRecipe {
-    pub recipe_id: u32,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct GatherProfessionNode {
-    pub node_id: u32,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct ProfessionStateUpdate {
-    pub snapshot: Option<ProfessionSnapshot>,
-    pub message: Option<String>,
-    pub skill_up: Option<ProfessionSkillSnapshot>,
-    pub error: Option<String>,
+pub struct CraftRecipe {
+    pub spell_id: u32,
+    pub casts: u16,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]

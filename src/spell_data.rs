@@ -155,6 +155,12 @@ pub enum CastFailReason {
     Silenced,
     /// Caster is pacified (physical abilities blocked).
     Pacified,
+    /// A `SpellReagents` item is missing from the caster's bags.
+    Reagents,
+    /// A `SpellTotems` tool is missing from the caster's bags.
+    Totems,
+    /// The created item does not fit in the caster's bags.
+    InventoryFull,
 }
 
 /// Context needed to validate a cast attempt.

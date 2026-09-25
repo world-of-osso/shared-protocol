@@ -174,6 +174,9 @@ fn cast_failed_round_trips_every_reason() {
         CastFailReason::Stunned,
         CastFailReason::Silenced,
         CastFailReason::Pacified,
+        CastFailReason::Reagents,
+        CastFailReason::Totems,
+        CastFailReason::InventoryFull,
     ];
     for reason in reasons {
         assert_wire_round_trip(&CastFailed {

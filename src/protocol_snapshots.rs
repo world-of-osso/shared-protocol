@@ -148,26 +148,14 @@ pub struct CollectionPetSnapshot {
 
 // -- Profession snapshots --
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+/// The owner's professions: learned skill lines and every spell learned through
+/// them (profession spells such as 3908 Tailoring, and recipes). Sent on enter
+/// world and after every change. Recipe data (reagents, category, trivial ranks,
+/// output) comes from the client's DB2 tables, as in Retail.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Default)]
 pub struct ProfessionSnapshot {
-    pub skills: Vec<ProfessionSkillSnapshot>,
-    pub recipes: Vec<ProfessionRecipeSnapshot>,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct ProfessionSkillSnapshot {
-    pub profession: String,
-    pub current: u16,
-    pub max: u16,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct ProfessionRecipeSnapshot {
-    pub spell_id: u32,
-    pub profession: String,
-    pub name: String,
-    pub craftable: bool,
-    pub cooldown: Option<String>,
+    pub lines: Vec<crate::profession::ProfessionSkillLine>,
+    pub spells: Vec<u32>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
