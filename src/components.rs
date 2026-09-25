@@ -139,7 +139,8 @@ pub struct Mana {
     Eq,
     Default,
 )]
-pub struct Gold(pub u32);
+/// Player money in copper (Retail cap 9,999,999g 99s 99c).
+pub struct Gold(pub u64);
 
 /// A single resource pool (current/max) for a specific resource type.
 ///

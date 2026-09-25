@@ -395,7 +395,8 @@ pub struct PvpSnapshot {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct BarberShopSnapshot {
     pub appearance: CharacterAppearance,
-    pub gold: u32,
+    /// The player's money in copper.
+    pub gold: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]

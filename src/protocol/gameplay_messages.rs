@@ -130,7 +130,8 @@ pub struct QueryAuctionInventory;
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct AuctionInventorySnapshot {
-    pub gold: u32,
+    /// The player's money in copper.
+    pub gold: u64,
     pub items: Vec<AuctionInventoryItem>,
 }
 
