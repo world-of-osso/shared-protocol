@@ -140,6 +140,7 @@ fn guild_bank_messages_round_trip() {
             kind: GuildBankLogKind::WithdrawItem,
             actor: "Bankalt".into(),
             item_id: 2589,
+            item_name: "Linen Cloth".into(),
             count: 5,
             copper: 0,
             seconds_ago: 90,

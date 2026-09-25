@@ -128,6 +128,7 @@ pub struct GuildBankLogEntry {
     pub kind: GuildBankLogKind,
     pub actor: String,
     pub item_id: u32,
+    pub item_name: String,
     pub count: u32,
     pub copper: u64,
     /// Seconds between the transaction and the server sending the log.
