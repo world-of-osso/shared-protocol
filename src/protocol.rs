@@ -9,11 +9,13 @@ use crate::components::{
     UnitLevel, UnitPowers, UnitTarget, Zone,
 };
 
+mod bank_messages;
 mod channels;
 mod core_messages;
 mod experience_messages;
 mod gameplay_messages;
 mod group_messages;
+mod guild_bank_messages;
 mod interaction_messages;
 mod inventory_messages;
 mod merchant_messages;
@@ -21,11 +23,13 @@ mod quest_messages;
 mod registration;
 mod spell_messages;
 
+pub use bank_messages::*;
 pub use channels::*;
 pub use core_messages::*;
 pub use experience_messages::*;
 pub use gameplay_messages::*;
 pub use group_messages::*;
+pub use guild_bank_messages::*;
 pub use interaction_messages::*;
 pub use inventory_messages::*;
 pub use merchant_messages::*;
@@ -48,6 +52,8 @@ impl Plugin for ProtocolPlugin {
         interaction_messages::register_interaction_protocol(app);
         experience_messages::register_experience_protocol(app);
         merchant_messages::register_merchant_protocol(app);
+        bank_messages::register_bank_protocol(app);
+        guild_bank_messages::register_guild_bank_protocol(app);
     }
 }
 
@@ -106,3 +112,7 @@ mod merchant_tests;
 #[cfg(test)]
 #[path = "protocol_experience_tests.rs"]
 mod experience_tests;
+
+#[cfg(test)]
+#[path = "protocol_bank_tests.rs"]
+mod bank_tests;

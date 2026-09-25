@@ -6,8 +6,13 @@
 //! routes its options through `SelectGossipOption`. The server sends
 //! `InteractionClosed` when the interaction ends (player walked away, NPC died or
 //! entered combat, the client sent `CloseInteraction`, or another NPC was opened).
-//! NPCs are addressed by server entity bits, like `SetTarget`. All messages use
-//! `InteractionChannel`.
+//! NPCs are addressed by server entity bits, like `SetTarget`.
+//!
+//! Game objects replicate `GameObjectInfo`. The client sends `UseGameObject` when
+//! the player right-clicks one (Retail `CMSG_GAME_OBJ_USE`); the server answers
+//! with the same `InteractionOpened` / `InteractionFailed` / `InteractionClosed`
+//! messages, whose `npc` field then carries the object's entity bits. All messages
+//! use `InteractionChannel`.
 
 use bevy::prelude::*;
 use lightyear::prelude::*;
@@ -97,6 +102,32 @@ pub enum NpcRole {
     Battlemaster,
     AuctionHouse,
     StableMaster,
+    GuildBanker,
+}
+
+/// AzerothCore `GAMEOBJECT_TYPE_GUILD_BANK`.
+pub const GAMEOBJECT_TYPE_GUILD_BANK: u8 = 34;
+
+/// A world game object (AzerothCore `gameobject_template`).
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    PartialEq,
+)]
+pub struct GameObjectInfo {
+    pub entry: u32,
+    /// AzerothCore `GameobjectTypes`, e.g. `GAMEOBJECT_TYPE_GUILD_BANK`.
+    pub go_type: u8,
+    /// Retail `GameObjectDisplayInfo` ID.
+    pub display_id: u32,
+    pub name: String,
+    pub scale: f32,
 }
 
 /// One selectable gossip line. `icon` is the Retail `GossipOptionIcon` id
@@ -155,6 +186,12 @@ pub struct InteractNpc {
     pub npc: u64,
 }
 
+/// Client right-clicked a game object (Retail `CMSG_GAME_OBJ_USE`).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct UseGameObject {
+    pub object: u64,
+}
+
 /// Client picked an option of the open gossip menu (`CMSG_GOSSIP_SELECT_OPTION`).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct SelectGossipOption {
@@ -188,12 +225,15 @@ pub struct InteractionClosed {
 
 pub(super) fn register_interaction_protocol(app: &mut App) {
     app.component::<NpcFlags>().replicate();
+    app.component::<GameObjectInfo>().replicate();
     app.add_channel::<InteractionChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
         ..default()
     })
     .add_direction(NetworkDirection::Bidirectional);
     app.register_message::<InteractNpc>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<UseGameObject>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_message::<SelectGossipOption>()
         .add_direction(NetworkDirection::ClientToServer);

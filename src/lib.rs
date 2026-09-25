@@ -12,7 +12,6 @@ pub mod formulas;
 pub mod game_object;
 pub mod game_object_handlers;
 pub mod group;
-pub mod guild_bank;
 pub mod guild_creation;
 pub mod holiday;
 pub mod instance;
@@ -37,7 +36,6 @@ pub mod ticket;
 pub mod trade;
 pub mod transmog;
 pub mod types;
-pub mod warbank;
 pub mod xp;
 
 pub use components::GuildMembership;
