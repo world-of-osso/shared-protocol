@@ -538,10 +538,26 @@ fn confirm_both_sides_completes_trade() {
     assert_eq!(completed.initiator_offer.slots[0], Some(sword()));
     assert_eq!(completed.target_offer.gold, 5000);
 
-    // Session removed after completion
+    // The session stays until the server has executed the exchange.
+    assert!(mgr.is_trading(100));
+    mgr.finish_trade(200);
     assert!(!mgr.is_trading(100));
     assert!(!mgr.is_trading(200));
     assert!(mgr.is_empty());
+}
+
+#[test]
+fn refused_exchange_keeps_the_trade_open_without_accepts() {
+    let mut mgr = open_trade();
+    mgr.set_item(100, 0, sword()).unwrap();
+    mgr.confirm_trade(100).unwrap();
+    assert!(mgr.confirm_trade(200).unwrap().is_some());
+
+    mgr.refuse_accepts(100);
+
+    let session = mgr.get_session(100).unwrap();
+    assert!(!session.has_accepted(100) && !session.has_accepted(200));
+    assert_eq!(session.initiator_offer.slots[0], Some(sword()));
 }
 
 #[test]

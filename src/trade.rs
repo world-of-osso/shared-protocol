@@ -559,9 +559,10 @@ impl TradeManager {
 
     /// Confirm (accept) the trade. Both players must confirm for it to complete.
     ///
-    /// Returns `Some(CompletedTrade)` if both players have now accepted,
-    /// which means the server should execute the item/gold exchange.
-    /// The session is removed on completion.
+    /// Returns `Some(CompletedTrade)` once both players have accepted: the server
+    /// then executes the exchange and calls `finish_trade` when it succeeded, or
+    /// `refuse_accepts` when it failed (AzerothCore keeps the window open and
+    /// clears both accepts, `TradeHandler.cpp:426-455`).
     pub fn confirm_trade(&mut self, player: u64) -> Result<Option<CompletedTrade>, TradeError> {
         let session = self.require_open_session(player)?;
         if player == session.initiator {
@@ -569,22 +570,29 @@ impl TradeManager {
         } else {
             session.target_accepted = true;
         }
-
         if !session.both_accepted() {
             return Ok(None);
         }
-
-        // Both accepted — complete the trade
-        let session_id = self.player_index[&player];
-        let session = self.sessions.remove(&session_id).unwrap();
-        self.player_index.remove(&session.initiator);
-        self.player_index.remove(&session.target);
         Ok(Some(CompletedTrade {
             initiator: session.initiator,
             target: session.target,
-            initiator_offer: session.initiator_offer,
-            target_offer: session.target_offer,
+            initiator_offer: session.initiator_offer.clone(),
+            target_offer: session.target_offer.clone(),
         }))
+    }
+
+    /// Close the session of an executed trade.
+    pub fn finish_trade(&mut self, player: u64) {
+        if let Some(&session_id) = self.player_index.get(&player) {
+            self.remove_session(session_id);
+        }
+    }
+
+    /// Clear both accepts after the exchange was refused.
+    pub fn refuse_accepts(&mut self, player: u64) {
+        if let Some(session) = self.get_session_mut(player) {
+            session.reset_accepts();
+        }
     }
 
     /// Withdraw acceptance (unconfirm). Only valid if the player has accepted.
