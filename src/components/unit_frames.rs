@@ -176,6 +176,31 @@ pub struct UnitLevel(pub u8);
 )]
 pub struct UnitFactionTemplate(pub u32);
 
+/// `UNIT_FIELD_FLAGS` (TrinityCore `UnitFlags`, `m_unitData->Flags`).
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+)]
+pub struct UnitFlags(pub u32);
+
+impl UnitFlags {
+    /// `UNIT_FLAG_NOT_SELECTABLE`: no nameplate, and the unit cannot be targeted or clicked.
+    pub const NOT_SELECTABLE: u32 = 0x0200_0000;
+
+    pub fn is_selectable(self) -> bool {
+        self.0 & Self::NOT_SELECTABLE == 0
+    }
+}
+
 /// Entity bits of the unit's current target (`None` = no target), for target-of-target.
 #[derive(
     Component,
