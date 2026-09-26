@@ -169,6 +169,28 @@ fn game_object_use_round_trips() {
 }
 
 #[test]
+fn vaults_mailboxes_stones_and_portals_are_usable_and_stockade_fires_are_not() {
+    let object = |go_type, name: &str| GameObjectInfo {
+        entry: 0,
+        go_type,
+        display_id: 0,
+        name: name.into(),
+        scale: 1.0,
+    };
+    for usable in [
+        object(GAMEOBJECT_TYPE_GUILD_BANK, "Guild Vault"),
+        object(GAMEOBJECT_TYPE_MAILBOX, "Mailbox"),
+        object(GAMEOBJECT_TYPE_MEETINGSTONE, "Meeting Stone"),
+        object(GAMEOBJECT_TYPE_RITUAL, "Summoning Portal"),
+    ] {
+        assert!(usable.is_usable(), "{}", usable.name);
+    }
+    // Stockade 206038 Small Fire (0.5) and 206117 Bonfire.
+    assert!(!object(GAMEOBJECT_TYPE_GENERIC, "Small Fire (0.5)").is_usable());
+    assert!(!object(GAMEOBJECT_TYPE_SPELL_FOCUS, "Bonfire").is_usable());
+}
+
+#[test]
 fn bank_errors_use_retail_wording() {
     assert_eq!(BankError::BankFull.message(), "Your bank is full");
     assert_eq!(

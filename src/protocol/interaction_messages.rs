@@ -120,6 +120,10 @@ pub const GAMEOBJECT_TYPE_MAILBOX: u8 = 19;
 pub const GAMEOBJECT_TYPE_RITUAL: u8 = 18;
 /// TrinityCore `GAMEOBJECT_TYPE_MEETINGSTONE`.
 pub const GAMEOBJECT_TYPE_MEETINGSTONE: u8 = 23;
+/// TrinityCore `GAMEOBJECT_TYPE_GENERIC`: decoration (fires, lamps).
+pub const GAMEOBJECT_TYPE_GENERIC: u8 = 5;
+/// TrinityCore `GAMEOBJECT_TYPE_SPELL_FOCUS`: a spell's required focus (bonfires, anvils).
+pub const GAMEOBJECT_TYPE_SPELL_FOCUS: u8 = 8;
 
 /// A world game object (AzerothCore `gameobject_template`).
 #[derive(
@@ -141,6 +145,22 @@ pub struct GameObjectInfo {
     pub display_id: u32,
     pub name: String,
     pub scale: f32,
+}
+
+impl GameObjectInfo {
+    /// Whether a player can use the object: the types whose TrinityCore `GameObject::Use`
+    /// (GameObject.cpp:2620-3530) gives the player an action the server implements. Others,
+    /// such as decoration (`GENERIC`, no `Use` case) and spell foci (`SPELL_FOCUS`, which only
+    /// triggers a linked trap), take no cursor, highlight or click.
+    pub fn is_usable(&self) -> bool {
+        matches!(
+            self.go_type,
+            GAMEOBJECT_TYPE_GUILD_BANK
+                | GAMEOBJECT_TYPE_MAILBOX
+                | GAMEOBJECT_TYPE_MEETINGSTONE
+                | GAMEOBJECT_TYPE_RITUAL
+        )
+    }
 }
 
 /// One selectable gossip line. `icon` is the Retail `GossipOptionIcon` id
