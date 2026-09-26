@@ -50,15 +50,18 @@ pub struct MailHeader {
     pub read: bool,
     /// Sent back to its sender (`wasReturned`).
     pub returned: bool,
-    /// Sent by a player (`canReply`): only player mail can be returned.
+    /// Sent by a player (`canReply`).
     pub from_player: bool,
+    /// Player mail not yet returned and not a C.O.D. payment can go back to its
+    /// sender (`ReturnInboxItem`).
+    pub returnable: bool,
 }
 
 impl MailHeader {
-    /// Retail `InboxItemCanDelete`: player mail still holding items or money is
+    /// Retail `InboxItemCanDelete`: returnable mail still holding items or money is
     /// returned rather than deleted.
     pub fn can_delete(&self) -> bool {
-        !self.from_player || self.returned || (self.attachments.is_empty() && self.money == 0)
+        !self.returnable || (self.attachments.is_empty() && self.money == 0)
     }
 }
 

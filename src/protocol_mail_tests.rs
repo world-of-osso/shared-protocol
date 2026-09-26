@@ -15,7 +15,7 @@ fn assert_wire_round_trip<T: Serialize + DeserializeOwned + PartialEq + Debug>(v
     assert_eq!(&decoded, value);
 }
 
-fn letter(from_player: bool, returned: bool) -> MailHeader {
+fn letter(from_player: bool, returnable: bool) -> MailHeader {
     MailHeader {
         mail_id: 4,
         sender: "Tradea".into(),
@@ -26,8 +26,9 @@ fn letter(from_player: bool, returned: bool) -> MailHeader {
         attachments: Vec::new(),
         expires_at: 1_800_000_000,
         read: false,
-        returned,
+        returned: from_player && !returnable,
         from_player,
+        returnable,
     }
 }
 
@@ -46,16 +47,17 @@ fn linen_attachment() -> MailAttachment {
 
 #[test]
 fn player_mail_holding_items_or_money_is_returned_not_deleted() {
-    assert!(letter(true, false).can_delete());
-    let mut with_item = letter(true, false);
+    assert!(letter(true, true).can_delete());
+    let mut with_item = letter(true, true);
     with_item.attachments.push(linen_attachment());
     assert!(!with_item.can_delete());
-    let mut with_money = letter(true, false);
+    let mut with_money = letter(true, true);
     with_money.money = 1;
     assert!(!with_money.can_delete());
     // Returned mail and mail from the Auction House cannot go back.
-    with_money.returned = true;
-    assert!(with_money.can_delete());
+    let mut returned = letter(true, false);
+    returned.money = 1;
+    assert!(returned.can_delete());
     let mut auction = letter(false, false);
     auction.attachments.push(linen_attachment());
     assert!(auction.can_delete());
@@ -63,7 +65,7 @@ fn player_mail_holding_items_or_money_is_returned_not_deleted() {
 
 #[test]
 fn mail_messages_round_trip() {
-    let mut header = letter(true, false);
+    let mut header = letter(true, true);
     header.cod = 5_000_000_000;
     header.attachments.push(linen_attachment());
     assert_wire_round_trip(&MailboxContents {
