@@ -126,7 +126,7 @@ pub struct TradeOffer {
     /// Item slots (6 total). `None` = empty slot.
     pub slots: [Option<TradeItem>; TRADE_SLOT_COUNT],
     /// Gold offered (in copper).
-    pub gold: u32,
+    pub gold: u64,
 }
 
 impl Default for TradeOffer {
@@ -167,7 +167,7 @@ impl TradeOffer {
     }
 
     /// Set the gold amount offered.
-    pub fn set_gold(&mut self, copper: u32) {
+    pub fn set_gold(&mut self, copper: u64) {
         self.gold = copper;
     }
 
@@ -536,7 +536,7 @@ impl TradeManager {
 
     /// Set the gold amount in a player's trade offer.
     /// Resets both players' accept flags.
-    pub fn set_gold(&mut self, player: u64, copper: u32) -> Result<(), TradeError> {
+    pub fn set_gold(&mut self, player: u64, copper: u64) -> Result<(), TradeError> {
         let session = self.require_open_session(player)?;
         session.reset_accepts();
         let offer = session

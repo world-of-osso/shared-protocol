@@ -27,9 +27,9 @@ pub struct Mail {
     /// Attached items.
     pub attachments: Vec<MailAttachment>,
     /// Gold attached in copper.
-    pub gold: u32,
+    pub gold: u64,
     /// Cash on delivery amount in copper (0 = no COD).
-    pub cod: u32,
+    pub cod: u64,
     /// Server timestamp when sent (seconds since epoch).
     pub sent_at: u64,
     /// Server timestamp when the mail becomes available to the recipient.
@@ -43,9 +43,9 @@ pub struct Mail {
 }
 
 /// Cost to send a mail in copper (base 30c per WoW standard).
-const MAIL_SEND_COST: u32 = 30;
+const MAIL_SEND_COST: u64 = 30;
 /// Additional cost per attachment.
-const MAIL_ATTACHMENT_COST: u32 = 30;
+const MAIL_ATTACHMENT_COST: u64 = 30;
 /// Maximum attachments per mail.
 pub const MAX_ATTACHMENTS: usize = 12;
 
@@ -82,8 +82,8 @@ pub enum MailError {
 }
 
 /// Calculate the cost to send a mail (in copper).
-pub fn send_cost(attachment_count: usize) -> u32 {
-    MAIL_SEND_COST + attachment_count as u32 * MAIL_ATTACHMENT_COST
+pub fn send_cost(attachment_count: usize) -> u64 {
+    MAIL_SEND_COST + attachment_count as u64 * MAIL_ATTACHMENT_COST
 }
 
 /// Parameters for creating a new mail.
@@ -94,8 +94,8 @@ pub struct NewMail {
     pub subject: String,
     pub body: String,
     pub attachments: Vec<MailAttachment>,
-    pub gold: u32,
-    pub cod: u32,
+    pub gold: u64,
+    pub cod: u64,
     pub now: u64,
     pub delivery_delay: u64,
     pub expiry_days: u32,
@@ -135,9 +135,9 @@ pub fn create_mail(params: NewMail) -> Result<Mail, MailError> {
 pub struct CollectResult {
     pub attachments: Vec<MailAttachment>,
     /// Gold received by the collector.
-    pub gold: u32,
+    pub gold: u64,
     /// COD amount paid by the collector (0 if no COD).
-    pub cod_paid: u32,
+    pub cod_paid: u64,
     /// Original sender name to receive COD payment (None if no COD).
     pub cod_recipient: Option<String>,
 }
@@ -149,7 +149,7 @@ pub enum CollectError {
     AlreadyCollected,
     /// Recipient doesn't have enough gold to pay the COD.
     NotEnoughGoldForCod {
-        required: u32,
+        required: u64,
     },
 }
 
@@ -179,7 +179,7 @@ impl Mailbox {
     pub fn collect(
         &mut self,
         mail_id: u64,
-        recipient_gold: u32,
+        recipient_gold: u64,
     ) -> Result<CollectResult, CollectError> {
         let mail = self
             .mails
@@ -289,13 +289,13 @@ pub fn return_to_sender(expired: &Mail, new_id: u64, now: u64) -> Option<Mail> {
 const AH_SENDER: &str = "Auction House";
 
 /// AH cut on sold items (5%).
-const AH_CUT_PERCENT: f32 = 0.05;
+const AH_CUT_PERCENT: u64 = 5;
 
 fn ah_mail(
     id: u64,
     recipient: &str,
     subject: String,
-    gold: u32,
+    gold: u64,
     attachments: Vec<MailAttachment>,
     now: u64,
 ) -> Mail {
@@ -317,8 +317,8 @@ fn ah_mail(
 }
 
 /// Create an AH mail for a successful sale (gold to seller, minus AH cut).
-pub fn ah_sold_mail(id: u64, seller: &str, item_name: &str, sale_price: u32, now: u64) -> Mail {
-    let cut = (sale_price as f32 * AH_CUT_PERCENT) as u32;
+pub fn ah_sold_mail(id: u64, seller: &str, item_name: &str, sale_price: u64, now: u64) -> Mail {
+    let cut = ah_cut(sale_price);
     let payout = sale_price.saturating_sub(cut);
     ah_mail(
         id,
@@ -343,7 +343,7 @@ pub fn ah_expired_mail(id: u64, seller: &str, item_id: u32, count: u16, now: u64
 }
 
 /// Create an AH mail for an outbid notification (no attachments, just info).
-pub fn ah_outbid_mail(id: u64, bidder: &str, item_name: &str, bid_refund: u32, now: u64) -> Mail {
+pub fn ah_outbid_mail(id: u64, bidder: &str, item_name: &str, bid_refund: u64, now: u64) -> Mail {
     ah_mail(
         id,
         bidder,
@@ -367,8 +367,8 @@ pub fn ah_won_mail(id: u64, buyer: &str, item_id: u32, count: u16, now: u64) -> 
 }
 
 /// Calculate the AH cut from a sale price.
-pub fn ah_cut(sale_price: u32) -> u32 {
-    (sale_price as f32 * AH_CUT_PERCENT) as u32
+pub fn ah_cut(sale_price: u64) -> u64 {
+    sale_price * AH_CUT_PERCENT / 100
 }
 
 #[cfg(test)]

@@ -51,10 +51,10 @@ pub struct AuctionListingSummary {
     pub item: AuctionInventoryItem,
     pub owner_name: String,
     pub stack_count: u32,
-    pub min_bid: u32,
-    pub current_bid: Option<u32>,
-    pub min_next_bid: u32,
-    pub buyout_price: Option<u32>,
+    pub min_bid: u64,
+    pub current_bid: Option<u64>,
+    pub min_next_bid: u64,
+    pub buyout_price: Option<u64>,
     pub time_left: AuctionTimeLeft,
 }
 
@@ -97,7 +97,7 @@ pub struct AuctionSearchResults {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct PlaceBid {
     pub auction_id: u64,
-    pub amount: u32,
+    pub amount: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -109,8 +109,8 @@ pub struct BuyoutAuction {
 pub struct CreateAuction {
     pub item_guid: u64,
     pub stack_count: u32,
-    pub min_bid: u32,
-    pub buyout_price: Option<u32>,
+    pub min_bid: u64,
+    pub buyout_price: Option<u64>,
     pub duration: AuctionDuration,
 }
 
@@ -156,7 +156,7 @@ pub struct AuctionMailEntry {
     pub mail_id: u64,
     pub subject: String,
     pub body: String,
-    pub attached_money: u32,
+    pub attached_money: u64,
     pub attached_item: Option<AuctionInventoryItem>,
 }
 
@@ -193,7 +193,7 @@ pub struct TradeItemSnapshot {
 pub struct TradePartySnapshot {
     pub name: String,
     pub accepted: bool,
-    pub gold: u32,
+    pub gold: u64,
     pub slots: Vec<Option<TradeItemSnapshot>>,
 }
 
@@ -232,7 +232,7 @@ pub struct ClearTradeItem {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct SetTradeMoney {
-    pub copper: u32,
+    pub copper: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
