@@ -117,7 +117,6 @@ fn register_guild_and_chat_messages(app: &mut App) {
 fn register_auction_messages(app: &mut App) {
     register_auction_query_messages(app);
     register_auction_action_messages(app);
-    register_auction_mail_messages(app);
 }
 
 fn register_auction_query_messages(app: &mut App) {
@@ -156,15 +155,6 @@ fn register_auction_action_messages(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
 }
 
-fn register_auction_mail_messages(app: &mut App) {
-    app.register_message::<QueryAuctionMailbox>()
-        .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<AuctionMailboxSnapshot>()
-        .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<ClaimAuctionMail>()
-        .add_direction(NetworkDirection::ClientToServer);
-}
-
 fn register_trade_messages(app: &mut App) {
     app.register_message::<InitiateTrade>()
         .add_direction(NetworkDirection::ClientToServer);
@@ -181,6 +171,8 @@ fn register_trade_messages(app: &mut App) {
     app.register_message::<SetTradeMoney>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_message::<ConfirmTrade>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<CancelTradeAccept>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_message::<TradeStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);

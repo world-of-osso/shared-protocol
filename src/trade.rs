@@ -12,8 +12,14 @@ use crate::item_data::BoundState;
 /// Maximum distance (in yards) between players to initiate or maintain a trade.
 pub const TRADE_RANGE: f32 = 11.11;
 
-/// Maximum number of item slots per player in a trade window.
-pub const TRADE_SLOT_COUNT: usize = 6;
+/// Item slots per player in a trade window (AzerothCore `TRADE_SLOT_COUNT`,
+/// Retail `MAX_TRADE_ITEMS`).
+pub const TRADE_SLOT_COUNT: usize = 7;
+/// Slots whose items change hands (AzerothCore `TRADE_SLOT_TRADED_COUNT`).
+pub const TRADE_SLOT_TRADED_COUNT: usize = 6;
+/// The "Will not be traded" slot (AzerothCore `TRADE_SLOT_NONTRADED`, Retail
+/// `TRADE_ENCHANT_SLOT`): its item stays with its owner.
+pub const TRADE_SLOT_NONTRADED: usize = 6;
 
 /// Duration (seconds) after group loot pickup during which a BoP item
 /// can be traded to eligible group members who were present for the kill.
@@ -120,10 +126,10 @@ pub struct TradeItem {
     pub count: u16,
 }
 
-/// One player's offer in a trade: up to 6 items + gold.
+/// One player's offer in a trade: 7 item slots (the last not traded) + gold.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct TradeOffer {
-    /// Item slots (6 total). `None` = empty slot.
+    /// Item slots (`TRADE_SLOT_COUNT`). `None` = empty slot.
     pub slots: [Option<TradeItem>; TRADE_SLOT_COUNT],
     /// Gold offered (in copper).
     pub gold: u64,
@@ -169,6 +175,11 @@ impl TradeOffer {
     /// Set the gold amount offered.
     pub fn set_gold(&mut self, copper: u64) {
         self.gold = copper;
+    }
+
+    /// Items that change hands (every slot but `TRADE_SLOT_NONTRADED`).
+    pub fn traded_items(&self) -> impl Iterator<Item = &TradeItem> {
+        self.slots[..TRADE_SLOT_TRADED_COUNT].iter().flatten()
     }
 
     /// Number of items offered (non-empty slots).

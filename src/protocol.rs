@@ -19,6 +19,7 @@ mod guild_bank_messages;
 mod interaction_messages;
 mod inventory_messages;
 mod loot_messages;
+mod mail_messages;
 mod merchant_messages;
 mod quest_messages;
 mod registration;
@@ -36,6 +37,7 @@ pub use guild_bank_messages::*;
 pub use interaction_messages::*;
 pub use inventory_messages::*;
 pub use loot_messages::*;
+pub use mail_messages::*;
 pub use merchant_messages::*;
 pub use quest_messages::*;
 pub use spell_messages::*;
@@ -62,6 +64,7 @@ impl Plugin for ProtocolPlugin {
         guild_bank_messages::register_guild_bank_protocol(app);
         trainer_messages::register_trainer_protocol(app);
         loot_messages::register_loot_protocol(app);
+        mail_messages::register_mail_protocol(app);
         taxi_messages::register_taxi_protocol(app);
     }
 }
@@ -138,3 +141,7 @@ mod loot_tests;
 #[cfg(test)]
 #[path = "protocol_taxi_tests.rs"]
 mod taxi_tests;
+
+#[cfg(test)]
+#[path = "protocol_mail_tests.rs"]
+mod mail_tests;

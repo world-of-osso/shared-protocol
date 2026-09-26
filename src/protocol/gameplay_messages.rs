@@ -151,28 +151,6 @@ pub struct AuctionOperationResponse {
     pub message: String,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct AuctionMailEntry {
-    pub mail_id: u64,
-    pub subject: String,
-    pub body: String,
-    pub attached_money: u64,
-    pub attached_item: Option<AuctionInventoryItem>,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct QueryAuctionMailbox;
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct AuctionMailboxSnapshot {
-    pub entries: Vec<AuctionMailEntry>,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
-pub struct ClaimAuctionMail {
-    pub mail_id: u64,
-}
-
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum TradePhase {
     PendingOutgoing,
@@ -237,6 +215,10 @@ pub struct SetTradeMoney {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ConfirmTrade;
+
+/// Withdraw the player's own accept (Retail `CancelTradeAccept`).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct CancelTradeAccept;
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct TradeStateUpdate {

@@ -103,10 +103,14 @@ pub enum NpcRole {
     AuctionHouse,
     StableMaster,
     GuildBanker,
+    /// Retail `PlayerInteractionType::MailInfo`.
+    Mailbox,
 }
 
 /// AzerothCore `GAMEOBJECT_TYPE_GUILD_BANK`.
 pub const GAMEOBJECT_TYPE_GUILD_BANK: u8 = 34;
+/// AzerothCore `GAMEOBJECT_TYPE_MAILBOX`.
+pub const GAMEOBJECT_TYPE_MAILBOX: u8 = 19;
 
 /// A world game object (AzerothCore `gameobject_template`).
 #[derive(

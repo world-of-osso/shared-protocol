@@ -367,8 +367,8 @@ fn offer_replace_item_in_same_slot() {
 #[test]
 fn offer_invalid_slot() {
     let mut offer = TradeOffer::default();
-    assert_eq!(offer.set_item(6, sword()), Err(TradeError::InvalidSlot));
-    assert_eq!(offer.clear_slot(6), Err(TradeError::InvalidSlot));
+    assert_eq!(offer.set_item(7, sword()), Err(TradeError::InvalidSlot));
+    assert_eq!(offer.clear_slot(7), Err(TradeError::InvalidSlot));
 }
 
 #[test]
@@ -484,8 +484,15 @@ fn both_players_fill_all_slots() {
         mgr.set_item(200, slot, item).unwrap();
     }
     let session = mgr.get_session(100).unwrap();
-    assert_eq!(session.initiator_offer.item_count(), 6);
-    assert_eq!(session.target_offer.item_count(), 6);
+    assert_eq!(session.initiator_offer.item_count(), 7);
+    assert_eq!(session.target_offer.item_count(), 7);
+    // The seventh slot ("Will not be traded") stays with its owner.
+    let traded: Vec<u64> = session
+        .initiator_offer
+        .traded_items()
+        .map(|item| item.item_guid)
+        .collect();
+    assert_eq!(traded, vec![1000, 1001, 1002, 1003, 1004, 1005]);
 }
 
 #[test]
