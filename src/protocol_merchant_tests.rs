@@ -48,7 +48,17 @@ fn merchant_messages_round_trip() {
         slot: 1,
         item_id: 2379,
         count: 2,
+        destination: None,
     });
+    // A merchant cursor dropped on backpack slot 5.
+    assert_wire_round_trip(&BuyItem {
+        npc: 7,
+        slot: 0,
+        item_id: 159,
+        count: 1,
+        destination: Some(ItemLocation::Bag { bag: 0, slot: 4 }),
+    });
+    assert_wire_round_trip(&SellAllJunkItems { npc: 7 });
     assert_wire_round_trip(&SellItem {
         npc: 7,
         item_guid: 90,
@@ -79,6 +89,10 @@ fn merchant_errors_use_retail_wording() {
         MerchantError::SoldOut.message(),
         "That item is currently sold out."
     );
+    assert_eq!(
+        MerchantError::CantStack.message(),
+        "This item cannot stack."
+    );
 }
 
 #[test]
@@ -94,6 +108,7 @@ fn protocol_plugin_registers_merchant_messages() {
     assert!(app.is_message_registered::<MerchantFailed>());
     assert!(app.is_message_registered::<BuyItem>());
     assert!(app.is_message_registered::<SellItem>());
+    assert!(app.is_message_registered::<SellAllJunkItems>());
     assert!(app.is_message_registered::<BuybackItemRequest>());
     assert!(app.is_message_registered::<RepairItem>());
 }

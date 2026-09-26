@@ -1,5 +1,6 @@
 //! Vendor messages (Retail `MerchantFrame`, AzerothCore `SMSG_LIST_INVENTORY` /
-//! `CMSG_BUY_ITEM` / `CMSG_SELL_ITEM` / `CMSG_BUYBACK_ITEM` / `CMSG_REPAIR_ITEM`).
+//! `CMSG_BUY_ITEM` / `CMSG_SELL_ITEM` / `CMSG_BUYBACK_ITEM` / `CMSG_REPAIR_ITEM`;
+//! TrinityCore `CMSG_SELL_ALL_JUNK_ITEMS`).
 //!
 //! The server sends `VendorInventory` and `BuybackList` when it opens the vendor
 //! role for an NPC, `VendorInventory` again when a limited-stock count changes, and
@@ -13,6 +14,8 @@ use bevy::prelude::*;
 use lightyear::prelude::*;
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
+
+use super::ItemLocation;
 
 /// Reliable ordered channel for vendor messages, bidirectional.
 pub struct MerchantChannel;
@@ -74,6 +77,9 @@ pub struct BuyItem {
     pub slot: u32,
     pub item_id: u32,
     pub count: u32,
+    /// Bag slot the purchase goes to (a merchant cursor dropped on it, TrinityCore
+    /// `HandleBuyItemOpcode` ContainerGUID + Slot); `None` stores it anywhere.
+    pub destination: Option<ItemLocation>,
 }
 
 /// Sell `count` of a bag item; 0 sells the whole stack.
@@ -82,6 +88,13 @@ pub struct SellItem {
     pub npc: u64,
     pub item_guid: u64,
     pub count: u32,
+}
+
+/// Sell every poor-quality bag item with a sell price (Retail
+/// `C_MerchantFrame.SellAllJunkItems`, TrinityCore `HandleSellAllJunkItems`).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct SellAllJunkItems {
+    pub npc: u64,
 }
 
 /// Buy back the item in buyback `slot`.
@@ -110,6 +123,8 @@ pub enum MerchantError {
     CantCarryMore,
     NotInterested,
     TooMuchGold,
+    /// The buy destination holds another item or a full stack (`EQUIP_ERR_CANT_STACK`).
+    CantStack,
 }
 
 impl MerchantError {
@@ -123,6 +138,7 @@ impl MerchantError {
             Self::CantCarryMore => "You can't carry any more of those items.", // ERR_ITEM_MAX_COUNT
             Self::NotInterested => "The merchant doesn't want that item.", // ERR_VENDOR_NOT_INTERESTED
             Self::TooMuchGold => "At gold limit",                          // ERR_TOO_MUCH_GOLD
+            Self::CantStack => "This item cannot stack.",                  // ERR_CANT_STACK
         }
     }
 }
@@ -148,6 +164,8 @@ pub(super) fn register_merchant_protocol(app: &mut App) {
     app.register_message::<BuyItem>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_message::<SellItem>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<SellAllJunkItems>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_message::<BuybackItemRequest>()
         .add_direction(NetworkDirection::ClientToServer);

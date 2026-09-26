@@ -104,6 +104,22 @@ fn inventory_requests_and_error_round_trip() {
 }
 
 #[test]
+fn inventory_errors_use_retail_wording() {
+    assert_eq!(
+        InventoryErrorReason::WrongSlot.message(),
+        "That item does not go in that slot."
+    );
+    assert_eq!(
+        InventoryErrorReason::CantEquipLevelI { level: 10 }.message(),
+        "You must reach level 10 to use that item."
+    );
+    assert_eq!(
+        InventoryErrorReason::InvFull.message(),
+        "Inventory is full."
+    );
+}
+
+#[test]
 fn equipment_slots_use_retail_invslot_ids() {
     let ids: Vec<u8> = EquipmentSlot::ALL.iter().map(|s| s.inv_slot_id()).collect();
     assert_eq!(ids, (1..=19).collect::<Vec<u8>>());

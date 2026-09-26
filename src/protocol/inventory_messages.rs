@@ -263,8 +263,8 @@ pub struct SortBags;
 /// Retail `EQUIP_ERR_*` results the server reports.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum InventoryErrorReason {
-    /// `EQUIP_ERR_CANT_EQUIP_LEVEL_I`
-    CantEquipLevelI,
+    /// `EQUIP_ERR_CANT_EQUIP_LEVEL_I` with the item's required level.
+    CantEquipLevelI { level: u16 },
     /// `EQUIP_ERR_WRONG_SLOT`
     WrongSlot,
     /// `EQUIP_ERR_BAG_FULL`
@@ -291,6 +291,30 @@ pub enum InventoryErrorReason {
     InternalBagError,
     /// `EQUIP_ERR_CANT_EQUIP_EVER` (class or race restriction)
     CantEquipEver,
+}
+
+impl InventoryErrorReason {
+    /// Retail UI error text (`ERR_*` GlobalStrings; TrinityCore ItemDefines.h comments).
+    pub fn message(self) -> String {
+        match self {
+            Self::CantEquipLevelI { level } => {
+                format!("You must reach level {level} to use that item.")
+            }
+            Self::WrongSlot => "That item does not go in that slot.".into(),
+            Self::BagFull => "That bag is full.".into(),
+            Self::InvFull => "Inventory is full.".into(),
+            Self::CantStack => "This item cannot stack.".into(),
+            Self::CantDualWield => "You cannot dual-wield".into(), // ERR_2HSKILLNOTFOUND
+            Self::NotEquippable => "This item cannot be equipped.".into(),
+            Self::SlotEmpty => "That slot is empty.".into(),
+            Self::ItemNotFound => "The item was not found.".into(),
+            Self::TooFewToSplit => "Tried to split more than number in stack.".into(),
+            Self::SplitFailed => "Couldn't split those items.".into(),
+            Self::CantDoRightNow => "You can't do that right now.".into(), // ERR_CANT_DO_THAT_RIGHT_NOW
+            Self::InternalBagError => "Internal Bag Error".into(),
+            Self::CantEquipEver => "You can never use that item.".into(),
+        }
+    }
 }
 
 /// Server rejected an inventory request from the owning client.
