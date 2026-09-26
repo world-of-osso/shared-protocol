@@ -32,6 +32,7 @@ struct BspNode {
     plane_dist: f32,
 }
 
+#[derive(Default)]
 pub struct WmoGroupCollision {
     bbox_min: Vec3,
     bbox_max: Vec3,
