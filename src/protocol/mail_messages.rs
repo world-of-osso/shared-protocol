@@ -31,6 +31,10 @@ pub const MAIL_BODY_MAX_LETTERS: usize = 500;
 pub struct MailAttachment {
     pub slot: u8,
     pub item: ItemStack,
+    /// Item name and Retail quality, for the attachment tooltip and the
+    /// `DELETE_MAIL_CONFIRMATION` text.
+    pub name: String,
+    pub quality: u8,
 }
 
 /// One inbox entry (Retail `GetInboxHeaderInfo` + `GetInboxText`).
