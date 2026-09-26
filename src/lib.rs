@@ -20,6 +20,7 @@ pub mod instance;
 pub mod instance_lockout;
 pub mod instance_teleport;
 pub mod item_data;
+pub mod level_scaling;
 pub mod loot;
 pub mod mail;
 pub mod motd;

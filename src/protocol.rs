@@ -24,8 +24,8 @@ mod merchant_messages;
 mod quest_messages;
 mod registration;
 mod spell_messages;
-mod trainer_messages;
 mod taxi_messages;
+mod trainer_messages;
 
 pub use bank_messages::*;
 pub use channels::*;
@@ -41,8 +41,8 @@ pub use mail_messages::*;
 pub use merchant_messages::*;
 pub use quest_messages::*;
 pub use spell_messages::*;
-pub use trainer_messages::*;
 pub use taxi_messages::*;
+pub use trainer_messages::*;
 
 use registration::{register_channels, register_messages};
 
@@ -90,6 +90,8 @@ fn register_replicated_components(app: &mut App) {
     app.component::<UnitPowers>().replicate();
     app.component::<UnitAuras>().replicate();
     app.component::<UnitLevel>().replicate();
+    app.component::<crate::level_scaling::LevelScaling>()
+        .replicate();
     app.component::<UnitFactionTemplate>().replicate();
     app.component::<UnitTarget>().replicate();
 }

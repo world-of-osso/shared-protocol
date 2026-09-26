@@ -118,6 +118,12 @@ fn unit_auras_round_trip() {
 #[test]
 fn unit_level_and_faction_template_round_trip() {
     assert_wire_round_trip(&UnitLevel(70));
+    assert_wire_round_trip(&crate::level_scaling::LevelScaling {
+        content_tuning_id: 73,
+        min_level: 1,
+        max_level: 30,
+        delta: -4,
+    });
     assert_wire_round_trip(&UnitFactionTemplate(1_801));
     assert_wire_round_trip(&UnitTarget(Some(0x0000_0001_0000_002A)));
     assert_wire_round_trip(&UnitTarget(None));
@@ -321,6 +327,7 @@ fn protocol_plugin_registers_spell_components_and_messages() {
     assert!(components.is_registered::<UnitPowers>());
     assert!(components.is_registered::<UnitAuras>());
     assert!(components.is_registered::<UnitLevel>());
+    assert!(components.is_registered::<crate::level_scaling::LevelScaling>());
     assert!(components.is_registered::<UnitFactionTemplate>());
     assert!(components.is_registered::<UnitTarget>());
 
