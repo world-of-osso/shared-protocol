@@ -142,6 +142,14 @@ pub fn placement_position(raw: [f32; 3]) -> Vec3 {
     Vec3::new(center - raw[2], raw[1], raw[0] - center)
 }
 
+/// Bevy world position of a WDT global WMO placement (MPHD flag 0x1, a map made of
+/// one WMO). Unlike an ADT placement it is not offset from the map corner: Stormwind
+/// Stockade's WDT 791060 places WMO 108631 at raw (0, 0, 0), and the Stockade entrance
+/// (world_safe_locs 3599, WoW (56.68, 0.62, -19.27)) lies inside that WMO's MOHD bounds.
+pub fn global_wmo_placement_position(raw: [f32; 3]) -> Vec3 {
+    Vec3::new(-raw[2], raw[1], raw[0])
+}
+
 /// Bevy rotation of an ADT MODF/MDDF placement rotation (degrees): stored
 /// `[X, Y, Z]` becomes model rotation `[Z, Y - 180, -X]`, applied in YZX order.
 pub fn placement_rotation(rot: [f32; 3]) -> Quat {

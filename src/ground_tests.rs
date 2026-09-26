@@ -303,6 +303,29 @@ fn placement_position_and_rotation_follow_the_adt_convention() {
 }
 
 #[test]
+fn global_wmo_placement_puts_file_coordinates_at_their_world_position() {
+    // Stormwind Stockade (map 34): WDT 791060 places WMO 108631 at raw (0, 0, 0),
+    // rotation 0. A floor under the entrance world_safe_locs 3599, WoW
+    // (56.68, 0.62, -19.27), sits at file (-56.68, -0.62) (WoW X and Y turned 180°).
+    let faces = quad([-60.0, -53.0], [-3.0, 2.0], -20.0, RENDER, 0);
+    let placement = Affine3A::from_rotation_translation(
+        placement_rotation([0.0, 0.0, 0.0]),
+        global_wmo_placement_position([0.0, 0.0, 0.0]),
+    );
+    let wmo = wmo_at(placement, &faces);
+
+    // WoW (56.68, 0.62, -19.5) is Bevy (56.68, -19.5, -0.62).
+    assert_eq!(
+        ground_height(&wmo, None, Vec3::new(56.68, -19.5, -0.62)),
+        Some((-20.0, Surface::Wmo))
+    );
+    assert_eq!(
+        ground_height(&wmo, None, Vec3::new(-56.68, -19.5, 0.62)),
+        None
+    );
+}
+
+#[test]
 fn terrain_alone_supports_within_reach_and_a_higher_terrain_does_not() {
     assert_eq!(
         select_ground(10.0, Some(10.5), []),
