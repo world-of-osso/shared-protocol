@@ -6,9 +6,10 @@ use crate::item_data::{ItemData, ItemSubclass};
 
 /// Account-wide collection of learned item appearances.
 ///
-/// Each appearance is identified by its `display_info_id` (u32). Once an item
-/// is equipped or bound, its appearance is added to the collection and can be
-/// used for transmogrification on any character on the account.
+/// Each appearance is identified by its Retail `ItemAppearance` id (the
+/// `ItemModifiedAppearance.ItemAppearanceID` of the item). Once an item is
+/// equipped or bound, its appearance is added to the collection and can be used
+/// for transmogrification on any character on the account.
 #[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
 pub struct AppearanceCollection {
     appearances: BTreeSet<u32>,
@@ -16,13 +17,13 @@ pub struct AppearanceCollection {
 
 impl AppearanceCollection {
     /// Learn a new appearance. Returns `true` if it was newly added.
-    pub fn learn(&mut self, display_info_id: u32) -> bool {
-        self.appearances.insert(display_info_id)
+    pub fn learn(&mut self, appearance_id: u32) -> bool {
+        self.appearances.insert(appearance_id)
     }
 
     /// Whether this appearance has been learned.
-    pub fn has(&self, display_info_id: u32) -> bool {
-        self.appearances.contains(&display_info_id)
+    pub fn has(&self, appearance_id: u32) -> bool {
+        self.appearances.contains(&appearance_id)
     }
 
     /// Number of learned appearances.
@@ -41,8 +42,8 @@ impl AppearanceCollection {
     }
 
     /// Remove an appearance (for GM commands). Returns `true` if it was present.
-    pub fn remove(&mut self, display_info_id: u32) -> bool {
-        self.appearances.remove(&display_info_id)
+    pub fn remove(&mut self, appearance_id: u32) -> bool {
+        self.appearances.remove(&appearance_id)
     }
 }
 
@@ -77,7 +78,7 @@ pub fn validate_transmog(
     equipped: &ItemData,
     source: &ItemData,
     collection: &AppearanceCollection,
-    source_display_id: u32,
+    source_appearance_id: u32,
 ) -> Result<(), TransmogError> {
     if equipped.slot.and_then(|s| s.to_visual_slot()).is_none() {
         return Err(TransmogError::NoVisualSlot);
@@ -86,7 +87,7 @@ pub fn validate_transmog(
         return Err(TransmogError::SourceNoVisualSlot);
     }
     validate_class_match(equipped, source)?;
-    if !collection.has(source_display_id) {
+    if !collection.has(source_appearance_id) {
         return Err(TransmogError::AppearanceNotLearned);
     }
     Ok(())

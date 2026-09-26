@@ -25,6 +25,7 @@ mod quest_messages;
 mod registration;
 mod spell_messages;
 mod taxi_messages;
+mod tooltip_messages;
 mod trainer_messages;
 
 pub use bank_messages::*;
@@ -42,6 +43,7 @@ pub use merchant_messages::*;
 pub use quest_messages::*;
 pub use spell_messages::*;
 pub use taxi_messages::*;
+pub use tooltip_messages::*;
 pub use trainer_messages::*;
 
 use registration::{register_channels, register_messages};
@@ -66,6 +68,7 @@ impl Plugin for ProtocolPlugin {
         loot_messages::register_loot_protocol(app);
         mail_messages::register_mail_protocol(app);
         taxi_messages::register_taxi_protocol(app);
+        tooltip_messages::register_tooltip_protocol(app);
     }
 }
 
@@ -147,3 +150,7 @@ mod taxi_tests;
 #[cfg(test)]
 #[path = "protocol_mail_tests.rs"]
 mod mail_tests;
+
+#[cfg(test)]
+#[path = "protocol_tooltip_tests.rs"]
+mod tooltip_tests;
