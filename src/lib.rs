@@ -12,6 +12,7 @@ pub mod faction_reaction;
 pub mod formulas;
 pub mod game_object;
 pub mod game_object_handlers;
+pub mod ground;
 pub mod group;
 pub mod guild_creation;
 pub mod holiday;
