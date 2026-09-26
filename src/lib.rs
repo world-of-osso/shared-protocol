@@ -8,6 +8,7 @@ pub mod components;
 pub mod currency;
 pub mod death;
 pub mod dungeon_finder;
+pub mod faction_reaction;
 pub mod formulas;
 pub mod game_object;
 pub mod game_object_handlers;
