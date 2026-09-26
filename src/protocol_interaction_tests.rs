@@ -106,3 +106,26 @@ fn protocol_plugin_registers_interaction_messages() {
     assert!(app.is_message_registered::<InteractionFailed>());
     assert!(app.is_message_registered::<InteractionClosed>());
 }
+
+#[test]
+fn summon_messages_round_trip() {
+    // Elwynn Forest (zone 12), CONFIRM_SUMMON's full two minutes.
+    assert_wire_round_trip(&SummonRequest {
+        summoner: "Stonecaller".into(),
+        zone_id: 12,
+        time_left_ms: 120_000,
+    });
+    assert_wire_round_trip(&SummonResponse { accept: true });
+}
+
+#[test]
+fn protocol_plugin_registers_summon_messages() {
+    let mut app = App::new();
+    app.init_resource::<ProtocolHasher>()
+        .init_resource::<ReplicationRules>()
+        .init_resource::<ReplicationRegistry>();
+    app.add_plugins(ProtocolPlugin);
+
+    assert!(app.is_message_registered::<SummonRequest>());
+    assert!(app.is_message_registered::<SummonResponse>());
+}

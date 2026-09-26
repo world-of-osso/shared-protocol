@@ -161,6 +161,12 @@ pub enum CastFailReason {
     Totems,
     /// The created item does not fit in the caster's bags.
     InventoryFull,
+    /// The target already has a summon offer (`SPELL_FAILED_SUMMON_PENDING`).
+    SummonPending,
+    /// The caster is below the required level (`SPELL_FAILED_LEVEL_REQUIREMENT`).
+    LevelRequirement,
+    /// The target is below the required level (`SPELL_FAILED_LOWLEVEL`).
+    TargetTooLowLevel,
 }
 
 /// Context needed to validate a cast attempt.

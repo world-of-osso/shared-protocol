@@ -13,6 +13,11 @@
 //! with the same `InteractionOpened` / `InteractionFailed` / `InteractionClosed`
 //! messages, whose `npc` field then carries the object's entity bits. All messages
 //! use `InteractionChannel`.
+//!
+//! A meeting stone summon (docs/specs/meeting-stones.md in game-server) ends in
+//! `SummonRequest` to the summoned player (Retail `SMSG_SUMMON_REQUEST`, shown as
+//! StaticPopup `CONFIRM_SUMMON`), answered by `SummonResponse`
+//! (`CMSG_SUMMON_RESPONSE`).
 
 use bevy::prelude::*;
 use lightyear::prelude::*;
@@ -111,6 +116,10 @@ pub enum NpcRole {
 pub const GAMEOBJECT_TYPE_GUILD_BANK: u8 = 34;
 /// AzerothCore `GAMEOBJECT_TYPE_MAILBOX`.
 pub const GAMEOBJECT_TYPE_MAILBOX: u8 = 19;
+/// TrinityCore `GAMEOBJECT_TYPE_RITUAL` (summoning portal).
+pub const GAMEOBJECT_TYPE_RITUAL: u8 = 18;
+/// TrinityCore `GAMEOBJECT_TYPE_MEETINGSTONE`.
+pub const GAMEOBJECT_TYPE_MEETINGSTONE: u8 = 23;
 
 /// A world game object (AzerothCore `gameobject_template`).
 #[derive(
@@ -227,6 +236,23 @@ pub struct InteractionClosed {
     pub npc: u64,
 }
 
+/// A party member summons the recipient (Retail `SMSG_SUMMON_REQUEST`; TrinityCore
+/// `Player::SendSummonRequestFrom`). `zone_id` is the summoner's `AreaTable` zone;
+/// the offer expires `time_left_ms` after it was sent.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SummonRequest {
+    pub summoner: String,
+    pub zone_id: u32,
+    pub time_left_ms: u32,
+}
+
+/// The recipient accepted or declined the pending summon (`CMSG_SUMMON_RESPONSE`,
+/// `C_SummonInfo.ConfirmSummon` / `CancelSummon`).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SummonResponse {
+    pub accept: bool,
+}
+
 pub(super) fn register_interaction_protocol(app: &mut App) {
     app.component::<NpcFlags>().replicate();
     app.component::<GameObjectInfo>().replicate();
@@ -249,4 +275,8 @@ pub(super) fn register_interaction_protocol(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
     app.register_message::<InteractionClosed>()
         .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<SummonRequest>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<SummonResponse>()
+        .add_direction(NetworkDirection::ClientToServer);
 }
