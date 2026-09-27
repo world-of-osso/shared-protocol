@@ -347,3 +347,31 @@ fn protocol_plugin_registers_spell_components_and_messages() {
     assert!(app.is_message_registered::<CommitTraitConfig>());
     assert!(app.is_message_registered::<SetSpecialization>());
 }
+
+#[test]
+fn unit_pose_decodes_trinitycore_values_round_trips_and_replicates() {
+    use crate::components::{SheathState, StandState, UnitPose};
+    // Stockade Guard 46405 / Petty Criminal 46382 creature_template_addon StandState.
+    assert_eq!(StandState::try_from(1), Ok(StandState::Sit));
+    assert_eq!(StandState::try_from(3), Ok(StandState::Sleep));
+    assert_eq!(StandState::try_from(8), Ok(StandState::Kneel));
+    assert_eq!(StandState::try_from(10), Err(10));
+    assert_eq!(SheathState::try_from(1), Ok(SheathState::Melee));
+    assert_eq!(SheathState::try_from(3), Err(3));
+    assert_wire_round_trip(&UnitPose {
+        stand_state: StandState::Sleep,
+        sheath_state: SheathState::Melee,
+        emote_state: 214,
+    });
+
+    let mut app = App::new();
+    app.init_resource::<ProtocolHasher>()
+        .init_resource::<ReplicationRules>()
+        .init_resource::<ReplicationRegistry>();
+    app.add_plugins(ProtocolPlugin);
+    assert!(
+        app.world()
+            .resource::<ComponentRegistry>()
+            .is_registered::<UnitPose>()
+    );
+}

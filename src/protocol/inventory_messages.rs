@@ -144,6 +144,7 @@ impl EquipmentSlot {
             V::Feet => Self::Feet,
             V::MainHand => Self::MainHand,
             V::OffHand => Self::OffHand,
+            V::Ranged => Self::Ranged,
         }
     }
 }

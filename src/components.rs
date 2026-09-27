@@ -392,6 +392,8 @@ pub enum EquipmentVisualSlot {
     Feet,
     MainHand,
     OffHand,
+    /// Creature virtual item 3 (TrinityCore `UnitData::VirtualItems[2]`): the ranged weapon.
+    Ranged,
 }
 
 #[derive(

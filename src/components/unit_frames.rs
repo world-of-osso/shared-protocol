@@ -247,3 +247,111 @@ pub enum CreatureMotion {
     Walk,
     Run,
 }
+
+/// `UnitData::StandState` (TrinityCore `UnitStandStateType`, UnitDefines.h).
+#[derive(
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    Default,
+    PartialEq,
+    Eq,
+)]
+pub enum StandState {
+    #[default]
+    Stand = 0,
+    Sit = 1,
+    SitChair = 2,
+    Sleep = 3,
+    SitLowChair = 4,
+    SitMediumChair = 5,
+    SitHighChair = 6,
+    Dead = 7,
+    Kneel = 8,
+    Submerged = 9,
+}
+
+impl TryFrom<u8> for StandState {
+    type Error = u8;
+
+    fn try_from(value: u8) -> Result<Self, u8> {
+        Ok(match value {
+            0 => Self::Stand,
+            1 => Self::Sit,
+            2 => Self::SitChair,
+            3 => Self::Sleep,
+            4 => Self::SitLowChair,
+            5 => Self::SitMediumChair,
+            6 => Self::SitHighChair,
+            7 => Self::Dead,
+            8 => Self::Kneel,
+            9 => Self::Submerged,
+            _ => return Err(value),
+        })
+    }
+}
+
+/// `UnitData::SheatheState` (TrinityCore `SheathState`, UnitDefines.h): which weapons are
+/// drawn.
+#[derive(
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    Default,
+    PartialEq,
+    Eq,
+)]
+pub enum SheathState {
+    /// Weapons sheathed.
+    #[default]
+    Unarmed = 0,
+    /// Main and off hand drawn.
+    Melee = 1,
+    /// Ranged weapon drawn.
+    Ranged = 2,
+}
+
+impl TryFrom<u8> for SheathState {
+    type Error = u8;
+
+    fn try_from(value: u8) -> Result<Self, u8> {
+        Ok(match value {
+            0 => Self::Unarmed,
+            1 => Self::Melee,
+            2 => Self::Ranged,
+            _ => return Err(value),
+        })
+    }
+}
+
+/// A unit's pose (TrinityCore `Creature::LoadCreaturesAddon`): stand state, drawn weapons
+/// and `UnitData::EmoteState`, the looping Emotes.db2 ID it plays (0 none).
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    Default,
+    PartialEq,
+    Eq,
+)]
+pub struct UnitPose {
+    pub stand_state: StandState,
+    pub sheath_state: SheathState,
+    pub emote_state: u32,
+}
