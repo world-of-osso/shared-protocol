@@ -167,6 +167,11 @@ impl ThreatTable {
         }
     }
 
+    /// Every entry, in the order units were added.
+    pub fn entries(&self) -> &[ThreatEntry] {
+        &self.entries
+    }
+
     /// Get the current top-threat entity (aggro target).
     pub fn top_threat(&self) -> Option<&ThreatEntry> {
         self.entries

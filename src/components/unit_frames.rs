@@ -195,9 +195,16 @@ pub struct UnitFlags(pub u32);
 impl UnitFlags {
     /// `UNIT_FLAG_NOT_SELECTABLE`: no nameplate, and the unit cannot be targeted or clicked.
     pub const NOT_SELECTABLE: u32 = 0x0200_0000;
+    /// `UNIT_FLAG_NON_ATTACKABLE_2` (`SPELL_AURA_MOD_UNATTACKABLE`): the unit cannot be
+    /// attacked (`WorldObject::IsValidAttackTarget`).
+    pub const NON_ATTACKABLE_2: u32 = 0x0001_0000;
 
     pub fn is_selectable(self) -> bool {
         self.0 & Self::NOT_SELECTABLE == 0
+    }
+
+    pub fn is_attackable(self) -> bool {
+        self.0 & Self::NON_ATTACKABLE_2 == 0
     }
 }
 
