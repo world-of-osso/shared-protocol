@@ -4,9 +4,9 @@ use lightyear::prelude::AppComponentExt;
 pub use crate::protocol_snapshots::*;
 
 use crate::components::{
-    CombatStatus, EquipmentAppearance, Gold, GuildMembership, Health, Mana, ModelDisplay, Mounted,
-    MovementControl, MovementSpeed, Npc, Player, Position, PresenceStatus, Rotation, UnitAuras,
-    UnitFactionTemplate, UnitFlags, UnitLevel, UnitPowers, UnitTarget, Zone,
+    CombatStatus, CreatureMotion, EquipmentAppearance, Gold, GuildMembership, Health, Mana,
+    ModelDisplay, Mounted, MovementControl, MovementSpeed, Npc, Player, Position, PresenceStatus,
+    Rotation, UnitAuras, UnitFactionTemplate, UnitFlags, UnitLevel, UnitPowers, UnitTarget, Zone,
 };
 
 mod bank_messages;
@@ -104,6 +104,7 @@ fn register_replicated_components(app: &mut App) {
     app.component::<UnitFactionTemplate>().replicate();
     app.component::<UnitFlags>().replicate();
     app.component::<UnitTarget>().replicate();
+    app.component::<CreatureMotion>().replicate();
 }
 
 #[cfg(test)]

@@ -223,3 +223,27 @@ impl UnitFlags {
     Eq,
 )]
 pub struct UnitTarget(pub Option<u64>);
+
+/// How a creature is moving: Retail `MOVEMENTFLAG_FORWARD`, walking with
+/// `MOVEMENTFLAG_WALKING` (`MoveSplineFlag::Walkmode`). The client plays the stand, walk
+/// or run animation from it.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    Default,
+    PartialEq,
+    Eq,
+)]
+pub enum CreatureMotion {
+    #[default]
+    Still,
+    Walk,
+    Run,
+}
