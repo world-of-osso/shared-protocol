@@ -2,7 +2,7 @@ use super::*;
 use bevy_replicon::shared::protocol::ProtocolHasher;
 use bevy_replicon::shared::replication::registry::ReplicationRegistry;
 use bevy_replicon::shared::replication::rules::ReplicationRules;
-use lightyear::prelude::AppMessageExt;
+use lightyear::prelude::{AppMessageExt, ComponentRegistry};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use std::fmt::Debug;
@@ -67,4 +67,26 @@ fn protocol_plugin_registers_transfer_messages() {
     assert!(app.is_message_registered::<NewWorld>());
     assert!(app.is_message_registered::<WorldPortAck>());
     assert!(app.is_message_registered::<TransferAborted>());
+    let components = app.world().resource::<ComponentRegistry>();
+    assert!(components.is_registered::<crate::components::WorldArrival>());
+}
+
+#[test]
+fn a_player_counts_no_map_arrival_until_the_server_bumps_it() {
+    let mut world = World::new();
+    let player = world.spawn(test_player()).id();
+    assert_eq!(
+        world.get::<crate::components::WorldArrival>(player),
+        Some(&crate::components::WorldArrival(0))
+    );
+    assert_wire_round_trip(&crate::components::WorldArrival(3));
+}
+
+fn test_player() -> crate::components::Player {
+    crate::components::Player {
+        name: "Osso".into(),
+        race: 1,
+        class: 2,
+        appearance: Default::default(),
+    }
 }

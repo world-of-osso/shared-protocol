@@ -322,6 +322,25 @@ pub struct Mounted {
     pub mount_display_id: u32,
 }
 
+/// The player's map arrivals (`HandleMoveWorldportAck`). The server bumps it in the
+/// replication tick that sends the destination's objects near the player, so a client
+/// that sees the new count also has those objects.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Default,
+)]
+pub struct WorldArrival(pub u32);
+
 /// Server-authoritative repositioning of a player (graveyard release, taxi).
 /// The owning client adopts `Position` when `epoch` changes and follows it while
 /// `controlled`, sending no movement input.
@@ -357,7 +376,7 @@ pub struct MovementControl {
     Clone,
     PartialEq,
 )]
-#[require(MovementControl)]
+#[require(MovementControl, WorldArrival)]
 pub struct Player {
     pub name: String,
     pub race: u8,

@@ -6,8 +6,8 @@ pub use crate::protocol_snapshots::*;
 use crate::components::{
     CombatStatus, CreatureMotion, EquipmentAppearance, Gold, GuildMembership, Health, Mana,
     ModelDisplay, Mounted, MovementControl, MovementSpeed, Npc, Player, Position, PresenceStatus,
-    Rotation, UnitAuras, UnitFactionTemplate, UnitFlags, UnitLevel, UnitPose, UnitPowers,
-    UnitTarget, Zone,
+    Rotation, UnitAuras, UnitFactionTemplate, UnitFlags, UnitLevel, UnitPowers, UnitTarget,
+    WorldArrival, Zone,
 };
 
 mod bank_messages;
@@ -95,6 +95,7 @@ fn register_replicated_components(app: &mut App) {
     app.component::<CombatStatus>().replicate();
     app.component::<Mounted>().replicate();
     app.component::<MovementControl>().replicate();
+    app.component::<WorldArrival>().replicate();
     app.component::<Zone>().replicate();
     app.component::<GuildMembership>().replicate();
     app.component::<PresenceStatus>().replicate();
