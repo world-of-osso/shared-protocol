@@ -311,7 +311,7 @@ pub struct ChatHistoryResponse {
     pub error: Option<String>,
 }
 
-/// Client movement input sent each tick.
+/// Client movement input, sent each frame the player moves.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct PlayerInput {
     /// Normalized movement direction in world space.
@@ -324,4 +324,6 @@ pub struct PlayerInput {
     pub running: bool,
     /// Whether the player is swimming.
     pub swimming: bool,
+    /// Seconds of movement the client applied for this input (its frame step).
+    pub elapsed_secs: f32,
 }
