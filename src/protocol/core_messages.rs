@@ -26,6 +26,30 @@ pub enum ChatType {
     System,
     /// Periodic server broadcast (autobroadcast).
     ServerBroadcast,
+    /// `CHAT_MSG_MONSTER_SAY` from the creature with these entity bits (creature_text
+    /// Type 12). Server to client only.
+    MonsterSay(u64),
+    /// `CHAT_MSG_MONSTER_YELL` (creature_text Type 14).
+    MonsterYell(u64),
+    /// `CHAT_MSG_MONSTER_EMOTE` (creature_text Type 16); `%s` in the text is the
+    /// speaker's name, substituted by the client.
+    MonsterEmote(u64),
+    /// `CHAT_MSG_RAID_BOSS_EMOTE` (creature_text Type 41): the center-screen
+    /// RaidBossEmoteFrame and a chat line; `%s` is the speaker's name.
+    RaidBossEmote(u64),
+}
+
+impl ChatType {
+    /// The speaking creature of a monster chat type.
+    pub fn monster_speaker(&self) -> Option<u64> {
+        match self {
+            Self::MonsterSay(speaker)
+            | Self::MonsterYell(speaker)
+            | Self::MonsterEmote(speaker)
+            | Self::RaidBossEmote(speaker) => Some(*speaker),
+            _ => None,
+        }
+    }
 }
 
 /// A chat message sent between client and server.

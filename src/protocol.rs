@@ -12,6 +12,7 @@ use crate::components::{
 mod bank_messages;
 mod channels;
 mod core_messages;
+mod encounter_messages;
 mod experience_messages;
 mod gameplay_messages;
 mod group_messages;
@@ -32,6 +33,7 @@ mod transfer_messages;
 pub use bank_messages::*;
 pub use channels::*;
 pub use core_messages::*;
+pub use encounter_messages::*;
 pub use experience_messages::*;
 pub use gameplay_messages::*;
 pub use group_messages::*;
@@ -72,6 +74,7 @@ impl Plugin for ProtocolPlugin {
         taxi_messages::register_taxi_protocol(app);
         tooltip_messages::register_tooltip_protocol(app);
         transfer_messages::register_transfer_protocol(app);
+        encounter_messages::register_encounter_protocol(app);
     }
 }
 
@@ -162,3 +165,7 @@ mod tooltip_tests;
 #[cfg(test)]
 #[path = "protocol_transfer_tests.rs"]
 mod transfer_tests;
+
+#[cfg(test)]
+#[path = "protocol_encounter_tests.rs"]
+mod encounter_tests;
