@@ -17,6 +17,7 @@ mod experience_messages;
 mod gameplay_messages;
 mod group_messages;
 mod guild_bank_messages;
+mod instance_messages;
 mod interaction_messages;
 mod inventory_messages;
 mod loot_messages;
@@ -38,6 +39,7 @@ pub use experience_messages::*;
 pub use gameplay_messages::*;
 pub use group_messages::*;
 pub use guild_bank_messages::*;
+pub use instance_messages::*;
 pub use interaction_messages::*;
 pub use inventory_messages::*;
 pub use loot_messages::*;
@@ -75,6 +77,7 @@ impl Plugin for ProtocolPlugin {
         tooltip_messages::register_tooltip_protocol(app);
         transfer_messages::register_transfer_protocol(app);
         encounter_messages::register_encounter_protocol(app);
+        instance_messages::register_instance_protocol(app);
     }
 }
 
@@ -170,3 +173,7 @@ mod transfer_tests;
 #[cfg(test)]
 #[path = "protocol_encounter_tests.rs"]
 mod encounter_tests;
+
+#[cfg(test)]
+#[path = "protocol_instance_tests.rs"]
+mod instance_tests;

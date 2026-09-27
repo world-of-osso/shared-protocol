@@ -39,15 +39,28 @@ pub enum TransferAbortReason {
     NotFound,
     /// `TRANSFER_ABORT_MAP_NOT_ALLOWED`: "Map cannot be entered at this time.".
     MapNotAllowed,
+    /// `TRANSFER_ABORT_DIFFICULTY` with the requested `Difficulty.db2` ID: the map offers
+    /// no difficulty it downscales to.
+    Difficulty(u32),
+    /// `TRANSFER_ABORT_LOCKED_TO_DIFFERENT_INSTANCE`: the player is saved to another copy.
+    LockedToDifferentInstance,
+    /// `TRANSFER_ABORT_ALREADY_COMPLETED_ENCOUNTER`.
+    AlreadyCompletedEncounter,
 }
 
 impl TransferAbortReason {
-    /// Retail GlobalStrings text the client shows in UIErrorsFrame.
-    pub fn text(self) -> &'static str {
+    /// Retail GlobalStrings text the client shows in UIErrorsFrame, `map_name` for `%s`.
+    pub fn text(self, map_name: &str) -> String {
         match self {
-            Self::MaxPlayers => "Transfer Aborted: instance is full",
-            Self::NotFound => "Transfer Aborted: instance not found",
-            Self::MapNotAllowed => "Map cannot be entered at this time.",
+            Self::MaxPlayers => "Transfer Aborted: instance is full".into(),
+            Self::NotFound => "Transfer Aborted: instance not found".into(),
+            Self::MapNotAllowed => "Map cannot be entered at this time.".into(),
+            // TRANSFER_ABORT_DIFFICULTY1..3 by the requested difficulty.
+            Self::Difficulty(1) => format!("Normal difficulty mode is not available for {map_name}."),
+            Self::Difficulty(2) => format!("Heroic difficulty mode is not available for {map_name}."),
+            Self::Difficulty(_) => format!("This difficulty mode is not available for {map_name}."),
+            Self::LockedToDifferentInstance => format!("You are already locked to {map_name}."),
+            Self::AlreadyCompletedEncounter => "You are ineligible to participate in at least one encounter in this instance because you are already locked to an instance in which it has been defeated.".into(),
         }
     }
 }

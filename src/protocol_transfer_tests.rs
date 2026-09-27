@@ -35,12 +35,24 @@ fn transfer_messages_round_trip() {
 #[test]
 fn transfer_abort_reasons_carry_retail_global_strings() {
     assert_eq!(
-        TransferAbortReason::MaxPlayers.text(),
+        TransferAbortReason::MaxPlayers.text("The Stockade"),
         "Transfer Aborted: instance is full"
     );
     assert_eq!(
-        TransferAbortReason::MapNotAllowed.text(),
+        TransferAbortReason::MapNotAllowed.text("The Stockade"),
         "Map cannot be entered at this time."
+    );
+    assert_eq!(
+        TransferAbortReason::Difficulty(2).text("Grim Batol"),
+        "Heroic difficulty mode is not available for Grim Batol."
+    );
+    assert_eq!(
+        TransferAbortReason::Difficulty(23).text("Grim Batol"),
+        "This difficulty mode is not available for Grim Batol."
+    );
+    assert_eq!(
+        TransferAbortReason::LockedToDifferentInstance.text("Grim Batol"),
+        "You are already locked to Grim Batol."
     );
 }
 
