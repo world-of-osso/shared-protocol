@@ -127,6 +127,15 @@ impl WmoGroupCollision {
         });
     }
 
+    /// The MOGP bounding box in WMO-local Bevy space, as `(min, max)`.
+    pub fn local_bounds(&self) -> (Vec3, Vec3) {
+        let (a, b) = (
+            file_to_local_bevy(self.bbox_min),
+            file_to_local_bevy(self.bbox_max),
+        );
+        (a.min(b), a.max(b))
+    }
+
     /// Corners of the MOGP bounding box in WMO-local Bevy space.
     pub(super) fn local_corners(&self) -> impl Iterator<Item = Vec3> + '_ {
         (0..8).map(|bits: u8| {

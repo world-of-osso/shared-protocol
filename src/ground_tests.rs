@@ -379,6 +379,11 @@ fn collidable_triangles_are_the_solid_faces_in_local_bevy_space() {
             ],
         ]
     );
+    assert_eq!(
+        group.local_bounds(),
+        (Vec3::new(0.0, 0.0, -3.0), Vec3::new(4.0, 5.0, 0.0)),
+        "file bbox (0,0,0)..(4,3,5) in local Bevy space"
+    );
     let antiportal =
         WmoGroupCollision::parse(&group_file(0x0400_0000, &faces, &[leaf(0..4)])).unwrap();
     assert_eq!(antiportal.collidable_triangles().count(), 0);
