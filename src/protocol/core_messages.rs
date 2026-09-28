@@ -311,10 +311,12 @@ pub struct ChatHistoryResponse {
     pub error: Option<String>,
 }
 
-/// Client movement input, sent each frame the player moves.
+/// Client movement, sent each frame the player moves. As Retail's `MSG_MOVE_*` movement
+/// info, it carries the position the client moved the player to; the server adopts it
+/// within the player's speed.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct PlayerInput {
-    /// Normalized movement direction in world space.
+    /// Movement direction in world space (the animation direction; it sets the speed).
     pub direction: [f32; 3],
     /// Character facing yaw in radians.
     pub facing_yaw: f32,
@@ -324,6 +326,9 @@ pub struct PlayerInput {
     pub running: bool,
     /// Whether the player is swimming.
     pub swimming: bool,
-    /// Seconds of movement the client applied for this input (its frame step).
-    pub elapsed_secs: f32,
+    /// Feet position the client moved the player to this frame, in world space.
+    pub position: [f32; 3],
+    /// `MovementControl::epoch` of that position: input from before a server teleport
+    /// is stale.
+    pub epoch: u32,
 }
