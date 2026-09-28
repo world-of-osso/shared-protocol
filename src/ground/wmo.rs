@@ -79,6 +79,18 @@ impl WmoGroupCollision {
         Ok(group)
     }
 
+    /// Every MOPY-collidable triangle in WMO-local Bevy space: the solid
+    /// surface of the group, walls and floors alike. Unreachable and
+    /// antiportal groups have none.
+    pub fn collidable_triangles(&self) -> impl Iterator<Item = [Vec3; 3]> + '_ {
+        let faces = self.indices.len() / 3;
+        (0..faces)
+            .filter_map(|face| u16::try_from(face).ok())
+            .filter(|&face| self.face_collides(face))
+            .filter_map(|face| self.face_vertices(face))
+            .map(|corners| corners.map(file_to_local_bevy))
+    }
+
     /// Push the world height of every walkable face the local segment
     /// `top..bottom` (WMO-local Bevy space) crosses.
     pub(super) fn walkable_hits(

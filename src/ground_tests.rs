@@ -336,3 +336,50 @@ fn terrain_alone_supports_within_reach_and_a_higher_terrain_does_not() {
     );
     assert_eq!(select_ground(10.0, Some(12.0), []), None);
 }
+
+/// Walls are solid too: every collidable face, floor or not, in WMO-local Bevy space
+/// (`[x, z, -y]` of the file). Render detail and unflagged faces, and antiportal groups, have none.
+#[test]
+fn collidable_triangles_are_the_solid_faces_in_local_bevy_space() {
+    let wall = Face {
+        corners: [[0.0, 3.0, 0.0], [4.0, 3.0, 0.0], [4.0, 3.0, 5.0]],
+        flags: RENDER,
+        material: 0,
+    };
+    let collision_only = Face {
+        corners: [[0.0, 0.0, 1.0], [1.0, 0.0, 1.0], [1.0, 1.0, 1.0]],
+        flags: 0,
+        material: 0xFF,
+    };
+    let detail = Face {
+        corners: [[0.0, 0.0, 2.0], [1.0, 0.0, 2.0], [1.0, 1.0, 2.0]],
+        flags: RENDER | DETAIL,
+        material: 0,
+    };
+    let unflagged = Face {
+        corners: [[0.0, 0.0, 3.0], [1.0, 0.0, 3.0], [1.0, 1.0, 3.0]],
+        flags: 0,
+        material: 3,
+    };
+    let faces = [wall, collision_only, detail, unflagged];
+    let group = WmoGroupCollision::parse(&group_file(0, &faces, &[leaf(0..4)])).unwrap();
+
+    assert_eq!(
+        group.collidable_triangles().collect::<Vec<_>>(),
+        vec![
+            [
+                Vec3::new(0.0, 0.0, -3.0),
+                Vec3::new(4.0, 0.0, -3.0),
+                Vec3::new(4.0, 5.0, -3.0)
+            ],
+            [
+                Vec3::new(0.0, 1.0, 0.0),
+                Vec3::new(1.0, 1.0, 0.0),
+                Vec3::new(1.0, 1.0, -1.0)
+            ],
+        ]
+    );
+    let antiportal =
+        WmoGroupCollision::parse(&group_file(0x0400_0000, &faces, &[leaf(0..4)])).unwrap();
+    assert_eq!(antiportal.collidable_triangles().count(), 0);
+}

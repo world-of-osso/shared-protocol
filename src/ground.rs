@@ -67,6 +67,16 @@ impl WmoCollision {
         }
     }
 
+    /// Maps WMO-local Bevy space to the world.
+    pub fn world_from_local(&self) -> Affine3A {
+        self.world_from_local
+    }
+
+    /// The placed WMO's collision groups, in WMO-local Bevy space.
+    pub fn groups(&self) -> &[std::sync::Arc<WmoGroupCollision>] {
+        &self.groups
+    }
+
     /// World heights of the walkable faces crossed by the vertical segment at
     /// world `(x, z)` from `top_y` down to `bottom_y`.
     pub fn floor_heights(&self, x: f32, z: f32, top_y: f32, bottom_y: f32, out: &mut Vec<f32>) {
