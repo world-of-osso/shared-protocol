@@ -27,6 +27,24 @@ pub const STRAFE_MULTIPLIER: f32 = 0.8;
 /// Jump impulse velocity in yards/sec.
 pub const JUMP_IMPULSE: f32 = 9.0;
 
+/// Water depth over the feet at which a player swims; a swimmer floats with its feet this
+/// far under the surface (game-engine `player_physics_data::SWIM_DEPTH`).
+pub const SWIM_DEPTH: f32 = 1.25;
+/// Slack for float error at the swim threshold and the surface.
+pub const SWIM_EPSILON: f32 = 0.01;
+
+/// Swimming while water stands `SWIM_DEPTH` over the feet above the ground (a floor above
+/// the water, such as a bridge, keeps the player dry).
+pub fn is_swimming(feet_y: f32, ground_y: f32, surface_y: Option<f32>) -> bool {
+    surface_y
+        .is_some_and(|surface| surface > ground_y && surface - feet_y >= SWIM_DEPTH - SWIM_EPSILON)
+}
+
+/// Highest feet height a swimmer reaches under `surface_y`: floating.
+pub fn swim_top(surface_y: f32) -> f32 {
+    surface_y - SWIM_DEPTH
+}
+
 /// Returns true if a mounted player should be dismounted (entering water).
 pub fn should_dismount(swimming: bool, mounted: bool) -> bool {
     swimming && mounted
@@ -86,6 +104,19 @@ pub fn is_walkable_slope(height_diff: f32, horizontal_dist: f32) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn swimming_starts_where_the_water_stands_swim_depth_over_the_feet() {
+        // Northshire lake (Azeroth 32,48): seabed 140.07, surface 143.99.
+        assert!(is_swimming(140.07, 140.07, Some(143.99)));
+        assert!(is_swimming(swim_top(143.99), 140.07, Some(143.99)));
+        assert!(!is_swimming(swim_top(143.99) + 0.02, 140.07, Some(143.99)));
+        // Shallows: 1 yd of water over the ground.
+        assert!(!is_swimming(142.99, 142.99, Some(143.99)));
+        // A floor over the water keeps the player dry.
+        assert!(!is_swimming(140.0, 145.0, Some(143.99)));
+        assert!(!is_swimming(140.07, 140.07, None));
+    }
 
     #[test]
     fn flat_is_walkable() {

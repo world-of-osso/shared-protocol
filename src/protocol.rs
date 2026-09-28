@@ -24,6 +24,7 @@ mod inventory_messages;
 mod loot_messages;
 mod mail_messages;
 mod merchant_messages;
+mod mirror_timer_messages;
 mod quest_messages;
 mod registration;
 mod spell_messages;
@@ -46,6 +47,7 @@ pub use inventory_messages::*;
 pub use loot_messages::*;
 pub use mail_messages::*;
 pub use merchant_messages::*;
+pub use mirror_timer_messages::*;
 pub use quest_messages::*;
 pub use spell_messages::*;
 pub use taxi_messages::*;
@@ -79,6 +81,7 @@ impl Plugin for ProtocolPlugin {
         transfer_messages::register_transfer_protocol(app);
         encounter_messages::register_encounter_protocol(app);
         instance_messages::register_instance_protocol(app);
+        mirror_timer_messages::register_mirror_timer_protocol(app);
     }
 }
 
@@ -180,3 +183,7 @@ mod encounter_tests;
 #[cfg(test)]
 #[path = "protocol_instance_tests.rs"]
 mod instance_tests;
+
+#[cfg(test)]
+#[path = "protocol_mirror_timer_tests.rs"]
+mod mirror_timer_tests;
