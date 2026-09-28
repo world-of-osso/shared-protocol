@@ -30,6 +30,12 @@ fn transfer_messages_round_trip() {
         map_id: 34,
         reason: TransferAbortReason::MaxPlayers,
     });
+    assert_wire_round_trip(&TransferAborted {
+        map_id: 34,
+        reason: TransferAbortReason::Condition(
+            "You must be at least level 10 to enter Stormwind Stockade.".into(),
+        ),
+    });
 }
 
 #[test]
@@ -53,6 +59,14 @@ fn transfer_abort_reasons_carry_retail_global_strings() {
     assert_eq!(
         TransferAbortReason::LockedToDifferentInstance.text("Grim Batol"),
         "You are already locked to Grim Batol."
+    );
+    // PlayerCondition 74354, the Stockade's MapDifficultyXCondition, as the server resolved it.
+    assert_eq!(
+        TransferAbortReason::Condition(
+            "You must be at least level 10 to enter Stormwind Stockade.".into()
+        )
+        .text("Stormwind Stockade"),
+        "You must be at least level 10 to enter Stormwind Stockade."
     );
 }
 

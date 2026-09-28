@@ -31,7 +31,7 @@ pub struct NewWorld {
 pub struct WorldPortAck;
 
 /// Why a teleport to another map was refused (TrinityCore `TransferAbortReason`).
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum TransferAbortReason {
     /// `TRANSFER_ABORT_MAX_PLAYERS`: "Transfer Aborted: instance is full".
     MaxPlayers,
@@ -46,11 +46,15 @@ pub enum TransferAbortReason {
     LockedToDifferentInstance,
     /// `TRANSFER_ABORT_ALREADY_COMPLETED_ENCOUNTER`.
     AlreadyCompletedEncounter,
+    /// `TRANSFER_ABORT_DIFFICULTY` with a `MapDifficultyXConditionId`: the player fails
+    /// that `PlayerCondition` (the dungeon's minimum level). Retail's client reads the
+    /// failure text from its DB2; the server sends it resolved.
+    Condition(String),
 }
 
 impl TransferAbortReason {
     /// Retail GlobalStrings text the client shows in UIErrorsFrame, `map_name` for `%s`.
-    pub fn text(self, map_name: &str) -> String {
+    pub fn text(&self, map_name: &str) -> String {
         match self {
             Self::MaxPlayers => "Transfer Aborted: instance is full".into(),
             Self::NotFound => "Transfer Aborted: instance not found".into(),
@@ -61,6 +65,7 @@ impl TransferAbortReason {
             Self::Difficulty(_) => format!("This difficulty mode is not available for {map_name}."),
             Self::LockedToDifferentInstance => format!("You are already locked to {map_name}."),
             Self::AlreadyCompletedEncounter => "You are ineligible to participate in at least one encounter in this instance because you are already locked to an instance in which it has been defeated.".into(),
+            Self::Condition(text) => text.clone(),
         }
     }
 }
