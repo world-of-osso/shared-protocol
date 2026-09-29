@@ -384,6 +384,8 @@ fn register_spell_messages(app: &mut App) {
         .add_direction(NetworkDirection::ClientToServer);
     app.register_message::<SetSpecialization>()
         .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<SpellGo>()
+        .add_direction(NetworkDirection::ServerToClient);
 }
 
 pub(super) fn register_channels(app: &mut App) {

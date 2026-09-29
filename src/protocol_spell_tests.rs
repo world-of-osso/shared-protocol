@@ -338,6 +338,7 @@ fn protocol_plugin_registers_spell_components_and_messages() {
     assert!(app.is_message_registered::<SpellChargesUpdate>());
     assert!(app.is_message_registered::<CastFailed>());
     assert!(app.is_message_registered::<CombatLogEvent>());
+    assert!(app.is_message_registered::<SpellGo>());
     assert!(app.is_message_registered::<ActionBarSnapshot>());
     assert!(app.is_message_registered::<TraitConfigSnapshot>());
     assert!(app.is_message_registered::<TraitCommitResult>());
@@ -374,4 +375,20 @@ fn unit_pose_decodes_trinitycore_values_round_trips_and_replicates() {
             .resource::<ComponentRegistry>()
             .is_registered::<UnitPose>()
     );
+}
+
+#[test]
+fn spell_go_round_trips_targeted_and_untargeted_casts() {
+    assert_wire_round_trip(&SpellGo {
+        caster: 0x0000_0002_0000_0010,
+        target: Some(0x0000_0003_0000_0011),
+        hit_targets: vec![0x0000_0003_0000_0011],
+        spell_id: 1464,
+    });
+    assert_wire_round_trip(&SpellGo {
+        caster: 7,
+        target: None,
+        hit_targets: vec![7, 9],
+        spell_id: 6673,
+    });
 }

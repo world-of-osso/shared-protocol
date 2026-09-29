@@ -59,6 +59,19 @@ pub struct CastFailed {
     pub detail: Option<String>,
 }
 
+/// A cast resolved (TrinityCore `SMSG_SPELL_GO`): broadcast to every client that
+/// replicates the caster, so each one plays the caster's cast animation and the spell's
+/// visual kits. `target` is the explicit unit target (`None` for untargeted casts);
+/// `hit_targets` are the units the spell's effects landed on (`SpellGo.HitTargets`),
+/// caster included for self-buffs, each once.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SpellGo {
+    pub caster: u64,
+    pub target: Option<u64>,
+    pub hit_targets: Vec<u64>,
+    pub spell_id: u32,
+}
+
 /// Avoidance/negation outcome of a combat log `Miss`.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MissKind {
