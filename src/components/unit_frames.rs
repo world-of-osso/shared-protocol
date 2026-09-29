@@ -208,6 +208,26 @@ impl UnitFlags {
     }
 }
 
+/// Entity bits of the units on this creature's threat list (TrinityCore
+/// `SMSG_THREAT_UPDATE` membership, sent to the creature's viewers). The Retail UI's
+/// `UnitDetailedThreatSituation(unit, creature)` is non-nil exactly for them: nameplates
+/// of a non-friendly creature with the player on this list turn hostile red
+/// (`CompactUnitFrame_IsOnThreatListWithPlayer`, `considerSelectionInCombatAsHostile`).
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Default,
+)]
+pub struct UnitThreatList(pub Vec<u64>);
+
 /// Entity bits of the unit's current target (`None` = no target), for target-of-target.
 #[derive(
     Component,
