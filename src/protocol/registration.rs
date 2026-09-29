@@ -41,6 +41,14 @@ fn register_core_messages(app: &mut App) {
         .add_direction(NetworkDirection::Bidirectional);
     app.register_message::<SetTarget>()
         .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<AttackSwing>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<AttackStop>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_message::<AttackStart>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_message::<AttackStopped>()
+        .add_direction(NetworkDirection::ServerToClient);
     app.register_message::<CombatEvent>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_message::<SpellCastIntent>()

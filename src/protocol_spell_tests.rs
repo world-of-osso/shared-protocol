@@ -339,6 +339,10 @@ fn protocol_plugin_registers_spell_components_and_messages() {
     assert!(app.is_message_registered::<CastFailed>());
     assert!(app.is_message_registered::<CombatLogEvent>());
     assert!(app.is_message_registered::<SpellGo>());
+    assert!(app.is_message_registered::<AttackSwing>());
+    assert!(app.is_message_registered::<AttackStop>());
+    assert!(app.is_message_registered::<AttackStart>());
+    assert!(app.is_message_registered::<AttackStopped>());
     assert!(app.is_message_registered::<ActionBarSnapshot>());
     assert!(app.is_message_registered::<TraitConfigSnapshot>());
     assert!(app.is_message_registered::<TraitCommitResult>());
@@ -390,5 +394,27 @@ fn spell_go_round_trips_targeted_and_untargeted_casts() {
         target: None,
         hit_targets: vec![7, 9],
         spell_id: 6673,
+    });
+}
+
+#[test]
+fn attack_swing_start_and_stop_messages_round_trip() {
+    assert_wire_round_trip(&AttackSwing {
+        target: 0x0000_0003_0000_0011,
+    });
+    assert_wire_round_trip(&AttackStop);
+    assert_wire_round_trip(&AttackStart {
+        attacker: 0x0000_0002_0000_0010,
+        victim: 0x0000_0003_0000_0011,
+    });
+    assert_wire_round_trip(&AttackStopped {
+        attacker: 0x0000_0002_0000_0010,
+        victim: Some(0x0000_0003_0000_0011),
+        now_dead: false,
+    });
+    assert_wire_round_trip(&AttackStopped {
+        attacker: 7,
+        victim: None,
+        now_dead: true,
     });
 }

@@ -67,6 +67,38 @@ pub struct SetTarget {
     pub target_entity: Option<u64>,
 }
 
+/// Client request to start auto-attacking `target` (TrinityCore `CMSG_ATTACK_SWING`,
+/// `WorldSession::HandleAttackSwingOpcode` → `Unit::Attack(victim, true)`). Selecting a
+/// target (`SetTarget`) never starts auto-attack.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct AttackSwing {
+    /// Server entity bits of the victim.
+    pub target: u64,
+}
+
+/// Client request to stop auto-attacking (TrinityCore `CMSG_ATTACK_STOP` →
+/// `Unit::AttackStop`).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct AttackStop;
+
+/// A unit started auto-attacking `victim` (TrinityCore `SMSG_ATTACK_START`,
+/// `Unit::SendMeleeAttackStart`), sent to every client that sees the attacker.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct AttackStart {
+    pub attacker: u64,
+    pub victim: u64,
+}
+
+/// A unit stopped auto-attacking (TrinityCore `SMSG_ATTACK_STOP`,
+/// `Unit::SendMeleeAttackStop`): `victim` is `None` when the swing request named no
+/// valid unit; `now_dead` is `!attacker.IsAlive()`.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct AttackStopped {
+    pub attacker: u64,
+    pub victim: Option<u64>,
+    pub now_dead: bool,
+}
+
 /// Combat event type for damage/death/respawn/avoidance notifications.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub enum CombatEventType {
