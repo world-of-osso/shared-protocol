@@ -449,6 +449,7 @@ pub fn register_snapshot_messages(app: &mut App) {
     register_server_snapshot::<BarberShopSnapshot>(app);
     register_server_snapshot::<DeathSnapshot>(app);
     register_server_snapshot::<DurabilitySnapshot>(app);
+    register_server_snapshot::<crate::protocol::DamageMeterSnapshot>(app);
 }
 
 fn register_server_snapshot<M>(app: &mut App)

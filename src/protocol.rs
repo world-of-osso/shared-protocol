@@ -13,6 +13,7 @@ use crate::components::{
 mod bank_messages;
 mod channels;
 mod core_messages;
+mod damage_meter_messages;
 mod encounter_messages;
 mod experience_messages;
 mod gameplay_messages;
@@ -36,6 +37,7 @@ mod transfer_messages;
 pub use bank_messages::*;
 pub use channels::*;
 pub use core_messages::*;
+pub use damage_meter_messages::*;
 pub use encounter_messages::*;
 pub use experience_messages::*;
 pub use gameplay_messages::*;
@@ -188,6 +190,10 @@ mod instance_tests;
 #[cfg(test)]
 #[path = "protocol_mirror_timer_tests.rs"]
 mod mirror_timer_tests;
+
+#[cfg(test)]
+#[path = "protocol_damage_meter_tests.rs"]
+mod damage_meter_tests;
 
 #[cfg(test)]
 #[path = "protocol_player_motion_tests.rs"]
