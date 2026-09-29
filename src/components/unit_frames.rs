@@ -248,6 +248,44 @@ pub enum CreatureMotion {
     Run,
 }
 
+/// How a player is moving, as Retail sends it in the `MovementInfo` flags of each
+/// `SMSG_MOVE_UPDATE` the server rebroadcasts from a player's `CMSG_MOVE_*`
+/// (TrinityCore `HandleMovementOpcode`). Bits keep TrinityCore `MovementFlags` values
+/// (MovementInfo.h); other clients pick the remote unit's animation from them. The server
+/// sets it from each applied `PlayerInput`.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    Default,
+    PartialEq,
+    Eq,
+)]
+pub struct PlayerMotion(pub u32);
+
+impl PlayerMotion {
+    pub const FORWARD: u32 = 0x0000_0001;
+    pub const BACKWARD: u32 = 0x0000_0002;
+    pub const STRAFE_LEFT: u32 = 0x0000_0004;
+    pub const STRAFE_RIGHT: u32 = 0x0000_0008;
+    /// Walk mode (run toggled off).
+    pub const WALKING: u32 = 0x0000_0100;
+    /// Airborne: a jump until it lands.
+    pub const FALLING: u32 = 0x0000_0800;
+    pub const SWIMMING: u32 = 0x0010_0000;
+
+    /// Whether every bit of `flags` is set.
+    pub fn contains(self, flags: u32) -> bool {
+        self.0 & flags == flags
+    }
+}
+
 /// `UnitData::StandState` (TrinityCore `UnitStandStateType`, UnitDefines.h).
 #[derive(
     Reflect,

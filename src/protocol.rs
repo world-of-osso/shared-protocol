@@ -5,9 +5,9 @@ pub use crate::protocol_snapshots::*;
 
 use crate::components::{
     CombatStatus, CreatureMotion, EquipmentAppearance, Gold, GuildMembership, Health, Mana,
-    ModelDisplay, Mounted, MovementControl, MovementSpeed, Npc, Player, Position, PresenceStatus,
-    Rotation, UnitAuras, UnitFactionTemplate, UnitFlags, UnitLevel, UnitPowers, UnitTarget,
-    WorldArrival, Zone,
+    ModelDisplay, Mounted, MovementControl, MovementSpeed, Npc, Player, PlayerMotion, Position,
+    PresenceStatus, Rotation, UnitAuras, UnitFactionTemplate, UnitFlags, UnitLevel, UnitPose,
+    UnitPowers, UnitTarget, WorldArrival, Zone,
 };
 
 mod bank_messages;
@@ -113,6 +113,7 @@ fn register_replicated_components(app: &mut App) {
     app.component::<UnitFlags>().replicate();
     app.component::<UnitTarget>().replicate();
     app.component::<CreatureMotion>().replicate();
+    app.component::<PlayerMotion>().replicate();
     app.component::<UnitPose>().replicate();
 }
 
@@ -187,3 +188,7 @@ mod instance_tests;
 #[cfg(test)]
 #[path = "protocol_mirror_timer_tests.rs"]
 mod mirror_timer_tests;
+
+#[cfg(test)]
+#[path = "protocol_player_motion_tests.rs"]
+mod player_motion_tests;
