@@ -53,7 +53,7 @@ pub use merchant_messages::*;
 pub use mirror_timer_messages::*;
 pub use protocol_check::{
     ProtocolCheckChannel, ProtocolCheckTimeout, ProtocolFingerprint, ProtocolRejected,
-    ProtocolVerified,
+    ProtocolVerified, defer_lightyear_protocol_check,
 };
 pub use quest_messages::*;
 pub use spell_messages::*;

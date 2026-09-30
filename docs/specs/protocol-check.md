@@ -8,6 +8,7 @@
 - [x] A differing fingerprint rejects the connection on the receiving side: `ProtocolRejected(reason)` names every differing registry (message, component, channel), and the link drops 1 s later so the peer also receives this side's fingerprint.
 - [x] A peer that sends no fingerprint within `ProtocolCheckTimeout` (default 10 s) is rejected the same way; builds before this check never send one.
 - [x] A matching fingerprint inserts `ProtocolVerified`. Hosts treat a connection as usable only after `ProtocolVerified`.
+- [x] Client hosts install `defer_lightyear_protocol_check` as the app error handler so lightyear's own check warns instead of panicking and this check reports the difference.
 - [x] The check's channel and message register before every other shared registration, so their ids agree between builds whose later registrations differ.
 
 ## How it works

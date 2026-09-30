@@ -8,6 +8,7 @@
 
 use core::time::Duration;
 
+use bevy::ecs::error::{ErrorContext, match_severity};
 use bevy::prelude::*;
 use bevy_replicon::shared::protocol::ProtocolHash;
 use lightyear::connection::client::Disconnecting;
@@ -192,6 +193,20 @@ fn drop_rejected_links(
             commands.trigger(Disconnect { entity });
         }
     }
+}
+
+const LIGHTYEAR_PROTOCOL_CHECK: &str =
+    "lightyear::protocol::ProtocolCheckPlugin::receive_verify_protocol";
+
+/// App error handler that leaves protocol differences to this check. Lightyear's own
+/// client-side check fails through the error handler, which by default panics the app on
+/// a message or channel difference before this check can report it.
+pub fn defer_lightyear_protocol_check(error: BevyError, ctx: ErrorContext) {
+    if ctx.name().to_string() == LIGHTYEAR_PROTOCOL_CHECK {
+        warn!("lightyear protocol check failed ({error}); the shared protocol check reports it");
+        return;
+    }
+    match_severity(error, ctx);
 }
 
 /// User-facing reason naming every registry that differs, or `None` when all match.

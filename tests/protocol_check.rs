@@ -13,7 +13,9 @@ use lightyear::prelude::server::{self as server_net, ClientOf, NetcodeServer, Se
 use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
 use shared::ProtocolPlugin;
-use shared::protocol::{ProtocolCheckTimeout, ProtocolRejected, ProtocolVerified};
+use shared::protocol::{
+    ProtocolCheckTimeout, ProtocolRejected, ProtocolVerified, defer_lightyear_protocol_check,
+};
 
 const TICK: Duration = Duration::from_millis(10);
 
@@ -59,20 +61,10 @@ fn with_added_channel(app: &mut App) {
     .add_direction(NetworkDirection::Bidirectional);
 }
 
-/// Lightyear's own client-side check panics on message/channel differences through the
-/// default error handler; the shared check reports those itself.
-fn ignore_lightyear_protocol_check(error: BevyError, ctx: bevy::ecs::error::ErrorContext) {
-    if ctx.name().to_string() == "lightyear::protocol::ProtocolCheckPlugin::receive_verify_protocol"
-    {
-        return;
-    }
-    bevy::ecs::error::panic(error, ctx);
-}
-
 fn base_app(timeout: Duration) -> App {
     let mut app = App::new();
     app.add_plugins((MinimalPlugins, StatesPlugin));
-    app.set_error_handler(ignore_lightyear_protocol_check);
+    app.set_error_handler(defer_lightyear_protocol_check);
     app.insert_resource(ProtocolCheckTimeout(timeout));
     app
 }
