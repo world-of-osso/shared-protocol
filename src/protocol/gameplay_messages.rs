@@ -60,6 +60,10 @@ pub struct AuctionListingSummary {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct AuctionSearchQuery {
+    /// Exact item filter, applied before pagination.
+    pub item_id: Option<u32>,
+    /// Retail item class filter, applied before pagination.
+    pub class_id: Option<u8>,
     pub text: String,
     pub page: u32,
     pub page_size: u32,
@@ -71,6 +75,25 @@ pub struct AuctionSearchQuery {
     pub sort_dir: AuctionSortDir,
     /// Filter by faction: 0 = neutral (show all), 1 = Alliance, 2 = Horde.
     pub faction: u8,
+}
+
+impl Default for AuctionSearchQuery {
+    fn default() -> Self {
+        Self {
+            item_id: None,
+            class_id: None,
+            text: String::new(),
+            page: 0,
+            page_size: 50,
+            min_level: None,
+            max_level: None,
+            quality: None,
+            usable_only: false,
+            sort_field: AuctionSortField::Name,
+            sort_dir: AuctionSortDir::Asc,
+            faction: 0,
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
