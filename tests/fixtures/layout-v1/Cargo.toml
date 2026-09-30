@@ -1,0 +1,14 @@
+[package]
+name = "layout-fixture-v1"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+# Both versions share the library name, so their types have identical type names, as the
+# same type does in a client and a server built from different revisions.
+[lib]
+name = "layout_fixture"
+
+[dependencies]
+bevy = { version = "0.19", default-features = false }
+serde = { version = "1", features = ["derive"] }

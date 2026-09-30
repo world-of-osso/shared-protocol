@@ -12,8 +12,8 @@
 //! sent in full to the owning client when a character enters the world and after
 //! every newly learned appearance. All messages use `TooltipChannel`.
 
+use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
-use lightyear::prelude::*;
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -70,10 +70,10 @@ pub(super) fn register_tooltip_protocol(app: &mut App) {
         ..default()
     })
     .add_direction(NetworkDirection::Bidirectional);
-    app.register_message::<CreatureTooltipQuery>()
+    app.register_protocol_message::<CreatureTooltipQuery>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<CreatureTooltip>()
+    app.register_protocol_message::<CreatureTooltip>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<AppearanceCollectionUpdate>()
+    app.register_protocol_message::<AppearanceCollectionUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }

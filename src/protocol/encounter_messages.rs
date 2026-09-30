@@ -6,6 +6,7 @@
 //! boss is a `boss1..5` unit for the client's boss frames (Retail
 //! `INSTANCE_ENCOUNTER_ENGAGE_UNIT`).
 
+use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
 use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -50,12 +51,12 @@ pub(super) fn register_encounter_protocol(app: &mut App) {
         ..default()
     })
     .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<EncounterStart>()
+    app.register_protocol_message::<EncounterStart>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<EncounterEnd>()
+    app.register_protocol_message::<EncounterEnd>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<EncounterEngageUnit>()
+    app.register_protocol_message::<EncounterEngageUnit>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<EncounterDisengageUnit>()
+    app.register_protocol_message::<EncounterDisengageUnit>()
         .add_direction(NetworkDirection::ServerToClient);
 }

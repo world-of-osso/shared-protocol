@@ -15,13 +15,18 @@ use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
 use tracing::{error, warn};
 
-/// Registry hashes of one build, each covering type names in registration order.
-/// `components` is replicon's hash of the replication rules and replicon events.
+use super::protocol_layout::{LocalLayouts, ProtocolRegistrationExt, finish_layouts};
+
+/// Registry hashes of one build. `messages`, `channels` and `components` cover type names
+/// in registration order (`components` is replicon's hash of the replication rules and
+/// replicon events); the `*_layouts` hashes cover each registered type's wire layout.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ProtocolFingerprint {
     pub messages: u64,
     pub channels: u64,
     pub components: ProtocolHash,
+    pub message_layouts: u64,
+    pub component_layouts: u64,
 }
 
 /// Reliable ordered channel for `ProtocolFingerprint`, bidirectional. Registered before
@@ -65,7 +70,7 @@ pub(super) fn register_protocol_check(app: &mut App) {
         ..default()
     })
     .add_direction(NetworkDirection::Bidirectional);
-    app.register_message::<ProtocolFingerprint>()
+    app.register_protocol_message::<ProtocolFingerprint>()
         .add_direction(NetworkDirection::Bidirectional);
     app.init_resource::<ProtocolCheckTimeout>();
     app.add_observer(reset_check);
@@ -78,15 +83,24 @@ pub(super) fn register_protocol_check(app: &mut App) {
     );
 }
 
+/// Hashes the layouts once every plugin has registered its types.
+pub(super) fn finish_protocol_check(app: &mut App) {
+    let layouts = finish_layouts(app.world_mut());
+    app.insert_resource(layouts);
+}
+
 fn local_fingerprint(
     messages: &mut MessageRegistry,
     channels: &mut ChannelRegistry,
     components: ProtocolHash,
+    layouts: LocalLayouts,
 ) -> ProtocolFingerprint {
     ProtocolFingerprint {
         messages: messages.finish(),
         channels: channels.finish(),
         components,
+        message_layouts: layouts.messages,
+        component_layouts: layouts.components,
     }
 }
 
@@ -111,6 +125,7 @@ fn send_fingerprints(
     mut messages: ResMut<MessageRegistry>,
     mut channels: ResMut<ChannelRegistry>,
     components: Res<ProtocolHash>,
+    layouts: Res<LocalLayouts>,
     time: Res<Time<Real>>,
     mut commands: Commands,
 ) {
@@ -126,6 +141,7 @@ fn send_fingerprints(
             &mut messages,
             &mut channels,
             *components,
+            *layouts,
         ));
     }
 }
@@ -135,12 +151,13 @@ fn verify_fingerprints(
     mut messages: ResMut<MessageRegistry>,
     mut channels: ResMut<ChannelRegistry>,
     components: Res<ProtocolHash>,
+    layouts: Res<LocalLayouts>,
     time: Res<Time<Real>>,
     mut commands: Commands,
 ) {
     for (entity, mut receiver) in &mut receivers {
         for remote in receiver.receive() {
-            let local = local_fingerprint(&mut messages, &mut channels, *components);
+            let local = local_fingerprint(&mut messages, &mut channels, *components, *layouts);
             match describe_mismatch(&local, &remote) {
                 None => {
                     commands.entity(entity).insert(ProtocolVerified);
@@ -218,12 +235,24 @@ pub fn defer_lightyear_protocol_check(error: BevyError, ctx: ErrorContext) {
     match_severity(error, ctx);
 }
 
-/// User-facing reason naming every registry that differs, or `None` when all match.
+/// User-facing reason naming every registry that differs, or `None` when all match. A
+/// layout difference is named only when the type names match: new or reordered types
+/// change the layout hash too.
 fn describe_mismatch(local: &ProtocolFingerprint, remote: &ProtocolFingerprint) -> Option<String> {
+    let messages = local.messages != remote.messages;
+    let components = local.components != remote.components;
     let differing: Vec<&str> = [
-        ("message", local.messages != remote.messages),
-        ("component", local.components != remote.components),
+        ("message", messages),
+        ("component", components),
         ("channel", local.channels != remote.channels),
+        (
+            "message layout",
+            !messages && local.message_layouts != remote.message_layouts,
+        ),
+        (
+            "component layout",
+            !components && local.component_layouts != remote.component_layouts,
+        ),
     ]
     .into_iter()
     .filter_map(|(registry, differs)| differs.then_some(registry))

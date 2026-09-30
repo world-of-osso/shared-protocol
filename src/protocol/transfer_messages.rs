@@ -8,6 +8,7 @@
 //! destination map. A teleport the destination refuses is answered with
 //! `TransferAborted` (`SMSG_TRANSFER_ABORTED`) and the player stays where it was.
 
+use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
 use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -83,10 +84,10 @@ pub(super) fn register_transfer_protocol(app: &mut App) {
         ..default()
     })
     .add_direction(NetworkDirection::Bidirectional);
-    app.register_message::<NewWorld>()
+    app.register_protocol_message::<NewWorld>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<WorldPortAck>()
+    app.register_protocol_message::<WorldPortAck>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<TransferAborted>()
+    app.register_protocol_message::<TransferAborted>()
         .add_direction(NetworkDirection::ServerToClient);
 }

@@ -9,6 +9,7 @@
 //! difficulty with a reset schedule saves the copy's players to it until the daily or
 //! weekly reset; the saved instances are listed by `InstanceInfo`.
 
+use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
 use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -125,26 +126,26 @@ pub(super) fn register_instance_protocol(app: &mut App) {
         ..default()
     })
     .add_direction(NetworkDirection::Bidirectional);
-    app.register_message::<SetDungeonDifficulty>()
+    app.register_protocol_message::<SetDungeonDifficulty>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<RequestRaidInfo>()
+    app.register_protocol_message::<RequestRaidInfo>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<ResetInstances>()
+    app.register_protocol_message::<ResetInstances>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<SetSavedInstanceExtend>()
+    app.register_protocol_message::<SetSavedInstanceExtend>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<DungeonDifficultySet>()
+    app.register_protocol_message::<DungeonDifficultySet>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<WorldServerInfo>()
+    app.register_protocol_message::<WorldServerInfo>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<InstanceInfo>()
+    app.register_protocol_message::<InstanceInfo>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<InstanceSaveCreated>()
+    app.register_protocol_message::<InstanceSaveCreated>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<InstanceReset>()
+    app.register_protocol_message::<InstanceReset>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<InstanceResetFailed>()
+    app.register_protocol_message::<InstanceResetFailed>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<RaidInstanceMessage>()
+    app.register_protocol_message::<RaidInstanceMessage>()
         .add_direction(NetworkDirection::ServerToClient);
 }

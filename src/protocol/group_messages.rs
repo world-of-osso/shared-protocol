@@ -5,6 +5,7 @@
 //! from any channel. The roster itself is `GroupRosterSnapshot` and results are
 //! `GroupCommandResponse` (protocol snapshots).
 
+use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
 use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -267,13 +268,13 @@ pub(super) fn register_group_messages(app: &mut App) {
     for_client::<SetGroupLootMethod>(app);
     for_client::<StartReadyCheck>(app);
     for_client::<RespondReadyCheck>(app);
-    app.register_message::<GroupInvitePrompt>()
+    app.register_protocol_message::<GroupInvitePrompt>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<GroupInviteCancelled>()
+    app.register_protocol_message::<GroupInviteCancelled>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<GroupMemberStates>()
+    app.register_protocol_message::<GroupMemberStates>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<ReadyCheckUpdate>()
+    app.register_protocol_message::<ReadyCheckUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
     app.add_channel::<GroupChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
@@ -285,6 +286,6 @@ pub(super) fn register_group_messages(app: &mut App) {
 fn for_client<M: lightyear::prelude::Message + Serialize + serde::de::DeserializeOwned>(
     app: &mut App,
 ) {
-    app.register_message::<M>()
+    app.register_protocol_message::<M>()
         .add_direction(NetworkDirection::ClientToServer);
 }

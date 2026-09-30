@@ -19,8 +19,8 @@
 //! StaticPopup `CONFIRM_SUMMON`), answered by `SummonResponse`
 //! (`CMSG_SUMMON_RESPONSE`).
 
+use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
-use lightyear::prelude::*;
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -274,29 +274,29 @@ pub struct SummonResponse {
 }
 
 pub(super) fn register_interaction_protocol(app: &mut App) {
-    app.component::<NpcFlags>().replicate();
-    app.component::<GameObjectInfo>().replicate();
+    app.protocol_component::<NpcFlags>().replicate();
+    app.protocol_component::<GameObjectInfo>().replicate();
     app.add_channel::<InteractionChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
         ..default()
     })
     .add_direction(NetworkDirection::Bidirectional);
-    app.register_message::<InteractNpc>()
+    app.register_protocol_message::<InteractNpc>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<UseGameObject>()
+    app.register_protocol_message::<UseGameObject>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<SelectGossipOption>()
+    app.register_protocol_message::<SelectGossipOption>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<CloseInteraction>()
+    app.register_protocol_message::<CloseInteraction>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<InteractionOpened>()
+    app.register_protocol_message::<InteractionOpened>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<InteractionFailed>()
+    app.register_protocol_message::<InteractionFailed>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<InteractionClosed>()
+    app.register_protocol_message::<InteractionClosed>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<SummonRequest>()
+    app.register_protocol_message::<SummonRequest>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<SummonResponse>()
+    app.register_protocol_message::<SummonResponse>()
         .add_direction(NetworkDirection::ClientToServer);
 }

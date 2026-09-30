@@ -13,8 +13,8 @@
 //! Rejected requests answer with `QuestFailed`. NPCs are addressed by server entity
 //! bits. All messages use `QuestChannel`.
 
+use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
-use lightyear::prelude::*;
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -282,39 +282,39 @@ pub(super) fn register_quest_protocol(app: &mut App) {
 }
 
 fn register_client_messages(app: &mut App) {
-    app.register_message::<QuestGiverStatusQuery>()
+    app.register_protocol_message::<QuestGiverStatusQuery>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<QuestGiverHello>()
+    app.register_protocol_message::<QuestGiverHello>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<QuestGiverQueryQuest>()
+    app.register_protocol_message::<QuestGiverQueryQuest>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<QuestGiverAcceptQuest>()
+    app.register_protocol_message::<QuestGiverAcceptQuest>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<QuestGiverCompleteQuest>()
+    app.register_protocol_message::<QuestGiverCompleteQuest>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<QuestGiverChooseReward>()
+    app.register_protocol_message::<QuestGiverChooseReward>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<AbandonQuest>()
+    app.register_protocol_message::<AbandonQuest>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<SetQuestWatched>()
+    app.register_protocol_message::<SetQuestWatched>()
         .add_direction(NetworkDirection::ClientToServer);
 }
 
 fn register_server_messages(app: &mut App) {
-    app.register_message::<QuestGiverStatusMultiple>()
+    app.register_protocol_message::<QuestGiverStatusMultiple>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<QuestGiverQuestList>()
+    app.register_protocol_message::<QuestGiverQuestList>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<QuestGiverQuestDetails>()
+    app.register_protocol_message::<QuestGiverQuestDetails>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<QuestGiverRequestItems>()
+    app.register_protocol_message::<QuestGiverRequestItems>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<QuestGiverOfferReward>()
+    app.register_protocol_message::<QuestGiverOfferReward>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<QuestGiverQuestComplete>()
+    app.register_protocol_message::<QuestGiverQuestComplete>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<QuestLogUpdate>()
+    app.register_protocol_message::<QuestLogUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<QuestFailed>()
+    app.register_protocol_message::<QuestFailed>()
         .add_direction(NetworkDirection::ServerToClient);
 }

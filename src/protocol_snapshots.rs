@@ -1,4 +1,5 @@
 use crate::components::{CharacterAppearance, EquipmentVisualSlot};
+use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
 use lightyear::prelude::*;
 use serde::de::DeserializeOwned;
@@ -456,6 +457,6 @@ fn register_server_snapshot<M>(app: &mut App)
 where
     M: lightyear::prelude::Message + Serialize + DeserializeOwned,
 {
-    app.register_message::<M>()
+    app.register_protocol_message::<M>()
         .add_direction(NetworkDirection::ServerToClient);
 }

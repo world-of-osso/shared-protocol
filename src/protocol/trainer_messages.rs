@@ -7,8 +7,8 @@
 //! spells change through `Gold` and `ProfessionSnapshot`; refusals come back as
 //! `TrainerBuyFailed`. All messages use `TrainerChannel`.
 
+use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
-use lightyear::prelude::*;
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -88,10 +88,10 @@ pub(super) fn register_trainer_protocol(app: &mut App) {
         ..default()
     })
     .add_direction(NetworkDirection::Bidirectional);
-    app.register_message::<TrainerList>()
+    app.register_protocol_message::<TrainerList>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<TrainerBuyFailed>()
+    app.register_protocol_message::<TrainerBuyFailed>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<TrainerBuySpell>()
+    app.register_protocol_message::<TrainerBuySpell>()
         .add_direction(NetworkDirection::ClientToServer);
 }

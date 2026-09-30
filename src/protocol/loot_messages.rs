@@ -9,8 +9,8 @@
 //! does not fit. The window ends with `LootClosed`. Items and money reach the
 //! player through `InventoryDelta` and `Gold`. All messages use `LootChannel`.
 
+use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
-use lightyear::prelude::*;
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -123,20 +123,20 @@ pub(super) fn register_loot_protocol(app: &mut App) {
         ..default()
     })
     .add_direction(NetworkDirection::Bidirectional);
-    app.register_message::<LootUnit>()
+    app.register_protocol_message::<LootUnit>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<LootSlotRequest>()
+    app.register_protocol_message::<LootSlotRequest>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<LootRelease>()
+    app.register_protocol_message::<LootRelease>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<LootResponse>()
+    app.register_protocol_message::<LootResponse>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<LootSlotRemoved>()
+    app.register_protocol_message::<LootSlotRemoved>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<LootClosed>()
+    app.register_protocol_message::<LootClosed>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<CorpseLootable>()
+    app.register_protocol_message::<CorpseLootable>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<LootFailed>()
+    app.register_protocol_message::<LootFailed>()
         .add_direction(NetworkDirection::ServerToClient);
 }

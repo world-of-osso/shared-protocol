@@ -35,90 +35,90 @@ pub(super) fn register_messages(app: &mut App) {
 }
 
 fn register_core_messages(app: &mut App) {
-    app.register_message::<PlayerInput>()
+    app.register_protocol_message::<PlayerInput>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<ChatMessage>()
+    app.register_protocol_message::<ChatMessage>()
         .add_direction(NetworkDirection::Bidirectional);
-    app.register_message::<SetTarget>()
+    app.register_protocol_message::<SetTarget>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<AttackSwing>()
+    app.register_protocol_message::<AttackSwing>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<AttackStop>()
+    app.register_protocol_message::<AttackStop>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<AttackStart>()
+    app.register_protocol_message::<AttackStart>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<AttackStopped>()
+    app.register_protocol_message::<AttackStopped>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<CombatEvent>()
+    app.register_protocol_message::<CombatEvent>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<SpellCastIntent>()
+    app.register_protocol_message::<SpellCastIntent>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<StopSpellCast>()
+    app.register_protocol_message::<StopSpellCast>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<EmoteIntent>()
+    app.register_protocol_message::<EmoteIntent>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<EmoteEvent>()
+    app.register_protocol_message::<EmoteEvent>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<GroupInviteIntent>()
+    app.register_protocol_message::<GroupInviteIntent>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<GroupUninviteIntent>()
+    app.register_protocol_message::<GroupUninviteIntent>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<LoadTerrain>()
+    app.register_protocol_message::<LoadTerrain>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_account_messages(app: &mut App) {
-    app.register_message::<LoginRequest>()
+    app.register_protocol_message::<LoginRequest>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<LoginResponse>()
+    app.register_protocol_message::<LoginResponse>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<ForcedDisconnect>()
+    app.register_protocol_message::<ForcedDisconnect>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<RegisterRequest>()
+    app.register_protocol_message::<RegisterRequest>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<RegisterResponse>()
+    app.register_protocol_message::<RegisterResponse>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_character_messages(app: &mut App) {
-    app.register_message::<CreateCharacter>()
+    app.register_protocol_message::<CreateCharacter>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<CreateCharacterResponse>()
+    app.register_protocol_message::<CreateCharacterResponse>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<DeleteCharacter>()
+    app.register_protocol_message::<DeleteCharacter>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<DeleteCharacterResponse>()
+    app.register_protocol_message::<DeleteCharacterResponse>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<CharacterListUpdate>()
+    app.register_protocol_message::<CharacterListUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<SelectCharacter>()
+    app.register_protocol_message::<SelectCharacter>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<EnterWorldResponse>()
+    app.register_protocol_message::<EnterWorldResponse>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_guild_and_chat_messages(app: &mut App) {
-    app.register_message::<GuildInviteRequest>()
+    app.register_protocol_message::<GuildInviteRequest>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<GuildInviteResponse>()
+    app.register_protocol_message::<GuildInviteResponse>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<GuildAcceptInviteRequest>()
+    app.register_protocol_message::<GuildAcceptInviteRequest>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<GuildAcceptInviteResponse>()
+    app.register_protocol_message::<GuildAcceptInviteResponse>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<QueryGuild>()
+    app.register_protocol_message::<QueryGuild>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<SetGuildMotd>()
+    app.register_protocol_message::<SetGuildMotd>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<SetGuildInfo>()
+    app.register_protocol_message::<SetGuildInfo>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<SetGuildOfficerNote>()
+    app.register_protocol_message::<SetGuildOfficerNote>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<GuildStateUpdate>()
+    app.register_protocol_message::<GuildStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<ChatHistoryRequest>()
+    app.register_protocol_message::<ChatHistoryRequest>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<ChatHistoryResponse>()
+    app.register_protocol_message::<ChatHistoryResponse>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
@@ -128,271 +128,271 @@ fn register_auction_messages(app: &mut App) {
 }
 
 fn register_auction_query_messages(app: &mut App) {
-    app.register_message::<OpenAuctionHouse>()
+    app.register_protocol_message::<OpenAuctionHouse>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<AuctionHouseOpened>()
+    app.register_protocol_message::<AuctionHouseOpened>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<QueryAuctions>()
+    app.register_protocol_message::<QueryAuctions>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<AuctionSearchResults>()
+    app.register_protocol_message::<AuctionSearchResults>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<QueryOwnedAuctions>()
+    app.register_protocol_message::<QueryOwnedAuctions>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<OwnedAuctionListResponse>()
+    app.register_protocol_message::<OwnedAuctionListResponse>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<QueryBidAuctions>()
+    app.register_protocol_message::<QueryBidAuctions>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<BidAuctionListResponse>()
+    app.register_protocol_message::<BidAuctionListResponse>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<QueryAuctionInventory>()
+    app.register_protocol_message::<QueryAuctionInventory>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<AuctionInventorySnapshot>()
+    app.register_protocol_message::<AuctionInventorySnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_auction_action_messages(app: &mut App) {
-    app.register_message::<PlaceBid>()
+    app.register_protocol_message::<PlaceBid>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<BuyoutAuction>()
+    app.register_protocol_message::<BuyoutAuction>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<CreateAuction>()
+    app.register_protocol_message::<CreateAuction>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<CancelAuction>()
+    app.register_protocol_message::<CancelAuction>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<AuctionOperationResponse>()
+    app.register_protocol_message::<AuctionOperationResponse>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_trade_messages(app: &mut App) {
-    app.register_message::<InitiateTrade>()
+    app.register_protocol_message::<InitiateTrade>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<AcceptTrade>()
+    app.register_protocol_message::<AcceptTrade>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<DeclineTrade>()
+    app.register_protocol_message::<DeclineTrade>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<CancelTrade>()
+    app.register_protocol_message::<CancelTrade>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<SetTradeItem>()
+    app.register_protocol_message::<SetTradeItem>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<ClearTradeItem>()
+    app.register_protocol_message::<ClearTradeItem>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<SetTradeMoney>()
+    app.register_protocol_message::<SetTradeMoney>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<ConfirmTrade>()
+    app.register_protocol_message::<ConfirmTrade>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<CancelTradeAccept>()
+    app.register_protocol_message::<CancelTradeAccept>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<TradeStateUpdate>()
+    app.register_protocol_message::<TradeStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_talent_messages(app: &mut App) {
-    app.register_message::<QueryTalents>()
+    app.register_protocol_message::<QueryTalents>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<ApplyTalentChoice>()
+    app.register_protocol_message::<ApplyTalentChoice>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<ResetTalents>()
+    app.register_protocol_message::<ResetTalents>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<TalentStateUpdate>()
+    app.register_protocol_message::<TalentStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_inspect_messages(app: &mut App) {
-    app.register_message::<QueryInspectTarget>()
+    app.register_protocol_message::<QueryInspectTarget>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<InspectStateUpdate>()
+    app.register_protocol_message::<InspectStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_duel_messages(app: &mut App) {
-    app.register_message::<InitiateDuel>()
+    app.register_protocol_message::<InitiateDuel>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<AcceptDuel>()
+    app.register_protocol_message::<AcceptDuel>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<DeclineDuel>()
+    app.register_protocol_message::<DeclineDuel>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<DuelStateUpdate>()
+    app.register_protocol_message::<DuelStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_profession_messages(app: &mut App) {
-    app.register_message::<CraftRecipe>()
+    app.register_protocol_message::<CraftRecipe>()
         .add_direction(NetworkDirection::ClientToServer);
 }
 
 fn register_reputation_messages(app: &mut App) {
-    app.register_message::<ReputationStateUpdate>()
+    app.register_protocol_message::<ReputationStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_achievement_messages(app: &mut App) {
-    app.register_message::<AchievementStateUpdate>()
+    app.register_protocol_message::<AchievementStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_world_map_messages(app: &mut App) {
-    app.register_message::<WorldMapStateUpdate>()
+    app.register_protocol_message::<WorldMapStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_rest_messages(app: &mut App) {
-    app.register_message::<RestStateUpdate>()
+    app.register_protocol_message::<RestStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_friends_messages(app: &mut App) {
-    app.register_message::<QueryFriends>()
+    app.register_protocol_message::<QueryFriends>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<AddFriend>()
+    app.register_protocol_message::<AddFriend>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<RemoveFriend>()
+    app.register_protocol_message::<RemoveFriend>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<SetPresenceStatus>()
+    app.register_protocol_message::<SetPresenceStatus>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<FriendsStateUpdate>()
+    app.register_protocol_message::<FriendsStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_who_messages(app: &mut App) {
-    app.register_message::<QueryWho>()
+    app.register_protocol_message::<QueryWho>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<WhoStateUpdate>()
+    app.register_protocol_message::<WhoStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_calendar_messages(app: &mut App) {
-    app.register_message::<QueryCalendar>()
+    app.register_protocol_message::<QueryCalendar>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<ScheduleCalendarEvent>()
+    app.register_protocol_message::<ScheduleCalendarEvent>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<RespondCalendarSignup>()
+    app.register_protocol_message::<RespondCalendarSignup>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<CalendarStateUpdate>()
+    app.register_protocol_message::<CalendarStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_ignore_messages(app: &mut App) {
-    app.register_message::<QueryIgnoreList>()
+    app.register_protocol_message::<QueryIgnoreList>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<AddIgnore>()
+    app.register_protocol_message::<AddIgnore>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<RemoveIgnore>()
+    app.register_protocol_message::<RemoveIgnore>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<IgnoreListStateUpdate>()
+    app.register_protocol_message::<IgnoreListStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_lfg_messages(app: &mut App) {
-    app.register_message::<QueryLfgStatus>()
+    app.register_protocol_message::<QueryLfgStatus>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<QueueForLfg>()
+    app.register_protocol_message::<QueueForLfg>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<DequeueFromLfg>()
+    app.register_protocol_message::<DequeueFromLfg>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<RespondToLfgRoleCheck>()
+    app.register_protocol_message::<RespondToLfgRoleCheck>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<LfgStateUpdate>()
+    app.register_protocol_message::<LfgStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_pvp_messages(app: &mut App) {
-    app.register_message::<QueryPvpStatus>()
+    app.register_protocol_message::<QueryPvpStatus>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<QueueForBattleground>()
+    app.register_protocol_message::<QueueForBattleground>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<QueueForRatedPvp>()
+    app.register_protocol_message::<QueueForRatedPvp>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<DequeueFromPvp>()
+    app.register_protocol_message::<DequeueFromPvp>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<PvpStateUpdate>()
+    app.register_protocol_message::<PvpStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_barber_shop_messages(app: &mut App) {
-    app.register_message::<QueryBarberShopStatus>()
+    app.register_protocol_message::<QueryBarberShopStatus>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<ApplyBarberShopChanges>()
+    app.register_protocol_message::<ApplyBarberShopChanges>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<BarberShopStateUpdate>()
+    app.register_protocol_message::<BarberShopStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_death_messages(app: &mut App) {
-    app.register_message::<QueryDeathStatus>()
+    app.register_protocol_message::<QueryDeathStatus>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<ReleaseSpirit>()
+    app.register_protocol_message::<ReleaseSpirit>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<ResurrectAtCorpse>()
+    app.register_protocol_message::<ResurrectAtCorpse>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<AcceptSpiritHealerResurrection>()
+    app.register_protocol_message::<AcceptSpiritHealerResurrection>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<UseStuckEscape>()
+    app.register_protocol_message::<UseStuckEscape>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<DeathStateUpdate>()
+    app.register_protocol_message::<DeathStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_durability_messages(app: &mut App) {
-    app.register_message::<QueryDurabilityStatus>()
+    app.register_protocol_message::<QueryDurabilityStatus>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<DurabilityStateUpdate>()
+    app.register_protocol_message::<DurabilityStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_collection_messages(app: &mut App) {
-    app.register_message::<SummonMount>()
+    app.register_protocol_message::<SummonMount>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<DismissMount>()
+    app.register_protocol_message::<DismissMount>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<SummonPet>()
+    app.register_protocol_message::<SummonPet>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<DismissPet>()
+    app.register_protocol_message::<DismissPet>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<CollectionStateUpdate>()
+    app.register_protocol_message::<CollectionStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_currency_messages(app: &mut App) {
-    app.register_message::<EarnCurrency>()
+    app.register_protocol_message::<EarnCurrency>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<SpendCurrency>()
+    app.register_protocol_message::<SpendCurrency>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<CurrencyStateUpdate>()
+    app.register_protocol_message::<CurrencyStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_spell_messages(app: &mut App) {
-    app.register_message::<KnownSpellsSnapshot>()
+    app.register_protocol_message::<KnownSpellsSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<SpellsLearned>()
+    app.register_protocol_message::<SpellsLearned>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<SpellsUnlearned>()
+    app.register_protocol_message::<SpellsUnlearned>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<SpellCooldownUpdate>()
+    app.register_protocol_message::<SpellCooldownUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<SpellChargesUpdate>()
+    app.register_protocol_message::<SpellChargesUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<CastFailed>()
+    app.register_protocol_message::<CastFailed>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<CombatLogEvent>()
+    app.register_protocol_message::<CombatLogEvent>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<ActionBarSnapshot>()
+    app.register_protocol_message::<ActionBarSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<TraitConfigSnapshot>()
+    app.register_protocol_message::<TraitConfigSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<TraitCommitResult>()
+    app.register_protocol_message::<TraitCommitResult>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<SpecializationChanged>()
+    app.register_protocol_message::<SpecializationChanged>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<SetActionButton>()
+    app.register_protocol_message::<SetActionButton>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<CancelAura>()
+    app.register_protocol_message::<CancelAura>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<CommitTraitConfig>()
+    app.register_protocol_message::<CommitTraitConfig>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<SetSpecialization>()
+    app.register_protocol_message::<SetSpecialization>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<SpellGo>()
+    app.register_protocol_message::<SpellGo>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 

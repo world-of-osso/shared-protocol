@@ -9,8 +9,8 @@
 //! refused unless its guild bank frame is open; refusals come back as
 //! `GuildBankFailed`. All messages use `GuildBankChannel`.
 
+use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
-use lightyear::prelude::*;
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -192,24 +192,24 @@ pub(super) fn register_guild_bank_protocol(app: &mut App) {
         ..default()
     })
     .add_direction(NetworkDirection::Bidirectional);
-    app.register_message::<GuildBankContents>()
+    app.register_protocol_message::<GuildBankContents>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<GuildBankLog>()
+    app.register_protocol_message::<GuildBankLog>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<GuildBankFailed>()
+    app.register_protocol_message::<GuildBankFailed>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<GuildBankDeposit>()
+    app.register_protocol_message::<GuildBankDeposit>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<GuildBankWithdraw>()
+    app.register_protocol_message::<GuildBankWithdraw>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<GuildBankMoneyTransfer>()
+    app.register_protocol_message::<GuildBankMoneyTransfer>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<GuildBankBuyTab>()
+    app.register_protocol_message::<GuildBankBuyTab>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<GuildBankSetTabInfo>()
+    app.register_protocol_message::<GuildBankSetTabInfo>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<GuildBankSetTabText>()
+    app.register_protocol_message::<GuildBankSetTabText>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<GuildBankQueryLog>()
+    app.register_protocol_message::<GuildBankQueryLog>()
         .add_direction(NetworkDirection::ClientToServer);
 }

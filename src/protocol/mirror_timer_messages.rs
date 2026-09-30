@@ -6,8 +6,8 @@
 //! and the client counts a running bar between messages (`GetMirrorTimerProgress`). All
 //! three use `MirrorTimerChannel`, so a stop never overtakes the start before it.
 
+use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
-use lightyear::prelude::*;
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -54,10 +54,10 @@ pub(super) fn register_mirror_timer_protocol(app: &mut App) {
         ..default()
     })
     .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<MirrorTimerStart>()
+    app.register_protocol_message::<MirrorTimerStart>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<MirrorTimerPause>()
+    app.register_protocol_message::<MirrorTimerPause>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<MirrorTimerStop>()
+    app.register_protocol_message::<MirrorTimerStop>()
         .add_direction(NetworkDirection::ServerToClient);
 }

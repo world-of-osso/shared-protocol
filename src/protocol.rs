@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use lightyear::prelude::AppComponentExt;
 
 pub use crate::protocol_snapshots::*;
 
@@ -22,11 +21,13 @@ mod guild_bank_messages;
 mod instance_messages;
 mod interaction_messages;
 mod inventory_messages;
+mod layout_tracer;
 mod loot_messages;
 mod mail_messages;
 mod merchant_messages;
 mod mirror_timer_messages;
 mod protocol_check;
+mod protocol_layout;
 mod quest_messages;
 mod registration;
 mod spell_messages;
@@ -55,6 +56,7 @@ pub use protocol_check::{
     ProtocolCheckChannel, ProtocolCheckTimeout, ProtocolFingerprint, ProtocolRejected,
     ProtocolVerified, defer_lightyear_protocol_check,
 };
+pub use protocol_layout::ProtocolRegistrationExt;
 pub use quest_messages::*;
 pub use spell_messages::*;
 pub use taxi_messages::*;
@@ -92,39 +94,44 @@ impl Plugin for ProtocolPlugin {
         instance_messages::register_instance_protocol(app);
         mirror_timer_messages::register_mirror_timer_protocol(app);
     }
+
+    fn finish(&self, app: &mut App) {
+        protocol_check::finish_protocol_check(app);
+    }
 }
 
 fn register_replicated_components(app: &mut App) {
-    app.component::<Position>().replicate();
-    app.component::<Health>().replicate();
-    app.component::<Mana>().replicate();
-    app.component::<Gold>().replicate();
-    app.component::<Player>().replicate();
-    app.component::<Npc>().replicate();
-    app.component::<ModelDisplay>().replicate();
-    app.component::<Rotation>().replicate();
-    app.component::<MovementSpeed>().replicate();
-    app.component::<CombatStatus>().replicate();
-    app.component::<Mounted>().replicate();
-    app.component::<MovementControl>().replicate();
-    app.component::<WorldArrival>().replicate();
-    app.component::<Zone>().replicate();
-    app.component::<GuildMembership>().replicate();
-    app.component::<PresenceStatus>().replicate();
-    app.component::<EquipmentAppearance>().replicate();
-    app.component::<crate::casting::CastState>().replicate();
-    app.component::<UnitPowers>().replicate();
-    app.component::<UnitAuras>().replicate();
-    app.component::<UnitLevel>().replicate();
-    app.component::<crate::level_scaling::LevelScaling>()
+    app.protocol_component::<Position>().replicate();
+    app.protocol_component::<Health>().replicate();
+    app.protocol_component::<Mana>().replicate();
+    app.protocol_component::<Gold>().replicate();
+    app.protocol_component::<Player>().replicate();
+    app.protocol_component::<Npc>().replicate();
+    app.protocol_component::<ModelDisplay>().replicate();
+    app.protocol_component::<Rotation>().replicate();
+    app.protocol_component::<MovementSpeed>().replicate();
+    app.protocol_component::<CombatStatus>().replicate();
+    app.protocol_component::<Mounted>().replicate();
+    app.protocol_component::<MovementControl>().replicate();
+    app.protocol_component::<WorldArrival>().replicate();
+    app.protocol_component::<Zone>().replicate();
+    app.protocol_component::<GuildMembership>().replicate();
+    app.protocol_component::<PresenceStatus>().replicate();
+    app.protocol_component::<EquipmentAppearance>().replicate();
+    app.protocol_component::<crate::casting::CastState>()
         .replicate();
-    app.component::<UnitFactionTemplate>().replicate();
-    app.component::<UnitFlags>().replicate();
-    app.component::<UnitTarget>().replicate();
-    app.component::<CreatureMotion>().replicate();
-    app.component::<PlayerMotion>().replicate();
-    app.component::<UnitPose>().replicate();
-    app.component::<UnitThreatList>().replicate();
+    app.protocol_component::<UnitPowers>().replicate();
+    app.protocol_component::<UnitAuras>().replicate();
+    app.protocol_component::<UnitLevel>().replicate();
+    app.protocol_component::<crate::level_scaling::LevelScaling>()
+        .replicate();
+    app.protocol_component::<UnitFactionTemplate>().replicate();
+    app.protocol_component::<UnitFlags>().replicate();
+    app.protocol_component::<UnitTarget>().replicate();
+    app.protocol_component::<CreatureMotion>().replicate();
+    app.protocol_component::<PlayerMotion>().replicate();
+    app.protocol_component::<UnitPose>().replicate();
+    app.protocol_component::<UnitThreatList>().replicate();
 }
 
 #[cfg(test)]

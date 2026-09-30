@@ -10,8 +10,8 @@
 //! `InventoryDelta` and `Gold`; refusals come back as `BankFailed`. All messages use
 //! `BankChannel`.
 
+use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
-use lightyear::prelude::*;
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -172,20 +172,20 @@ pub(super) fn register_bank_protocol(app: &mut App) {
         ..default()
     })
     .add_direction(NetworkDirection::Bidirectional);
-    app.register_message::<BankContents>()
+    app.register_protocol_message::<BankContents>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<BankFailed>()
+    app.register_protocol_message::<BankFailed>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<BankDeposit>()
+    app.register_protocol_message::<BankDeposit>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<BankWithdraw>()
+    app.register_protocol_message::<BankWithdraw>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<BankPurchaseTab>()
+    app.register_protocol_message::<BankPurchaseTab>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<BankMoneyTransfer>()
+    app.register_protocol_message::<BankMoneyTransfer>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<BankAutoDeposit>()
+    app.register_protocol_message::<BankAutoDeposit>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<BankUpdateTabSettings>()
+    app.register_protocol_message::<BankUpdateTabSettings>()
         .add_direction(NetworkDirection::ClientToServer);
 }

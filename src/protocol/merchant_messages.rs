@@ -10,8 +10,8 @@
 //! `DurabilityStateUpdate`; refusals come back as `MerchantFailed`. All messages use
 //! `MerchantChannel`.
 
+use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
-use lightyear::prelude::*;
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -155,20 +155,20 @@ pub(super) fn register_merchant_protocol(app: &mut App) {
         ..default()
     })
     .add_direction(NetworkDirection::Bidirectional);
-    app.register_message::<VendorInventory>()
+    app.register_protocol_message::<VendorInventory>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<BuybackList>()
+    app.register_protocol_message::<BuybackList>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<MerchantFailed>()
+    app.register_protocol_message::<MerchantFailed>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<BuyItem>()
+    app.register_protocol_message::<BuyItem>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<SellItem>()
+    app.register_protocol_message::<SellItem>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<SellAllJunkItems>()
+    app.register_protocol_message::<SellAllJunkItems>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<BuybackItemRequest>()
+    app.register_protocol_message::<BuybackItemRequest>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<RepairItem>()
+    app.register_protocol_message::<RepairItem>()
         .add_direction(NetworkDirection::ClientToServer);
 }

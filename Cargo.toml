@@ -13,6 +13,9 @@ bitcode = "0.6"
 bevy_replicon = { version = "0.41", default-features = false }
 # Protocol check rejections; already in the tree via lightyear.
 tracing = "0.1"
+# Registration builder and registry key types that `lightyear` does not re-export.
+lightyear_messages = "0.28"
+lightyear_replication = "0.28"
 
 [dev-dependencies]
 serde_json = "1"
@@ -22,6 +25,9 @@ bitcode = { version = "0.6", features = ["serde"] }
 bincode = { version = "2", features = ["serde"] }
 # Real Netcode/UDP connect path for the protocol check tests.
 lightyear = { version = "0.28", features = ["replication", "netcode", "udp"] }
+# Two builds of the same protocol types, differing by one field each.
+layout_v1 = { package = "layout-fixture-v1", path = "tests/fixtures/layout-v1" }
+layout_v2 = { package = "layout-fixture-v2", path = "tests/fixtures/layout-v2" }
 
 # Per-client server disconnect, used by the protocol check; see vendor/lightyear_netcode/UPSTREAM.md.
 # Consumers that run the netcode server (game-server) patch to the same copy.

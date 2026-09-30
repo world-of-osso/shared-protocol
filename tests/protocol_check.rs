@@ -1,5 +1,6 @@
-//! A server and a client with differing registries connect over real Netcode/UDP on
-//! localhost; both sides must reject the connection, and matching builds must verify.
+//! A server and a client with differing registries or type layouts connect over real
+//! Netcode/UDP on localhost; both sides must reject the connection and drop the link, and
+//! matching builds must verify.
 
 use core::net::{IpAddr, Ipv4Addr, SocketAddr};
 use core::time::Duration;
@@ -14,7 +15,8 @@ use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
 use shared::ProtocolPlugin;
 use shared::protocol::{
-    ProtocolCheckTimeout, ProtocolRejected, ProtocolVerified, defer_lightyear_protocol_check,
+    ProtocolCheckTimeout, ProtocolRegistrationExt, ProtocolRejected, ProtocolVerified,
+    defer_lightyear_protocol_check,
 };
 
 const TICK: Duration = Duration::from_millis(10);
@@ -35,21 +37,41 @@ type Registrations = fn(&mut App);
 fn no_registrations(_: &mut App) {}
 
 fn with_added_component(app: &mut App) {
-    app.component::<AddedComponent>().replicate();
+    app.protocol_component::<AddedComponent>().replicate();
 }
 
 fn with_both_components(app: &mut App) {
-    app.component::<AddedComponent>().replicate();
-    app.component::<OtherComponent>().replicate();
+    app.protocol_component::<AddedComponent>().replicate();
+    app.protocol_component::<OtherComponent>().replicate();
 }
 
 fn with_both_components_reversed(app: &mut App) {
-    app.component::<OtherComponent>().replicate();
-    app.component::<AddedComponent>().replicate();
+    app.protocol_component::<OtherComponent>().replicate();
+    app.protocol_component::<AddedComponent>().replicate();
 }
 
 fn with_added_message(app: &mut App) {
-    app.register_message::<AddedMessage>()
+    app.register_protocol_message::<AddedMessage>()
+        .add_direction(NetworkDirection::ServerToClient);
+}
+
+fn with_v1_component(app: &mut App) {
+    app.protocol_component::<layout_v1::LayoutComponent>()
+        .replicate();
+}
+
+fn with_v2_component(app: &mut App) {
+    app.protocol_component::<layout_v2::LayoutComponent>()
+        .replicate();
+}
+
+fn with_v1_message(app: &mut App) {
+    app.register_protocol_message::<layout_v1::LayoutMessage>()
+        .add_direction(NetworkDirection::ServerToClient);
+}
+
+fn with_v2_message(app: &mut App) {
+    app.register_protocol_message::<layout_v2::LayoutMessage>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
@@ -294,6 +316,24 @@ fn component_registration_order_difference_is_rejected_by_both_sides() {
 #[test]
 fn message_registered_only_on_server_is_rejected_by_both_sides() {
     assert_rejected(run_pair(with_added_message, no_registrations), "message");
+}
+
+#[test]
+fn component_with_an_added_field_is_rejected_by_both_sides() {
+    let outcome = run_pair(with_v1_component, with_v2_component);
+    assert_rejected(outcome, "component layout");
+}
+
+#[test]
+fn message_with_an_added_field_is_rejected_by_both_sides() {
+    assert_rejected(run_pair(with_v2_message, with_v1_message), "message layout");
+}
+
+#[test]
+fn builds_with_the_same_layouts_verify() {
+    let outcome = run_pair(with_v1_component, with_v1_component);
+    assert_eq!(outcome.client, Some(Verdict::Verified));
+    assert_eq!(outcome.server, Some(Verdict::Verified));
 }
 
 #[test]

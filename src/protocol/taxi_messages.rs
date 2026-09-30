@@ -8,8 +8,8 @@
 //! back as `TaxiFailed`. The flight itself is `MovementControl` on the player.
 //! All messages use `TaxiChannel`.
 
+use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
-use lightyear::prelude::*;
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -100,12 +100,12 @@ pub(super) fn register_taxi_protocol(app: &mut App) {
         ..default()
     })
     .add_direction(NetworkDirection::Bidirectional);
-    app.register_message::<TaxiMap>()
+    app.register_protocol_message::<TaxiMap>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<TaxiNodeDiscovered>()
+    app.register_protocol_message::<TaxiNodeDiscovered>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<TaxiFailed>()
+    app.register_protocol_message::<TaxiFailed>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<ActivateTaxi>()
+    app.register_protocol_message::<ActivateTaxi>()
         .add_direction(NetworkDirection::ClientToServer);
 }

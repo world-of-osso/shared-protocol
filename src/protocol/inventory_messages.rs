@@ -5,8 +5,8 @@
 //! `ItemLocation`; rejected requests answer with `InventoryError`. All messages use
 //! `InventoryChannel`.
 
+use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
-use lightyear::prelude::*;
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -332,24 +332,24 @@ pub(super) fn register_inventory_protocol(app: &mut App) {
         ..default()
     })
     .add_direction(NetworkDirection::Bidirectional);
-    app.register_message::<InventorySnapshot>()
+    app.register_protocol_message::<InventorySnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<EquipmentSnapshot>()
+    app.register_protocol_message::<EquipmentSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<InventoryDelta>()
+    app.register_protocol_message::<InventoryDelta>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<InventoryError>()
+    app.register_protocol_message::<InventoryError>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<SwapItem>()
+    app.register_protocol_message::<SwapItem>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<SplitItem>()
+    app.register_protocol_message::<SplitItem>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<DestroyItem>()
+    app.register_protocol_message::<DestroyItem>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<UseItem>()
+    app.register_protocol_message::<UseItem>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<EquipItem>()
+    app.register_protocol_message::<EquipItem>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<SortBags>()
+    app.register_protocol_message::<SortBags>()
         .add_direction(NetworkDirection::ClientToServer);
 }

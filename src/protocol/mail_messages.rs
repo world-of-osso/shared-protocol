@@ -8,8 +8,8 @@
 //! `UPDATE_PENDING_MAIL`) is sent on entering the world and whenever the unread
 //! delivered mail changes, open mailbox or not. All messages use `MailChannel`.
 
+use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
-use lightyear::prelude::*;
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -180,16 +180,16 @@ pub(super) fn register_mail_protocol(app: &mut App) {
         ..default()
     })
     .add_direction(NetworkDirection::Bidirectional);
-    app.register_message::<MailboxContents>()
+    app.register_protocol_message::<MailboxContents>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<MailSent>()
+    app.register_protocol_message::<MailSent>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<MailFailed>()
+    app.register_protocol_message::<MailFailed>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<PendingMail>()
+    app.register_protocol_message::<PendingMail>()
         .add_direction(NetworkDirection::ServerToClient);
-    app.register_message::<SendMail>()
+    app.register_protocol_message::<SendMail>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.register_message::<MailRequest>()
+    app.register_protocol_message::<MailRequest>()
         .add_direction(NetworkDirection::ClientToServer);
 }
