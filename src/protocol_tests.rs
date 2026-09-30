@@ -165,6 +165,8 @@ fn emote_messages_round_trip() {
 
 fn sample_auction_query() -> AuctionSearchQuery {
     AuctionSearchQuery {
+        item_id: None,
+        class_id: None,
         text: "linen".into(),
         page: 0,
         page_size: 20,
