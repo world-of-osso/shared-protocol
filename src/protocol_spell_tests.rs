@@ -1,7 +1,7 @@
 use super::*;
 use crate::components::{
     AuraView, PowerEntry, PowerType, UnitAuras, UnitFactionTemplate, UnitLevel, UnitPowers,
-    UnitTarget,
+    UnitRunes, UnitTarget,
 };
 use crate::spell_data::CastFailReason;
 use bevy_replicon::shared::protocol::ProtocolHasher;
@@ -68,18 +68,57 @@ fn unit_powers_round_trip_keeps_primary_first() {
                 power: PowerType::Mana,
                 current: 41_250,
                 max: 50_000,
+                partial: 0,
+                regen_per_sec: 0.0,
             },
             PowerEntry {
                 power: PowerType::HolyPower,
                 current: 3,
                 max: 5,
+                partial: 0,
+                regen_per_sec: 0.0,
+            },
+            PowerEntry {
+                power: PowerType::Essence,
+                current: 2,
+                max: 5,
+                partial: 600,
+                regen_per_sec: 0.2,
             },
         ],
+        charged_points: vec![2, 5],
     };
     assert_wire_round_trip(&powers);
+    assert_wire_round_trip(&UnitRunes {
+        duration_ms: 10_000,
+        ready_in_ms: vec![0, 0, 0, 4_000, 7_500, 14_000],
+    });
     for (_, power) in DB_POWER_TYPES {
         assert_wire_round_trip(&power);
     }
+}
+
+#[test]
+fn unit_powers_round_trip_preserves_decay_and_fractional_raw_units() {
+    assert_wire_round_trip(&UnitPowers {
+        entries: vec![PowerEntry {
+            power: PowerType::Rage,
+            current: 99,
+            max: 1000,
+            partial: 375,
+            regen_per_sec: -12.5,
+        }],
+        charged_points: Vec::new(),
+    });
+}
+
+#[test]
+fn unit_runes_round_trip_preserves_ready_recharging_and_queued_runes() {
+    assert_wire_round_trip(&UnitRunes {
+        duration_ms: 8_000,
+        ready_in_ms: vec![0, 1_250, 8_000, 9_250, 16_000, 0, 0],
+    });
+    assert_wire_round_trip(&UnitRunes::default());
 }
 
 #[test]

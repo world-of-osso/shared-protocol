@@ -79,6 +79,11 @@ pub struct PowerEntry {
     pub power: PowerType,
     pub current: i32,
     pub max: i32,
+    /// Progress toward the next whole unit when sent, thousandths (retail `UnitPartialPower`).
+    pub partial: u16,
+    /// Effective raw units per second when sent (negative decays, 0 idle); the client
+    /// predicts `current + partial` between sends, which happen on whole-unit changes.
+    pub regen_per_sec: f32,
 }
 
 /// All powers of a unit; the primary power comes first.
@@ -96,6 +101,31 @@ pub struct PowerEntry {
 )]
 pub struct UnitPowers {
     pub entries: Vec<PowerEntry>,
+    /// Charged combo points, 1-based ascending (retail `GetUnitChargedPowerPoints`).
+    pub charged_points: Vec<u8>,
+}
+
+/// Death Knight rune cooldowns in rune index order (retail `GetRuneCooldown`): rune `i`
+/// started `duration_ms - ready_in_ms[i]` before the send and is ready when its
+/// `ready_in_ms` is 0. A rune waiting behind the three recharging ones has a
+/// `ready_in_ms` above `duration_ms`, i.e. a start in the future.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    PartialEq,
+    Default,
+)]
+pub struct UnitRunes {
+    /// Full recharge time of one rune when sent, ms.
+    pub duration_ms: u32,
+    /// Per rune, ms until it is ready when sent.
+    pub ready_in_ms: Vec<u32>,
 }
 
 /// Client-facing view of one aura on a unit.

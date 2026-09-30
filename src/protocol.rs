@@ -6,7 +6,7 @@ use crate::components::{
     CombatStatus, CreatureMotion, EquipmentAppearance, Gold, GuildMembership, Health, Mana,
     ModelDisplay, Mounted, MovementControl, MovementSpeed, Npc, Player, PlayerMotion, Position,
     PresenceStatus, Rotation, UnitAuras, UnitFactionTemplate, UnitFlags, UnitLevel, UnitPose,
-    UnitPowers, UnitTarget, UnitThreatList, WorldArrival, Zone,
+    UnitPowers, UnitRunes, UnitTarget, UnitThreatList, WorldArrival, Zone,
 };
 
 mod bank_messages;
@@ -132,6 +132,7 @@ fn register_replicated_components(app: &mut App) {
     app.protocol_component::<PlayerMotion>().replicate();
     app.protocol_component::<UnitPose>().replicate();
     app.protocol_component::<UnitThreatList>().replicate();
+    app.protocol_component::<UnitRunes>().replicate();
 }
 
 #[cfg(test)]

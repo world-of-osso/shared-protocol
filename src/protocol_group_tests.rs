@@ -43,6 +43,8 @@ fn group_member_states_round_trip_on_the_wire() {
                 power: PowerType::Rage,
                 current: 35,
                 max: 100,
+                partial: 0,
+                regen_per_sec: 0.0,
             }),
             death: crate::death::DeathState::Ghost,
             position: Position {
