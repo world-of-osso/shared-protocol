@@ -11,8 +11,6 @@ use core::time::Duration;
 use bevy::ecs::error::{ErrorContext, match_severity};
 use bevy::prelude::*;
 use bevy_replicon::shared::protocol::ProtocolHash;
-use lightyear::connection::client::Disconnecting;
-use lightyear::prelude::server::ClientOf;
 use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
 use tracing::{error, warn};
@@ -189,25 +187,20 @@ fn reject(commands: &mut Commands, entity: Entity, reason: String, now: Duration
         .insert((ProtocolRejected(reason), ProtocolCutoff(now + REJECT_GRACE)));
 }
 
-/// A client disconnects through its transport. Lightyear 0.28 has no per-client disconnect
-/// on the server (`Disconnect` on a netcode `ClientOf` is not observed), so the server stops
-/// serving the link: `Disconnecting` drops `Connected`, which ends payloads and keepalives,
-/// and lightyear despawns the `ClientOf` in `Last`.
+/// Either side drops the link with `Disconnect`. On the server this needs the vendored
+/// `lightyear_netcode` (see `vendor/lightyear_netcode/UPSTREAM.md`): upstream ignores
+/// `Disconnect` on a `ClientOf`, so the client would only notice at its timeout.
 fn drop_rejected_links(
-    rejected: Query<(Entity, &ProtocolCutoff, Has<ClientOf>), With<Connected>>,
+    rejected: Query<(Entity, &ProtocolCutoff), With<Connected>>,
     time: Res<Time<Real>>,
     mut commands: Commands,
 ) {
-    for (entity, cutoff, server_side) in &rejected {
+    for (entity, cutoff) in &rejected {
         if time.elapsed() < cutoff.0 {
             continue;
         }
         commands.entity(entity).remove::<ProtocolCutoff>();
-        if server_side {
-            commands.entity(entity).insert(Disconnecting);
-        } else {
-            commands.trigger(Disconnect { entity });
-        }
+        commands.trigger(Disconnect { entity });
     }
 }
 

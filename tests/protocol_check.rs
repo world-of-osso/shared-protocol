@@ -194,6 +194,7 @@ struct Outcome {
     server: Option<Verdict>,
     client_disconnected: bool,
     server_connections: usize,
+    elapsed: Duration,
 }
 
 /// Steps both apps until each side reached a verdict and a rejected client finished
@@ -219,10 +220,13 @@ fn run(
                 .world()
                 .entity(client_entity)
                 .contains::<Disconnected>(),
+            elapsed: started.elapsed(),
         };
         let server_done = match outcome.server {
             Some(Verdict::Verified) => true,
-            Some(Verdict::Rejected(_)) => outcome.server_connections == 0,
+            Some(Verdict::Rejected(_)) => {
+                outcome.server_connections == 0 && outcome.client_disconnected
+            }
             None => !server.0,
         };
         let client_done = match outcome.client {
@@ -333,5 +337,16 @@ fn server_rejects_a_client_that_never_sends_a_fingerprint() {
     assert_eq!(
         outcome.server_connections, 0,
         "server kept serving the client"
+    );
+    // The client runs no check, so only the server's disconnect ends its link: 0.8 s check
+    // timeout + 1 s grace, where the 3 s netcode timeout would land past 4.8 s.
+    assert!(
+        outcome.client_disconnected,
+        "server never disconnected the client"
+    );
+    assert!(
+        outcome.elapsed < Duration::from_secs(3),
+        "client disconnected only after {:?}, at the netcode timeout",
+        outcome.elapsed
     );
 }

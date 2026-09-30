@@ -316,6 +316,34 @@ impl NetcodeServerPlugin {
         }
     }
 
+    /// Disconnects one client, as `stop` does for every client: the netcode disconnect
+    /// packets go out through the link, and `Disconnecting` keeps `send` from draining them.
+    fn disconnect_client(
+        trigger: On<Disconnect>,
+        mut server_query: Query<&mut NetcodeServer>,
+        mut link_query: Query<
+            (&LinkOf, &mut Link, &RemoteId),
+            (
+                With<ClientOf>,
+                With<Connected>,
+                Without<HostClient>,
+                Without<SkipNetcode>,
+            ),
+        >,
+        mut commands: Commands,
+    ) -> Result {
+        let Ok((link_of, mut link, remote_id)) = link_query.get_mut(trigger.entity) else {
+            return Ok(());
+        };
+        let PeerId::Netcode(client_id) = remote_id.0 else {
+            return Err(crate::error::Error::UnknownClient(remote_id.0).into());
+        };
+        let mut netcode_server = server_query.get_mut(link_of.server)?;
+        netcode_server.inner.disconnect(client_id, &mut link.send)?;
+        commands.entity(trigger.entity).insert(Disconnecting);
+        Ok(())
+    }
+
     fn stop(
         trigger: On<Stop>,
         mut commands: Commands,
@@ -391,5 +419,6 @@ impl Plugin for NetcodeServerPlugin {
 
         app.add_observer(Self::start);
         app.add_observer(Self::stop);
+        app.add_observer(Self::disconnect_client);
     }
 }

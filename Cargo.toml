@@ -22,3 +22,8 @@ bitcode = { version = "0.6", features = ["serde"] }
 bincode = { version = "2", features = ["serde"] }
 # Real Netcode/UDP connect path for the protocol check tests.
 lightyear = { version = "0.28", features = ["replication", "netcode", "udp"] }
+
+# Per-client server disconnect, used by the protocol check; see vendor/lightyear_netcode/UPSTREAM.md.
+# Consumers that run the netcode server (game-server) patch to the same copy.
+[patch.crates-io]
+lightyear_netcode = { path = "vendor/lightyear_netcode" }
