@@ -1,5 +1,5 @@
 use serde_json::json;
-use shared::components::{CharacterAppearance, CustomizationChoiceSelection};
+use shared::components::{CharacterAppearance, CustomizationChoiceSelection, FormAppearance};
 use shared::protocol::{CreateCharacter, LoginResponse};
 
 fn appearance_json() -> serde_json::Value {
@@ -9,7 +9,8 @@ fn appearance_json() -> serde_json::Value {
         "customization_choices": [
             {"option_id": 87, "choice_id": 1734},
             {"option_id": 214, "choice_id": 6109}
-        ]
+        ],
+        "visage": null
     })
 }
 
@@ -64,4 +65,44 @@ fn customization_choices_survive_create_and_roster_wire_roundtrips() {
         serde_json::to_value(&decoded.characters[0].appearance).unwrap(),
         expected
     );
+}
+
+/// A Dracthyr's visage form travels with its dragon form in `CreateCharacter`.
+#[test]
+fn visage_form_survives_create_character_wire_roundtrip() {
+    let appearance = CharacterAppearance {
+        sex: 1,
+        skin_color: 3,
+        visage: Some(FormAppearance {
+            skin_color: 2,
+            face: 4,
+            eye_color: 1,
+            hair_style: 7,
+            hair_color: 5,
+            facial_style: 0,
+            customization_choices: vec![CustomizationChoiceSelection {
+                option_id: 2064,
+                choice_id: 30012,
+            }],
+        }),
+        ..Default::default()
+    };
+    let request = CreateCharacter {
+        name: "Scalesong".into(),
+        race: 52,
+        class: 13,
+        appearance: appearance.clone(),
+    };
+    let decoded: CreateCharacter =
+        bitcode::deserialize(&bitcode::serialize(&request).unwrap()).unwrap();
+    assert_eq!(decoded.appearance, appearance);
+    let decoded: CharacterAppearance = bitcode::decode(&bitcode::encode(&appearance)).unwrap();
+    assert_eq!(decoded, appearance);
+    // JSON written before the field existed still reads, with no visage.
+    let old: CharacterAppearance = serde_json::from_value(json!({
+        "sex": 0, "skin_color": 0, "face": 0, "eye_color": 0, "hair_style": 0,
+        "hair_color": 0, "facial_style": 0, "customization_choices": []
+    }))
+    .unwrap();
+    assert_eq!(old.visage, None);
 }

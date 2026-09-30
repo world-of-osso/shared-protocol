@@ -53,6 +53,34 @@ pub struct CharacterAppearance {
     pub facial_style: u8,
     /// Stable option/choice IDs for non-core options; core selectors above remain canonical.
     pub customization_choices: Vec<CustomizationChoiceSelection>,
+    /// Dracthyr (races 52, 70) only: the visage form (ChrRaces 75), which Retail
+    /// creates alongside the dragon form. `None` for every other race.
+    #[serde(default)]
+    pub visage: Option<FormAppearance>,
+}
+
+/// One form's selections, encoded like `CharacterAppearance` without `sex`, which
+/// the forms share.
+#[derive(
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Default,
+)]
+pub struct FormAppearance {
+    pub skin_color: u8,
+    pub face: u8,
+    pub eye_color: u8,
+    pub hair_style: u8,
+    pub hair_color: u8,
+    pub facial_style: u8,
+    pub customization_choices: Vec<CustomizationChoiceSelection>,
 }
 
 #[derive(

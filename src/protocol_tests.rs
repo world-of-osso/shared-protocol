@@ -492,6 +492,7 @@ fn barber_shop_state_update_round_trip() {
                 hair_color: 6,
                 facial_style: 1,
                 customization_choices: Vec::new(),
+                visage: None,
             },
             gold: 87_500,
         }),
