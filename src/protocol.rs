@@ -26,6 +26,7 @@ mod loot_messages;
 mod mail_messages;
 mod merchant_messages;
 mod mirror_timer_messages;
+mod protocol_check;
 mod quest_messages;
 mod registration;
 mod spell_messages;
@@ -50,6 +51,10 @@ pub use loot_messages::*;
 pub use mail_messages::*;
 pub use merchant_messages::*;
 pub use mirror_timer_messages::*;
+pub use protocol_check::{
+    ProtocolCheckChannel, ProtocolCheckTimeout, ProtocolFingerprint, ProtocolRejected,
+    ProtocolVerified,
+};
 pub use quest_messages::*;
 pub use spell_messages::*;
 pub use taxi_messages::*;
@@ -65,6 +70,8 @@ pub struct ProtocolPlugin;
 
 impl Plugin for ProtocolPlugin {
     fn build(&self, app: &mut App) {
+        // First, so the check's message and channel ids match across differing registries.
+        protocol_check::register_protocol_check(app);
         register_replicated_components(app);
         register_messages(app);
         register_channels(app);

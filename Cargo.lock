@@ -5781,6 +5781,7 @@ dependencies = [
  "lightyear",
  "serde",
  "serde_json",
+ "tracing",
 ]
 
 [[package]]

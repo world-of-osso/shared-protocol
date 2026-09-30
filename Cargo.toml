@@ -9,6 +9,10 @@ bevy = { version = "0.19", default-features = false }
 lightyear = { version = "0.28", features = ["replication"] }
 serde = { version = "1", features = ["derive"] }
 bitcode = "0.6"
+# ProtocolHash (replication rule hash) for the connect-time protocol check.
+bevy_replicon = { version = "0.41", default-features = false }
+# Protocol check rejections; already in the tree via lightyear.
+tracing = "0.1"
 
 [dev-dependencies]
 serde_json = "1"
@@ -16,5 +20,5 @@ serde_json = "1"
 bitcode = { version = "0.6", features = ["serde"] }
 # Same encoder/config lightyear uses for message and component payloads on the wire.
 bincode = { version = "2", features = ["serde"] }
-# Replication rule resources that lightyear's shared plugins normally install.
-bevy_replicon = { version = "0.41", default-features = false }
+# Real Netcode/UDP connect path for the protocol check tests.
+lightyear = { version = "0.28", features = ["replication", "netcode", "udp"] }
