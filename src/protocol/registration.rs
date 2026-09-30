@@ -148,6 +148,10 @@ fn register_auction_query_messages(app: &mut App) {
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<AuctionInventorySnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<QueryAuctionBrowse>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<AuctionBrowseResults>()
+        .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_auction_action_messages(app: &mut App) {

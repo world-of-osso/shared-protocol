@@ -96,6 +96,31 @@ impl Default for AuctionSearchQuery {
     }
 }
 
+/// Global item browse is distinct from per-auction search and purchase selection.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct QueryAuctionBrowse {
+    pub query: AuctionSearchQuery,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct AuctionBrowseItem {
+    pub item_id: u32,
+    pub name: String,
+    pub quality: u8,
+    pub required_level: u16,
+    /// Lowest effective unit price, rounded up to integer copper.
+    pub lowest_unit_price: u64,
+    pub total_quantity: u64,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct AuctionBrowseResults {
+    pub query: AuctionSearchQuery,
+    /// Matching distinct items, before pagination.
+    pub total_results: u32,
+    pub items: Vec<AuctionBrowseItem>,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct AuctionHouseOpened {
     pub success: bool,
