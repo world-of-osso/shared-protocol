@@ -70,7 +70,8 @@ pub(super) fn register_protocol_check(app: &mut App) {
     app.register_message::<ProtocolFingerprint>()
         .add_direction(NetworkDirection::Bidirectional);
     app.init_resource::<ProtocolCheckTimeout>();
-    app.add_observer(send_fingerprint);
+    app.add_observer(reset_check);
+    app.add_systems(PostUpdate, send_fingerprints.before(MessageSystems::Send));
     app.add_systems(
         PreUpdate,
         (verify_fingerprints, expire_unverified, drop_rejected_links)
@@ -91,29 +92,44 @@ fn local_fingerprint(
     }
 }
 
-fn send_fingerprint(
-    connected: On<Add, Connected>,
-    mut senders: Query<&mut MessageSender<ProtocolFingerprint>>,
+/// A reconnecting client starts a new check; the verdict of its previous connection stays
+/// readable until then.
+fn reset_check(connecting: On<Add, Connecting>, mut commands: Commands) {
+    commands.entity(connecting.entity).remove::<(
+        ProtocolVerified,
+        ProtocolRejected,
+        ProtocolCutoff,
+        ProtocolCheckStarted,
+    )>();
+}
+
+/// A system rather than an `Add<Connected>` observer: a link can connect before
+/// `App::finish` inserts `ProtocolHash`, and systems only run after it.
+fn send_fingerprints(
+    mut connected: Query<
+        (Entity, Option<&mut MessageSender<ProtocolFingerprint>>),
+        Added<Connected>,
+    >,
     mut messages: ResMut<MessageRegistry>,
     mut channels: ResMut<ChannelRegistry>,
     components: Res<ProtocolHash>,
     time: Res<Time<Real>>,
     mut commands: Commands,
 ) {
-    let entity = connected.entity;
-    commands
-        .entity(entity)
-        .remove::<(ProtocolVerified, ProtocolRejected, ProtocolCutoff)>()
-        .insert(ProtocolCheckStarted(time.elapsed()));
-    let Ok(mut sender) = senders.get_mut(entity) else {
-        warn!("connection {entity} has no ProtocolFingerprint sender; the peer will time out");
-        return;
-    };
-    sender.send::<ProtocolCheckChannel>(local_fingerprint(
-        &mut messages,
-        &mut channels,
-        *components,
-    ));
+    for (entity, sender) in &mut connected {
+        commands
+            .entity(entity)
+            .insert(ProtocolCheckStarted(time.elapsed()));
+        let Some(mut sender) = sender else {
+            warn!("connection {entity} has no ProtocolFingerprint sender; the peer will time out");
+            continue;
+        };
+        sender.send::<ProtocolCheckChannel>(local_fingerprint(
+            &mut messages,
+            &mut channels,
+            *components,
+        ));
+    }
 }
 
 fn verify_fingerprints(
