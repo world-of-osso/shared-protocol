@@ -36,6 +36,7 @@ mod taxi_messages;
 mod tooltip_messages;
 mod trainer_messages;
 mod transfer_messages;
+mod world_time_messages;
 
 pub use bank_messages::*;
 pub use channels::*;
@@ -64,6 +65,7 @@ pub use taxi_messages::*;
 pub use tooltip_messages::*;
 pub use trainer_messages::*;
 pub use transfer_messages::*;
+pub use world_time_messages::*;
 
 use registration::{register_channels, register_messages};
 
@@ -94,6 +96,7 @@ impl Plugin for ProtocolPlugin {
         encounter_messages::register_encounter_protocol(app);
         instance_messages::register_instance_protocol(app);
         mirror_timer_messages::register_mirror_timer_protocol(app);
+        world_time_messages::register_world_time_protocol(app);
     }
 
     fn finish(&self, app: &mut App) {
@@ -211,6 +214,10 @@ mod instance_tests;
 #[cfg(test)]
 #[path = "protocol_mirror_timer_tests.rs"]
 mod mirror_timer_tests;
+
+#[cfg(test)]
+#[path = "protocol_world_time_tests.rs"]
+mod world_time_tests;
 
 #[cfg(test)]
 #[path = "protocol_damage_meter_tests.rs"]
