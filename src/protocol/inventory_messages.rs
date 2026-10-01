@@ -292,6 +292,8 @@ pub enum InventoryErrorReason {
     InternalBagError,
     /// `EQUIP_ERR_CANT_EQUIP_EVER` (class or race restriction)
     CantEquipEver,
+    /// `EQUIP_ERR_NOT_IN_COMBAT` (ItemDefines.h:87)
+    NotInCombat,
 }
 
 impl InventoryErrorReason {
@@ -314,6 +316,7 @@ impl InventoryErrorReason {
             Self::CantDoRightNow => "You can't do that right now.".into(), // ERR_CANT_DO_THAT_RIGHT_NOW
             Self::InternalBagError => "Internal Bag Error".into(),
             Self::CantEquipEver => "You can never use that item.".into(),
+            Self::NotInCombat => "You can't do that while in combat".into(),
         }
     }
 }
