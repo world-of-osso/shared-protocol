@@ -3,10 +3,10 @@ use bevy::prelude::*;
 pub use crate::protocol_snapshots::*;
 
 use crate::components::{
-    CombatStatus, CreatureMotion, EquipmentAppearance, Gold, GuildMembership, Health, Mana,
-    ModelDisplay, Mounted, MovementControl, MovementSpeed, Npc, Player, PlayerMotion, Position,
-    PresenceStatus, Rotation, UnitAuras, UnitFactionTemplate, UnitFlags, UnitLevel, UnitPose,
-    UnitPowers, UnitRunes, UnitTarget, UnitThreatList, WorldArrival, Zone,
+    CombatRatings, CombatStatus, CreatureMotion, EquipmentAppearance, Gold, GuildMembership,
+    Health, Mana, ModelDisplay, Mounted, MovementControl, MovementSpeed, Npc, Player, PlayerMotion,
+    Position, PresenceStatus, Rotation, UnitAuras, UnitFactionTemplate, UnitFlags, UnitLevel,
+    UnitPose, UnitPowers, UnitRunes, UnitStats, UnitTarget, UnitThreatList, WorldArrival, Zone,
 };
 
 mod bank_messages;
@@ -133,6 +133,9 @@ fn register_replicated_components(app: &mut App) {
     app.protocol_component::<UnitPose>().replicate();
     app.protocol_component::<UnitThreatList>().replicate();
     app.protocol_component::<UnitRunes>().replicate();
+    // The character sheet's stats: the server shows them to the owning client only.
+    app.protocol_component::<UnitStats>().replicate();
+    app.protocol_component::<CombatRatings>().replicate();
 }
 
 #[cfg(test)]
