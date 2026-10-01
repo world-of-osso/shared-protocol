@@ -278,6 +278,7 @@ fn combat_log_event_round_trips_every_kind() {
             resisted: 20,
             blocked: 0,
             crit: true,
+            glancing: false,
             periodic: false,
             kind,
         });
@@ -293,6 +294,7 @@ fn combat_log_event_round_trips_every_kind() {
         resisted: 0,
         blocked: 12,
         crit: false,
+        glancing: false,
         periodic: true,
         kind: CombatLogKind::Miss(MissKind::Block),
     });

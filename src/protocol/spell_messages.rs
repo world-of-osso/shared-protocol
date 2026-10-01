@@ -119,6 +119,11 @@ pub struct CombatLogEvent {
     pub resisted: i32,
     pub blocked: i32,
     pub crit: bool,
+    /// A glancing melee swing (`HITINFO_GLANCING`; CLEU SWING_DAMAGE `glancing`): a player's
+    /// swing at a creature 4 or more levels above it. Crushing blows are not carried: whether
+    /// Retail 12.x still produces them is unverified (TrinityCore master's formula never
+    /// fires, Unit.cpp:2475).
+    pub glancing: bool,
     pub periodic: bool,
     pub kind: CombatLogKind,
 }
