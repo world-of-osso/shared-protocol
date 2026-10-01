@@ -124,6 +124,8 @@ pub const GAMEOBJECT_TYPE_MEETINGSTONE: u8 = 23;
 pub const GAMEOBJECT_TYPE_GENERIC: u8 = 5;
 /// TrinityCore `GAMEOBJECT_TYPE_SPELL_FOCUS`: a spell's required focus (bonfires, anvils).
 pub const GAMEOBJECT_TYPE_SPELL_FOCUS: u8 = 8;
+/// TrinityCore `GAMEOBJECT_TYPE_CHAIR`: using it seats the player.
+pub const GAMEOBJECT_TYPE_CHAIR: u8 = 7;
 
 /// A world game object (AzerothCore `gameobject_template`).
 #[derive(
@@ -159,6 +161,7 @@ impl GameObjectInfo {
                 | GAMEOBJECT_TYPE_MAILBOX
                 | GAMEOBJECT_TYPE_MEETINGSTONE
                 | GAMEOBJECT_TYPE_RITUAL
+                | GAMEOBJECT_TYPE_CHAIR
         )
     }
 }

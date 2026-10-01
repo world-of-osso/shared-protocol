@@ -169,7 +169,7 @@ fn game_object_use_round_trips() {
 }
 
 #[test]
-fn vaults_mailboxes_stones_and_portals_are_usable_and_stockade_fires_are_not() {
+fn vaults_mailboxes_stones_portals_and_chairs_are_usable_and_stockade_fires_are_not() {
     let object = |go_type, name: &str| GameObjectInfo {
         entry: 0,
         go_type,
@@ -182,6 +182,8 @@ fn vaults_mailboxes_stones_and_portals_are_usable_and_stockade_fires_are_not() {
         object(GAMEOBJECT_TYPE_MAILBOX, "Mailbox"),
         object(GAMEOBJECT_TYPE_MEETINGSTONE, "Meeting Stone"),
         object(GAMEOBJECT_TYPE_RITUAL, "Summoning Portal"),
+        // Lion's Pride Inn 177499.
+        object(GAMEOBJECT_TYPE_CHAIR, "Wooden Chair"),
     ] {
         assert!(usable.is_usable(), "{}", usable.name);
     }
