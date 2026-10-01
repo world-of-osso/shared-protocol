@@ -423,6 +423,49 @@ fn unit_pose_decodes_trinitycore_values_round_trips_and_replicates() {
 }
 
 #[test]
+fn player_stand_state_follows_trinitycore_sit_and_stand_predicates_and_replicates() {
+    use crate::components::{PlayerStandState, StandState};
+    let sitting: Vec<_> = (0..10)
+        .map(|value| StandState::try_from(value).unwrap())
+        .filter(|state| state.is_sit())
+        .collect();
+    assert_eq!(
+        sitting,
+        [
+            StandState::Sit,
+            StandState::SitChair,
+            StandState::SitLowChair,
+            StandState::SitMediumChair,
+            StandState::SitHighChair
+        ]
+    );
+    let standing: Vec<_> = (0..10)
+        .map(|value| StandState::try_from(value).unwrap())
+        .filter(|state| state.is_stand())
+        .collect();
+    assert_eq!(
+        standing,
+        [StandState::Stand, StandState::Dead, StandState::Submerged]
+    );
+    assert_wire_round_trip(&PlayerStandState(StandState::Kneel));
+    assert_wire_round_trip(&StandStateIntent {
+        state: StandState::Sit,
+    });
+
+    let mut app = App::new();
+    app.init_resource::<ProtocolHasher>()
+        .init_resource::<ReplicationRules>()
+        .init_resource::<ReplicationRegistry>();
+    app.add_plugins(ProtocolPlugin);
+    assert!(
+        app.world()
+            .resource::<ComponentRegistry>()
+            .is_registered::<PlayerStandState>()
+    );
+    assert!(app.is_message_registered::<StandStateIntent>());
+}
+
+#[test]
 fn spell_go_round_trips_targeted_and_untargeted_casts() {
     assert_wire_round_trip(&SpellGo {
         caster: 0x0000_0002_0000_0010,

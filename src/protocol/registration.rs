@@ -59,6 +59,8 @@ fn register_core_messages(app: &mut App) {
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<EmoteEvent>()
         .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<StandStateIntent>()
+        .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<GroupInviteIntent>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<GroupUninviteIntent>()

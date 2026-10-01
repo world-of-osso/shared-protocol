@@ -160,6 +160,14 @@ pub struct EmoteIntent {
     pub emote: EmoteKind,
 }
 
+/// `CMSG_STAND_STATE_CHANGE`: the player asks to stand, sit, sleep or kneel. The server
+/// accepts only those four (TrinityCore `HandleStandStateChangeOpcode`,
+/// MiscHandler.cpp:401-415).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct StandStateIntent {
+    pub state: crate::components::StandState,
+}
+
 /// Server broadcasts a social emote animation for a player entity.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct EmoteEvent {

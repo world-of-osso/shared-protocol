@@ -5,8 +5,9 @@ pub use crate::protocol_snapshots::*;
 use crate::components::{
     CombatRatings, CombatStatus, CreatureMotion, EquipmentAppearance, Gold, GuildMembership,
     Health, Mana, ModelDisplay, Mounted, MovementControl, MovementSpeed, Npc, Player, PlayerMotion,
-    Position, PresenceStatus, Rotation, UnitAuras, UnitFactionTemplate, UnitFlags, UnitLevel,
-    UnitPose, UnitPowers, UnitRunes, UnitStats, UnitTarget, UnitThreatList, WorldArrival, Zone,
+    PlayerStandState, Position, PresenceStatus, Rotation, UnitAuras, UnitFactionTemplate,
+    UnitFlags, UnitLevel, UnitPose, UnitPowers, UnitRunes, UnitStats, UnitTarget, UnitThreatList,
+    WorldArrival, Zone,
 };
 
 mod bank_messages;
@@ -136,6 +137,7 @@ fn register_replicated_components(app: &mut App) {
     // The character sheet's stats: the server shows them to the owning client only.
     app.protocol_component::<UnitStats>().replicate();
     app.protocol_component::<CombatRatings>().replicate();
+    app.protocol_component::<PlayerStandState>().replicate();
 }
 
 #[cfg(test)]

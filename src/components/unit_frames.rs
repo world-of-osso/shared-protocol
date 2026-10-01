@@ -384,6 +384,44 @@ impl TryFrom<u8> for StandState {
     }
 }
 
+impl StandState {
+    /// `Unit::IsSitState` (Unit.cpp:10787-10794): on the ground or a chair.
+    pub fn is_sit(self) -> bool {
+        matches!(
+            self,
+            Self::Sit
+                | Self::SitChair
+                | Self::SitLowChair
+                | Self::SitMediumChair
+                | Self::SitHighChair
+        )
+    }
+
+    /// `Unit::IsStandState` (Unit.cpp:10796-10800): neither sitting, asleep nor
+    /// kneeling.
+    pub fn is_stand(self) -> bool {
+        !self.is_sit() && !matches!(self, Self::Sleep | Self::Kneel)
+    }
+}
+
+/// A player's `UnitData::StandState`. Creatures carry theirs in `UnitPose`, with the
+/// sheath and emote state of their addon, which the server does not model for players.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    Default,
+    PartialEq,
+    Eq,
+)]
+pub struct PlayerStandState(pub StandState);
+
 /// `UnitData::SheatheState` (TrinityCore `SheathState`, UnitDefines.h): which weapons are
 /// drawn.
 #[derive(
