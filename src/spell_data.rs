@@ -167,6 +167,10 @@ pub enum CastFailReason {
     LevelRequirement,
     /// The target is below the required level (`SPELL_FAILED_LOWLEVEL`).
     TargetTooLowLevel,
+    /// The cast was cancelled: moved, stopped, stunned, died (`SPELL_FAILED_INTERRUPTED`).
+    Interrupted,
+    /// An interrupt effect stopped the cast (`SPELL_FAILED_INTERRUPTED_COMBAT`).
+    InterruptedCombat,
 }
 
 /// Context needed to validate a cast attempt.

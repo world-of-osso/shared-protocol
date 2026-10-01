@@ -72,6 +72,18 @@ pub struct SpellGo {
     pub spell_id: u32,
 }
 
+/// A cast or channel ended without resolving (TrinityCore `SMSG_SPELL_FAILURE`, sent by
+/// `Spell::SendInterrupted` with `SendMessageToSet`): every client that replicates the
+/// caster learns why, so cast bars show "Interrupted" or "Failed". `failed_by` is the
+/// unit whose interrupt effect stopped it (`SpellFailure.FailedBy`).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SpellFailure {
+    pub caster: u64,
+    pub spell_id: u32,
+    pub reason: CastFailReason,
+    pub failed_by: Option<u64>,
+}
+
 /// Avoidance/negation outcome of a combat log `Miss`.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MissKind {

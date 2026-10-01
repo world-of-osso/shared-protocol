@@ -380,6 +380,7 @@ fn protocol_plugin_registers_spell_components_and_messages() {
     assert!(app.is_message_registered::<CastFailed>());
     assert!(app.is_message_registered::<CombatLogEvent>());
     assert!(app.is_message_registered::<SpellGo>());
+    assert!(app.is_message_registered::<SpellFailure>());
     assert!(app.is_message_registered::<AttackSwing>());
     assert!(app.is_message_registered::<AttackStop>());
     assert!(app.is_message_registered::<AttackStart>());
@@ -500,5 +501,21 @@ fn attack_swing_start_and_stop_messages_round_trip() {
         attacker: 7,
         victim: None,
         now_dead: true,
+    });
+}
+
+#[test]
+fn spell_failure_round_trips_interrupts_and_failures() {
+    assert_wire_round_trip(&SpellFailure {
+        caster: 0x0000_0003_0000_0011,
+        spell_id: 9053,
+        reason: CastFailReason::InterruptedCombat,
+        failed_by: Some(0x0000_0002_0000_0010),
+    });
+    assert_wire_round_trip(&SpellFailure {
+        caster: 7,
+        spell_id: 133,
+        reason: CastFailReason::Interrupted,
+        failed_by: None,
     });
 }
