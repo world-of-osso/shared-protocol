@@ -58,6 +58,10 @@ pub struct CombatRatings {
     pub dodge: f32,
     pub parry: f32,
     pub block: f32,
+    /// Tertiary ratings: `CR_SPEED`, `CR_LIFESTEAL` and `CR_AVOIDANCE`.
+    pub speed: f32,
+    pub leech: f32,
+    pub avoidance: f32,
 }
 
 impl AddAssign for CombatRatings {
@@ -70,6 +74,9 @@ impl AddAssign for CombatRatings {
         self.dodge += rhs.dodge;
         self.parry += rhs.parry;
         self.block += rhs.block;
+        self.speed += rhs.speed;
+        self.leech += rhs.leech;
+        self.avoidance += rhs.avoidance;
     }
 }
 
@@ -100,6 +107,10 @@ pub struct DerivedStats {
     pub mastery_pct: f32,
     /// Damage done bonus.
     pub versatility_pct: f32,
+    /// `GetLifesteal`, `GetAvoidance` and `GetSpeed`.
+    pub leech_pct: f32,
+    pub avoidance_pct: f32,
+    pub speed_pct: f32,
 }
 
 #[derive(
@@ -307,6 +318,9 @@ mod tests {
             dodge: 5.0,
             parry: 8.0,
             block: 10.0,
+            speed: 3.0,
+            leech: 4.0,
+            avoidance: 6.0,
         };
         let encoded = bitcode::encode(&ratings);
         let decoded: CombatRatings = bitcode::decode(&encoded).unwrap();
@@ -322,6 +336,9 @@ mod tests {
             haste_pct: 7.25,
             mastery_pct: 18.0,
             versatility_pct: 3.5,
+            leech_pct: 1.5,
+            avoidance_pct: 2.0,
+            speed_pct: 0.75,
         };
         let encoded = bitcode::encode(&derived);
         let decoded: DerivedStats = bitcode::decode(&encoded).unwrap();
