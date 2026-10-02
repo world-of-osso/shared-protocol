@@ -171,6 +171,9 @@ pub enum CastFailReason {
     Interrupted,
     /// An interrupt effect stopped the cast (`SPELL_FAILED_INTERRUPTED_COMBAT`).
     InterruptedCombat,
+    /// The target is not in line of sight (`SPELL_FAILED_LINE_OF_SIGHT`, "Target not in
+    /// line of sight").
+    LineOfSight,
 }
 
 /// Context needed to validate a cast attempt.

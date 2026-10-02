@@ -131,11 +131,23 @@ pub struct CombatEvent {
 }
 
 /// Client requests to start casting a spell.
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct SpellCastIntent {
     pub spell_id: Option<u32>,
     pub spell: String,
     pub target_entity: Option<u64>,
+    /// Line-of-sight witness: a segment the client found clear of baked geometry, from
+    /// its eye point to a point inside the target's body, in world space. The server
+    /// checks it against its own positions and the same bake
+    /// (game-server docs/specs/line-of-sight.md, Player casts).
+    pub witness: Option<WitnessRay>,
+}
+
+/// A line-of-sight witness segment, world space.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq)]
+pub struct WitnessRay {
+    pub start: [f32; 3],
+    pub end: [f32; 3],
 }
 
 /// Client requests to stop the current spell cast.

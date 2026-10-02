@@ -519,3 +519,28 @@ fn spell_failure_round_trips_interrupts_and_failures() {
         failed_by: None,
     });
 }
+
+#[test]
+fn spell_cast_intent_round_trips_witness_ray_and_line_of_sight_failure() {
+    assert_wire_round_trip(&SpellCastIntent {
+        spell_id: Some(133),
+        spell: "Fireball".into(),
+        target_entity: Some(0x0000_0003_0000_0011),
+        witness: Some(WitnessRay {
+            start: [-8913.2, 101.5, -553.25],
+            end: [-8930.0, 97.1, -560.0],
+        }),
+    });
+    assert_wire_round_trip(&SpellCastIntent {
+        spell_id: None,
+        spell: "Fireball".into(),
+        target_entity: None,
+        witness: None,
+    });
+    assert_wire_round_trip(&SpellFailure {
+        caster: 7,
+        spell_id: 133,
+        reason: CastFailReason::LineOfSight,
+        failed_by: None,
+    });
+}
