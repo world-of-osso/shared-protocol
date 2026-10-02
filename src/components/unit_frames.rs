@@ -481,3 +481,58 @@ pub struct UnitPose {
     pub sheath_state: SheathState,
     pub emote_state: u32,
 }
+
+/// A creature's `creature_template.rank` (TrinityCore `CreatureClassifications`,
+/// SharedDefines.h; world.db keeps AzerothCore's 3 = world boss). Retail's
+/// `UnitClassification` token for each is [`Self::token`]. Players carry none.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+)]
+pub enum CreatureClassification {
+    Normal = 0,
+    Elite = 1,
+    RareElite = 2,
+    WorldBoss = 3,
+    Rare = 4,
+    Trivial = 5,
+    MinusMob = 6,
+}
+
+impl CreatureClassification {
+    /// The classification of a `creature_template.rank`; `None` outside 0..=6.
+    pub fn from_rank(rank: u8) -> Option<Self> {
+        Some(match rank {
+            0 => Self::Normal,
+            1 => Self::Elite,
+            2 => Self::RareElite,
+            3 => Self::WorldBoss,
+            4 => Self::Rare,
+            5 => Self::Trivial,
+            6 => Self::MinusMob,
+            _ => return None,
+        })
+    }
+
+    /// Retail `UnitClassification(unit)`.
+    pub fn token(self) -> &'static str {
+        match self {
+            Self::Normal => "normal",
+            Self::Elite => "elite",
+            Self::RareElite => "rareelite",
+            Self::WorldBoss => "worldboss",
+            Self::Rare => "rare",
+            Self::Trivial => "trivial",
+            Self::MinusMob => "minus",
+        }
+    }
+}

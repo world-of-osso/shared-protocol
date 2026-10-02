@@ -1,7 +1,7 @@
 use super::*;
 use crate::components::{
-    AuraView, PowerEntry, PowerType, UnitAuras, UnitFactionTemplate, UnitLevel, UnitPowers,
-    UnitRunes, UnitTarget,
+    AuraView, CreatureClassification, PowerEntry, PowerType, UnitAuras, UnitFactionTemplate,
+    UnitLevel, UnitPowers, UnitRunes, UnitTarget,
 };
 use crate::spell_data::CastFailReason;
 use bevy_replicon::shared::protocol::ProtocolHasher;
@@ -166,6 +166,24 @@ fn unit_level_and_faction_template_round_trip() {
     assert_wire_round_trip(&UnitFactionTemplate(1_801));
     assert_wire_round_trip(&UnitTarget(Some(0x0000_0001_0000_002A)));
     assert_wire_round_trip(&UnitTarget(None));
+}
+
+/// Timber (world.db creature_template 1132, rank 4) is a rare; Hogger's rank 1 an elite.
+#[test]
+fn creature_classification_from_world_db_rank_round_trips() {
+    let timber = CreatureClassification::from_rank(4).unwrap();
+    assert_eq!(timber, CreatureClassification::Rare);
+    assert_eq!(timber.token(), "rare");
+    assert_wire_round_trip(&timber);
+    assert_eq!(
+        CreatureClassification::from_rank(2).map(CreatureClassification::token),
+        Some("rareelite")
+    );
+    assert_eq!(
+        CreatureClassification::from_rank(3).map(CreatureClassification::token),
+        Some("worldboss")
+    );
+    assert_eq!(CreatureClassification::from_rank(7), None);
 }
 
 #[test]
@@ -368,6 +386,7 @@ fn protocol_plugin_registers_spell_components_and_messages() {
     assert!(components.is_registered::<UnitPowers>());
     assert!(components.is_registered::<UnitAuras>());
     assert!(components.is_registered::<UnitLevel>());
+    assert!(components.is_registered::<CreatureClassification>());
     assert!(components.is_registered::<crate::level_scaling::LevelScaling>());
     assert!(components.is_registered::<UnitFactionTemplate>());
     assert!(components.is_registered::<UnitTarget>());
