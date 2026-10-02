@@ -1,7 +1,7 @@
 use super::*;
 use crate::components::{
     AuraView, CreatureClassification, PowerEntry, PowerType, UnitAuras, UnitFactionTemplate,
-    UnitLevel, UnitPowers, UnitRunes, UnitTarget,
+    UnitLevel, UnitPowers, UnitRunes, UnitTarget, UnitVignette,
 };
 use crate::spell_data::CastFailReason;
 use bevy_replicon::shared::protocol::ProtocolHasher;
@@ -184,6 +184,12 @@ fn creature_classification_from_world_db_rank_round_trips() {
         Some("worldboss")
     );
     assert_eq!(CreatureClassification::from_rank(7), None);
+}
+
+/// Doomwalker (world.db creature_template 167749) carries Vignette 6520.
+#[test]
+fn unit_vignette_round_trips() {
+    assert_wire_round_trip(&UnitVignette(6_520));
 }
 
 #[test]
@@ -387,6 +393,7 @@ fn protocol_plugin_registers_spell_components_and_messages() {
     assert!(components.is_registered::<UnitAuras>());
     assert!(components.is_registered::<UnitLevel>());
     assert!(components.is_registered::<CreatureClassification>());
+    assert!(components.is_registered::<UnitVignette>());
     assert!(components.is_registered::<crate::level_scaling::LevelScaling>());
     assert!(components.is_registered::<UnitFactionTemplate>());
     assert!(components.is_registered::<UnitTarget>());

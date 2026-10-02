@@ -536,3 +536,23 @@ impl CreatureClassification {
         }
     }
 }
+
+/// The `Vignette` DB2 ID a unit shows on the minimap and world map
+/// (`creature_template.VignetteID`; TrinityCore `Unit::SetVignette`). Present while
+/// the vignette exists: the server removes it on death unless the vignette has
+/// `PersistsThroughDeath`, and replication adds and removes it with the unit's
+/// visibility, as TrinityCore sends `SMSG_VIGNETTE_UPDATE` Added/Removed.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+)]
+pub struct UnitVignette(pub u32);
