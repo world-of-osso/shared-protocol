@@ -41,6 +41,9 @@ pub struct VendorItem {
     pub num_available: Option<u32>,
     /// The player meets the item's class and level requirements.
     pub usable: bool,
+    /// Durability of a new item (the item's `MaxDurability`), `None` for items without
+    /// durability; the Retail merchant tooltip shows `DURABILITY_TEMPLATE` from it.
+    pub max_durability: Option<u32>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -48,6 +51,11 @@ pub struct VendorInventory {
     pub npc: u64,
     /// The NPC repairs (`UNIT_NPC_FLAG_REPAIR`).
     pub can_repair: bool,
+    /// Copper the player may spend on guild bank repairs at this repairer
+    /// (TrinityCore `Guild::GetMemberAvailableMoneyForRepairItems`: the guild money,
+    /// capped by the rank's daily allowance left); `None` when the player's rank lacks
+    /// `GR_RIGHT_WITHDRAW_REPAIR` or the NPC doesn't repair (Retail `CanGuildBankRepair`).
+    pub guild_repair_money: Option<u64>,
     pub items: Vec<VendorItem>,
 }
 
@@ -104,11 +112,14 @@ pub struct BuybackItemRequest {
     pub slot: u8,
 }
 
-/// Repair one item, or every item when `item_guid` is `None`.
+/// Repair one item, or every item when `item_guid` is `None`; `guild_bank` pays a
+/// repair-all from the guild bank (TrinityCore `CMSG_REPAIR_ITEM` `UseGuildBank`,
+/// Retail `RepairAllItems(true)`).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct RepairItem {
     pub npc: u64,
     pub item_guid: Option<u64>,
+    pub guild_bank: bool,
 }
 
 /// Why the server refused a vendor request; `message` is the Retail UI error text.
@@ -125,6 +136,10 @@ pub enum MerchantError {
     TooMuchGold,
     /// The buy destination holds another item or a full stack (`EQUIP_ERR_CANT_STACK`).
     CantStack,
+    /// A guild repair by a rank without `GR_RIGHT_WITHDRAW_REPAIR`.
+    GuildPermissions,
+    /// A guild repair the guild money left for the player covers nothing of.
+    GuildNotEnoughMoney,
 }
 
 impl MerchantError {
@@ -139,6 +154,8 @@ impl MerchantError {
             Self::NotInterested => "The merchant doesn't want that item.", // ERR_VENDOR_NOT_INTERESTED
             Self::TooMuchGold => "At gold limit",                          // ERR_TOO_MUCH_GOLD
             Self::CantStack => "This item cannot stack.",                  // ERR_CANT_STACK
+            Self::GuildPermissions => "You don't have permission to do that.", // ERR_GUILD_PERMISSIONS
+            Self::GuildNotEnoughMoney => "The guild bank does not have enough money", // ERR_GUILD_NOT_ENOUGH_MONEY
         }
     }
 }

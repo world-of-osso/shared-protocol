@@ -146,6 +146,19 @@ fn guild_bank_messages_round_trip() {
             seconds_ago: 90,
         }],
     });
+    // GUILDBANK_REPAIR_MONEY_FORMAT "%s withdrew %s for repairs".
+    assert_wire_round_trip(&GuildBankLog {
+        tab: None,
+        entries: vec![GuildBankLogEntry {
+            kind: GuildBankLogKind::RepairMoney,
+            actor: "Bankalt".into(),
+            item_id: 0,
+            item_name: String::new(),
+            count: 0,
+            copper: 52,
+            seconds_ago: 5,
+        }],
+    });
     assert_wire_round_trip(&GuildBankFailed {
         object: 9,
         error: GuildBankError::WithdrawLimit,

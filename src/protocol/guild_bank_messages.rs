@@ -121,6 +121,8 @@ pub enum GuildBankLogKind {
     DepositMoney,
     WithdrawMoney,
     BuyTab,
+    /// Guild money spent on a member's repairs (`GUILD_BANK_LOG_REPAIR_MONEY`, Retail "repair").
+    RepairMoney,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]

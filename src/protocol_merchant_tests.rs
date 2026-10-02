@@ -21,6 +21,7 @@ fn merchant_messages_round_trip() {
     assert_wire_round_trip(&VendorInventory {
         npc: 4_294_967_301,
         can_repair: false,
+        guild_repair_money: None,
         items: vec![VendorItem {
             slot: 0,
             item_id: 159,
@@ -31,6 +32,26 @@ fn merchant_messages_round_trip() {
             max_stack: 20,
             num_available: Some(3),
             usable: true,
+            max_durability: None,
+        }],
+    });
+    // Corina Steele (54) repairs and sells the Gladius (2488, 536 copper, durability 35);
+    // a Member with 25g left of the guild's repair allowance.
+    assert_wire_round_trip(&VendorInventory {
+        npc: 4_294_967_302,
+        can_repair: true,
+        guild_repair_money: Some(250_000),
+        items: vec![VendorItem {
+            slot: 0,
+            item_id: 2488,
+            name: "Gladius".into(),
+            quality: 1,
+            price: 536,
+            stack_count: 1,
+            max_stack: 1,
+            num_available: None,
+            usable: true,
+            max_durability: Some(35),
         }],
     });
     assert_wire_round_trip(&BuybackList {
@@ -68,6 +89,13 @@ fn merchant_messages_round_trip() {
     assert_wire_round_trip(&RepairItem {
         npc: 7,
         item_guid: None,
+        guild_bank: false,
+    });
+    // MerchantGuildBankRepairButton: RepairAllItems(true).
+    assert_wire_round_trip(&RepairItem {
+        npc: 7,
+        item_guid: None,
+        guild_bank: true,
     });
     assert_wire_round_trip(&MerchantFailed {
         npc: 7,
@@ -92,6 +120,14 @@ fn merchant_errors_use_retail_wording() {
     assert_eq!(
         MerchantError::CantStack.message(),
         "This item cannot stack."
+    );
+    assert_eq!(
+        MerchantError::GuildPermissions.message(),
+        "You don't have permission to do that."
+    );
+    assert_eq!(
+        MerchantError::GuildNotEnoughMoney.message(),
+        "The guild bank does not have enough money"
     );
 }
 
