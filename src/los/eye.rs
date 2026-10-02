@@ -5,8 +5,9 @@
 //! point in the display's model space (WoW axes: X forward, Y left, Z up), in yards, posed
 //! at the first frame of the stand state's animation and scaled by the display's
 //! `CreatureDisplayInfo.CreatureModelScale` and `CreatureModelData.ModelScale`. `source`
-//! is `eyes` (the centroid of the eye geoset's skinned vertices) or `head` (the head
-//! bone, for models without eye geometry). A state whose sequence the model lacks holds
+//! is `eyes` (the centroid of the eye geoset's skinned vertices), `head` (the head bone,
+//! for models without eye geometry) or `bounds` (the top centre of the model's bounding
+//! box, for models with neither). A state whose sequence the model lacks holds
 //! the Stand eye. The caller multiplies by the unit's own scale and rotates by its facing.
 //!
 //! `player_displays.tsv` maps each playable race and sex to its character display.
@@ -40,6 +41,9 @@ pub enum EyeSource {
     Eyes,
     /// The head bone (`key_bone_id` 6).
     Head,
+    /// The top centre of the model's bounding box, for models with neither: the same
+    /// point in every stand state.
+    Bounds,
 }
 
 impl EyeSource {
@@ -47,6 +51,7 @@ impl EyeSource {
         match self {
             Self::Eyes => "eyes",
             Self::Head => "head",
+            Self::Bounds => "bounds",
         }
     }
 
@@ -54,6 +59,7 @@ impl EyeSource {
         match text {
             "eyes" => Some(Self::Eyes),
             "head" => Some(Self::Head),
+            "bounds" => Some(Self::Bounds),
             _ => None,
         }
     }
