@@ -21,7 +21,7 @@ pub const PLAYER_DISPLAYS_FILE: &str = "player_displays.tsv";
 /// TrinityCore `UnitStandStateType` and the looping animation (`AnimationData` ID) each
 /// poses the model in, as the client picks it (game-engine
 /// `src/game/creatures/npc_gear_data.rs` `unit_pose_anim_id`). `SIT_CHAIR` (2) has no
-/// established Retail animation there, so it has no row.
+/// established Retail animation: see [`STAND_EYE_STATES`].
 pub const STAND_STATE_ANIMS: [(u8, u16); 9] = [
     (0, 0),   // STAND: Stand
     (1, 97),  // SIT: SitGround
@@ -33,6 +33,12 @@ pub const STAND_STATE_ANIMS: [(u8, u16); 9] = [
     (8, 115), // KNEEL: KneelLoop
     (9, 202), // SUBMERGED: Submerged
 ];
+
+/// Stand states with no established animation, which hold the Stand eye (user decision
+/// 2026-10-02). `SIT_CHAIR` (2): uncited; TrinityCore, AzerothCore, WMVx, wow_client,
+/// WoWee, WebWowViewerCpp and solarityclient map it to no animation, and chairs seat units
+/// in states 4-6.
+pub const STAND_EYE_STATES: [u8; 1] = [2];
 
 /// Where a model's eye point comes from.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
