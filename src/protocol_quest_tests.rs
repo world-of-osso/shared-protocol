@@ -75,7 +75,7 @@ fn quest_giver_messages_round_trip() {
     assert_wire_round_trip(&QuestGiverStatusMultiple {
         statuses: vec![QuestGiverStatusEntry {
             npc: 42,
-            status: QuestGiverStatus::Reward,
+            status: QuestGiverStatus::Reward(QuestMarkerClass::Repeatable),
         }],
     });
     assert_wire_round_trip(&QuestGiverQuestList {
@@ -121,21 +121,33 @@ fn quest_giver_messages_round_trip() {
 }
 
 #[test]
-fn quest_giver_status_orders_by_marker_priority() {
+fn quest_giver_status_orders_like_trinitycore_status_bits() {
+    use QuestMarkerClass::*;
     let mut statuses = [
-        QuestGiverStatus::Available,
-        QuestGiverStatus::Reward,
-        QuestGiverStatus::Incomplete,
+        QuestGiverStatus::Available(Normal),
+        QuestGiverStatus::Trivial(Legendary),
+        QuestGiverStatus::Reward(Normal),
+        QuestGiverStatus::Incomplete(Repeatable),
+        QuestGiverStatus::Future(Important),
+        QuestGiverStatus::Available(Legendary),
         QuestGiverStatus::None,
+        QuestGiverStatus::Incomplete(Normal),
+        QuestGiverStatus::Future(Normal),
     ];
     statuses.sort();
+    // TrinityCore a352b1fa QuestDef.h:153 bit values, ascending.
     assert_eq!(
         statuses,
         [
-            QuestGiverStatus::None,
-            QuestGiverStatus::Incomplete,
-            QuestGiverStatus::Available,
-            QuestGiverStatus::Reward,
+            QuestGiverStatus::None,                   // 0
+            QuestGiverStatus::Future(Normal),         // Future 0x2
+            QuestGiverStatus::Future(Important),      // FutureImportantQuest 0x10
+            QuestGiverStatus::Trivial(Legendary),     // TrivialLegendaryQuest 0x800
+            QuestGiverStatus::Incomplete(Normal),     // Reward 0x2000
+            QuestGiverStatus::Incomplete(Repeatable), // RepeatableReward 0x4000
+            QuestGiverStatus::Available(Normal),      // Quest 0x400000
+            QuestGiverStatus::Available(Legendary),   // LegendaryQuest 0x40000000
+            QuestGiverStatus::Reward(Normal),         // RewardCompletePOI 0x400000000
         ]
     );
 }

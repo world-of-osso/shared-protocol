@@ -26,21 +26,42 @@ pub struct QuestChannel;
 /// Retail maximum number of quests in the log.
 pub const MAX_QUEST_LOG_SIZE: usize = 35;
 
+/// The kind of quest a giver marker stands for, lowest to highest priority within a
+/// state (TrinityCore a352b1fa `QuestGiverStatus` bit order, QuestDef.h:153). Retail
+/// draws each kind with its own `interface/buttons/talktome*` model.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum QuestMarkerClass {
+    Normal,
+    /// Daily or weekly (`Quest::IsDailyOrWeekly`).
+    Repeatable,
+    /// `QuestInfo.Modifiers & 0x800` (`Quest::IsMeta`).
+    Meta,
+    /// Covenant calling (`QuestInfo.Type`).
+    Calling,
+    /// A visible campaign quest line (`QuestMgr::IsCampaignQuestStatusVisibleForPlayer`).
+    Campaign,
+    /// `QUEST_FLAGS_EX_LEGENDARY`.
+    Legendary,
+    /// `QuestInfo.Modifiers & 0x400` (`Quest::IsImportant`).
+    Important,
+}
+
 /// Quest marker over an NPC for one player, lowest to highest priority
-/// (TrinityCore `QuestGiverStatus`; the highest status among the NPC's quests wins).
+/// (TrinityCore `QuestGiverStatus` bit order; the highest status among the NPC's
+/// quests wins).
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum QuestGiverStatus {
     None,
-    /// Grey `!`: a quest the player will be able to take within a few levels.
-    Unavailable,
-    /// Grey `!` (trivial): available, but far below the player's level.
-    LowLevelAvailable,
-    /// Grey `?`: a quest in the log that ends here is not complete yet.
-    Incomplete,
-    /// Yellow `!`.
-    Available,
-    /// Yellow `?`: a completed quest can be turned in here.
-    Reward,
+    /// A quest the player will be able to take within a few levels (`Future*`).
+    Future(QuestMarkerClass),
+    /// Available, but far below the player's level (`Trivial*`).
+    Trivial(QuestMarkerClass),
+    /// A quest in the log that ends here is not complete yet (`Reward`, `*Reward`).
+    Incomplete(QuestMarkerClass),
+    /// A quest the player can take (`Quest`, `*Quest`).
+    Available(QuestMarkerClass),
+    /// A completed quest can be turned in here (`*RewardComplete*`).
+    Reward(QuestMarkerClass),
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
