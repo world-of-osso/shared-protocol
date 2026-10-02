@@ -78,6 +78,39 @@ pub struct RespondReadyCheck {
     pub ready: bool,
 }
 
+/// Raid target icons per group (`TARGET_ICONS_COUNT`): Retail indices 1 Star, 2 Circle,
+/// 3 Diamond, 4 Triangle, 5 Moon, 6 Square, 7 Cross, 8 Skull.
+pub const RAID_TARGET_ICON_COUNT: usize = 8;
+/// Retail raid target index of the Skull (`RAIDTARGET8`).
+pub const RAID_TARGET_SKULL: u8 = 8;
+
+/// Client puts raid target icon `icon` (1–8) on `target`, or clears its icon with 0
+/// (`SetRaidTarget(unit, index)`; TrinityCore `CMSG_UPDATE_RAID_TARGET`). A unit holds one
+/// icon and an icon marks one unit: the icon leaves its previous unit, and the unit's
+/// previous icon is cleared (`Group::SetTargetIcon`).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct SetRaidTarget {
+    /// Server entity bits of the marked unit.
+    pub target: u64,
+    pub icon: u8,
+}
+
+/// The recipient's raid target icons (TrinityCore `SMSG_SEND_RAID_TARGET_UPDATE_ALL`),
+/// sent after every change: the group's icons, or a solo player's own.
+#[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq, Eq)]
+pub struct RaidTargetIcons {
+    /// Server entity bits of the unit carrying icon `i + 1`.
+    pub targets: [Option<u64>; RAID_TARGET_ICON_COUNT],
+}
+
+impl RaidTargetIcons {
+    /// `GetRaidTargetIndex(unit)`: the icon (1–8) on `target`.
+    pub fn icon_of(&self, target: u64) -> Option<u8> {
+        let slot = self.targets.iter().position(|t| *t == Some(target))?;
+        Some(slot as u8 + 1)
+    }
+}
+
 /// Server asks the invitee to accept a party invite: the `PARTY_INVITE` popup data.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct GroupInvitePrompt {
@@ -268,6 +301,7 @@ pub(super) fn register_group_messages(app: &mut App) {
     for_client::<SetGroupLootMethod>(app);
     for_client::<StartReadyCheck>(app);
     for_client::<RespondReadyCheck>(app);
+    for_client::<SetRaidTarget>(app);
     app.register_protocol_message::<GroupInvitePrompt>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<GroupInviteCancelled>()
@@ -275,6 +309,8 @@ pub(super) fn register_group_messages(app: &mut App) {
     app.register_protocol_message::<GroupMemberStates>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<ReadyCheckUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<RaidTargetIcons>()
         .add_direction(NetworkDirection::ServerToClient);
     app.add_channel::<GroupChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),

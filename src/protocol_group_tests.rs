@@ -125,3 +125,26 @@ fn group_message_codes_use_retail_global_strings() {
         "Raid converted to Party"
     );
 }
+
+#[test]
+fn protocol_plugin_registers_raid_target_messages() {
+    let mut app = App::new();
+    app.init_resource::<ProtocolHasher>()
+        .init_resource::<ReplicationRules>()
+        .init_resource::<ReplicationRegistry>();
+    app.add_plugins(ProtocolPlugin);
+
+    assert!(app.is_message_registered::<SetRaidTarget>());
+    assert!(app.is_message_registered::<RaidTargetIcons>());
+}
+
+#[test]
+fn raid_target_icons_name_the_icon_of_a_unit() {
+    let mut icons = RaidTargetIcons::default();
+    icons.targets[RAID_TARGET_SKULL as usize - 1] = Some(4_294_967_337);
+    icons.targets[0] = Some(77);
+
+    assert_eq!(icons.icon_of(4_294_967_337), Some(RAID_TARGET_SKULL));
+    assert_eq!(icons.icon_of(77), Some(1));
+    assert_eq!(icons.icon_of(78), None);
+}
