@@ -128,6 +128,21 @@ fn equipment_slots_use_retail_invslot_ids() {
 }
 
 #[test]
+fn bag_slots_use_retail_container_inventory_ids() {
+    let ids: Vec<u8> = EquipmentSlot::BAGS
+        .iter()
+        .map(|s| s.inv_slot_id())
+        .collect();
+    assert_eq!(ids, vec![31, 32, 33, 34, 35]);
+    assert_eq!(EquipmentSlot::Bag3.bag_index(), Some(3));
+    assert_eq!(EquipmentSlot::ReagentBag.bag_index(), Some(REAGENT_BAG));
+    assert_eq!(EquipmentSlot::Head.bag_index(), None);
+    assert_eq!(EquipmentSlot::from_bag_index(1), Some(EquipmentSlot::Bag1));
+    assert_eq!(EquipmentSlot::from_bag_index(BACKPACK_BAG), None);
+    assert_eq!(EquipmentSlot::from_bag_index(BAG_COUNT), None);
+}
+
+#[test]
 fn inventory_types_map_to_retail_equipment_slots() {
     use EquipmentSlot::*;
     assert_eq!(EquipmentSlot::for_inventory_type(1), &[Head]);
@@ -137,7 +152,11 @@ fn inventory_types_map_to_retail_equipment_slots() {
     assert_eq!(EquipmentSlot::for_inventory_type(17), &[MainHand]);
     assert_eq!(EquipmentSlot::for_inventory_type(26), &[MainHand]);
     assert_eq!(EquipmentSlot::for_inventory_type(14), &[OffHand]);
-    for non_equip in [0, 18, 24, 27, 29, 255] {
+    assert_eq!(
+        EquipmentSlot::for_inventory_type(18),
+        &[Bag1, Bag2, Bag3, Bag4]
+    );
+    for non_equip in [0, 24, 27, 29, 255] {
         assert!(EquipmentSlot::for_inventory_type(non_equip).is_empty());
     }
 }

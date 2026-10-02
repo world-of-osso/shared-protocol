@@ -17,12 +17,15 @@ pub struct InventoryChannel;
 
 /// Backpack container index (Retail `BACKPACK_CONTAINER`).
 pub const BACKPACK_BAG: u8 = 0;
-/// Containers addressed by `ItemLocation::Bag`: backpack plus four bag slots.
-pub const BAG_COUNT: u8 = 5;
+/// Reagent bag container index (Retail `Enum.BagIndex.ReagentBag`).
+pub const REAGENT_BAG: u8 = 5;
+/// Containers addressed by `ItemLocation::Bag`: backpack, four bags and the reagent bag.
+pub const BAG_COUNT: u8 = 6;
 /// Backpack capacity (Retail `BACKPACK_SLOTS`).
 pub const BACKPACK_SLOTS: u8 = 16;
 
-/// Retail character equipment slots, in `INVSLOT_*` order (1-19).
+/// Retail character equipment slots, in `INVSLOT_*` order (1-19), then the bag
+/// slots (`CONTAINER_BAG_OFFSET` + container index, 31-35).
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum EquipmentSlot {
     Head,
@@ -44,9 +47,15 @@ pub enum EquipmentSlot {
     OffHand,
     Ranged,
     Tabard,
+    Bag1,
+    Bag2,
+    Bag3,
+    Bag4,
+    ReagentBag,
 }
 
 impl EquipmentSlot {
+    /// Paperdoll slots, `INVSLOT_*` 1-19.
     pub const ALL: [Self; 19] = [
         Self::Head,
         Self::Neck,
@@ -69,14 +78,42 @@ impl EquipmentSlot {
         Self::Tabard,
     ];
 
-    /// Retail `INVSLOT_*` id (Head = 1 … Tabard = 19).
+    /// Bag slots, by container index 1-5.
+    pub const BAGS: [Self; 5] = [
+        Self::Bag1,
+        Self::Bag2,
+        Self::Bag3,
+        Self::Bag4,
+        Self::ReagentBag,
+    ];
+
+    /// Retail inventory slot id: `INVSLOT_*` (Head = 1 … Tabard = 19), bags
+    /// `C_Container.ContainerIDToInventoryID` (Bag1 = 31 … ReagentBag = 35).
     pub fn inv_slot_id(self) -> u8 {
-        self as u8 + 1
+        match self.bag_index() {
+            Some(bag) => 30 + bag,
+            None => self as u8 + 1,
+        }
+    }
+
+    /// Container index (`ItemLocation::Bag::bag`) the bag in this slot provides.
+    pub fn bag_index(self) -> Option<u8> {
+        Self::BAGS
+            .iter()
+            .position(|&slot| slot == self)
+            .map(|index| index as u8 + 1)
+    }
+
+    /// Bag slot providing container `bag` (1-5); `None` for the backpack.
+    pub fn from_bag_index(bag: u8) -> Option<Self> {
+        Self::BAGS.get(usize::from(bag.checked_sub(1)?)).copied()
     }
 
     /// Slots an item of Retail `Enum.InventoryType` may occupy, preferred first.
-    /// Empty for non-equippable types (0 = non-equip, 18 bag, 24 ammo, 27 quiver).
+    /// Empty for non-equippable types (0 = non-equip, 24 ammo, 27 quiver).
     /// Ranged weapons (15 bow, 25 thrown, 26 gun/wand) use the main hand since MoP.
+    /// Bags (18) take the four bag slots; a reagent bag goes in `ReagentBag`
+    /// instead, which needs its item subclass (TrinityCore `Player::FindEquipSlot`).
     pub fn for_inventory_type(inventory_type: u8) -> &'static [Self] {
         use EquipmentSlot::*;
         match inventory_type {
@@ -96,6 +133,7 @@ impl EquipmentSlot {
             14 | 22 | 23 => &[OffHand],
             15 | 17 | 21 | 25 | 26 => &[MainHand],
             16 => &[Back],
+            18 => &[Bag1, Bag2, Bag3, Bag4],
             19 => &[Tabard],
             28 => &[Ranged],
             _ => &[],
@@ -124,7 +162,12 @@ impl EquipmentSlot {
             | Self::Finger2
             | Self::Trinket1
             | Self::Trinket2
-            | Self::Ranged => return None,
+            | Self::Ranged
+            | Self::Bag1
+            | Self::Bag2
+            | Self::Bag3
+            | Self::Bag4
+            | Self::ReagentBag => return None,
         })
     }
 
@@ -152,7 +195,8 @@ impl EquipmentSlot {
 /// Where an item sits: a container slot or an equipment slot.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum ItemLocation {
-    /// `bag` 0 is the backpack, 1-4 the equipped bags; `slot` is 0-based.
+    /// `bag` 0 is the backpack, 1-4 the equipped bags, 5 the reagent bag;
+    /// `slot` is 0-based.
     Bag {
         bag: u8,
         slot: u8,
@@ -191,7 +235,10 @@ pub struct BagContents {
     pub items: Vec<BagSlotItem>,
 }
 
-/// Full bag contents (containers 0-4), owner only.
+/// Full bag contents (containers 0-5), owner only. A container's size is its
+/// equipped bag's `ContainerSlots` (0 when the bag slot is empty); the bag item
+/// itself is in `EquipmentSnapshot` at its `EquipmentSlot::BAGS` slot. The server
+/// resends this whenever a bag slot changes.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct InventorySnapshot {
     pub bags: Vec<BagContents>,
@@ -294,6 +341,14 @@ pub enum InventoryErrorReason {
     CantEquipEver,
     /// `EQUIP_ERR_NOT_IN_COMBAT` (ItemDefines.h:87)
     NotInCombat,
+    /// `EQUIP_ERR_BAG_IN_BAG`
+    BagInBag,
+    /// `EQUIP_ERR_WRONG_BAG_TYPE`
+    WrongBagType,
+    /// `EQUIP_ERR_CANT_SWAP`
+    CantSwap,
+    /// `EQUIP_ERR_DESTROY_NONEMPTY_BAG`
+    DestroyNonemptyBag,
 }
 
 impl InventoryErrorReason {
@@ -317,6 +372,10 @@ impl InventoryErrorReason {
             Self::InternalBagError => "Internal Bag Error".into(),
             Self::CantEquipEver => "You can never use that item.".into(),
             Self::NotInCombat => "You can't do that while in combat".into(),
+            Self::BagInBag => "Can't put non-empty bags in other bags.".into(),
+            Self::WrongBagType => "That item doesn't go in that container.".into(),
+            Self::CantSwap => "These items can't be swapped.".into(),
+            Self::DestroyNonemptyBag => "You can only do that with empty bags.".into(),
         }
     }
 }
