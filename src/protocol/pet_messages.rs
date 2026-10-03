@@ -65,7 +65,7 @@ pub struct PetClearSpells;
 
 /// `CMSG_PET_ACTION`: a pet bar button pressed. `action` is the packed button; `target` the
 /// unit it acts on (the owner's target for Attack); `position` the ground point of Move To,
-/// in world coordinates.
+/// as `[x, y, z]` of a `Position` (the replicated unit position space).
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq)]
 pub struct PetAction {
     /// Server entity bits of the pet.
