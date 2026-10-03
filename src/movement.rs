@@ -18,6 +18,10 @@ pub const WALK_SPEED: f32 = 2.5;
 /// Swim speed in yards/sec (67.5% of run speed, WoW default).
 pub const SWIM_SPEED: f32 = 4.7222;
 
+/// Base flight speed in yards/sec (TrinityCore `baseMoveSpeed[MOVE_FLIGHT]`, Unit.cpp:106);
+/// flying mounts scale it by their SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED (207).
+pub const FLIGHT_SPEED: f32 = 7.0;
+
 /// Backward movement speed multiplier (WoW: ~60% of forward).
 pub const BACKPEDAL_MULTIPLIER: f32 = 0.6;
 
