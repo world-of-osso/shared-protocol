@@ -73,6 +73,8 @@ fn register_core_messages(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<PetAction>()
         .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<PetSpellAutocast>()
+        .add_direction(NetworkDirection::ClientToServer);
 }
 
 fn register_account_messages(app: &mut App) {

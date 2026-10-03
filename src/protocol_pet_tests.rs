@@ -53,6 +53,11 @@ fn pet_messages_round_trip_on_the_wire() {
         target: None,
         position: Some([-8_913.5, 82.25, -554.0]),
     });
+    assert_wire_round_trip(&PetSpellAutocast {
+        pet: 0x0000_0001_0000_0042,
+        spell: 17_253,
+        enabled: false,
+    });
     assert_wire_round_trip(&UnitSummonedBy(0x0000_0001_0000_0010));
 }
 
@@ -69,4 +74,5 @@ fn protocol_plugin_registers_pet_component_and_messages() {
     assert!(app.is_message_registered::<PetSpells>());
     assert!(app.is_message_registered::<PetClearSpells>());
     assert!(app.is_message_registered::<PetAction>());
+    assert!(app.is_message_registered::<PetSpellAutocast>());
 }

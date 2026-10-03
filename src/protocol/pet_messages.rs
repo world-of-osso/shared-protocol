@@ -1,7 +1,8 @@
 //! Pet control messages: the owner's pet action bar (TrinityCore `SMSG_PET_SPELLS_MESSAGE`,
 //! `Player::PetSpellInitialize`, Player.cpp:22440-22477; `SMSG_PET_CLEAR_SPELLS`) and the
 //! orders its buttons give (`CMSG_PET_ACTION`, `WorldSession::HandlePetAction`,
-//! PetHandler.cpp:64-116). All travel on `CombatChannel`.
+//! PetHandler.cpp:64-116) and the autocast toggle (`CMSG_PET_SPELL_AUTOCAST`,
+//! `HandlePetSpellAutocastOpcode`, PetHandler.cpp:628-676). All travel on `CombatChannel`.
 //!
 //! A bar slot is a packed unit action button (`MAKE_UNIT_ACTION_BUTTON`, CharmInfo.h:32-34):
 //! the action (a spell ID, a `COMMAND_*` or a `REACT_*`) in the low 24 bits and its
@@ -73,4 +74,14 @@ pub struct PetAction {
     pub action: u32,
     pub target: Option<u64>,
     pub position: Option<[f32; 3]>,
+}
+
+/// `CMSG_PET_SPELL_AUTOCAST` (Retail `TogglePetAutocast`, a right click on a pet spell
+/// button): turn autocast of the pet's `spell` on (`ACT_ENABLED`) or off (`ACT_DISABLED`).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct PetSpellAutocast {
+    /// Server entity bits of the pet.
+    pub pet: u64,
+    pub spell: u32,
+    pub enabled: bool,
 }
