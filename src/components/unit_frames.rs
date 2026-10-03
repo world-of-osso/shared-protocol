@@ -228,6 +228,9 @@ impl UnitFlags {
     /// `UNIT_FLAG_NON_ATTACKABLE_2` (`SPELL_AURA_MOD_UNATTACKABLE`): the unit cannot be
     /// attacked (`WorldObject::IsValidAttackTarget`).
     pub const NON_ATTACKABLE_2: u32 = 0x0001_0000;
+    /// `UNIT_FLAG_PET_IN_COMBAT`: on a player's pet, the pet is going after a target to
+    /// attack (`PetAI::DoAttack`); the pet bar's Attack button is active while it is set.
+    pub const PET_IN_COMBAT: u32 = 0x0000_0800;
 
     pub fn is_selectable(self) -> bool {
         self.0 & Self::NOT_SELECTABLE == 0
@@ -561,3 +564,22 @@ impl CreatureClassification {
     Eq,
 )]
 pub struct UnitVignette(pub u32);
+
+/// The unit that owns this one (`UF::UnitData::SummonedBy`, set by TrinityCore
+/// `Unit::SetOwnerGUID` from `Unit::SetMinion`): a hunter pet carries its owner's
+/// entity bits. The owner's client finds its pet (`UnitPet`, `UnitIsUnit("pet", …)`)
+/// as the unit summoned by its player.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+)]
+pub struct UnitSummonedBy(pub u64);

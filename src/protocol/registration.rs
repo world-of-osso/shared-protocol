@@ -67,6 +67,12 @@ fn register_core_messages(app: &mut App) {
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<LoadTerrain>()
         .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<PetSpells>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<PetClearSpells>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<PetAction>()
+        .add_direction(NetworkDirection::ClientToServer);
 }
 
 fn register_account_messages(app: &mut App) {

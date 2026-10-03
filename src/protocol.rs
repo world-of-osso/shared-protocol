@@ -7,7 +7,8 @@ use crate::components::{
     EquipmentAppearance, Gold, GuildMembership, Health, Mana, ModelDisplay, Mounted,
     MovementControl, MovementSpeed, Npc, Player, PlayerMotion, PlayerStandState, Position,
     PresenceStatus, Rotation, UnitAuras, UnitFactionTemplate, UnitFlags, UnitLevel, UnitPose,
-    UnitPowers, UnitRunes, UnitStats, UnitTarget, UnitThreatList, UnitVignette, WorldArrival, Zone,
+    UnitPowers, UnitRunes, UnitStats, UnitSummonedBy, UnitTarget, UnitThreatList, UnitVignette,
+    WorldArrival, Zone,
 };
 
 mod bank_messages;
@@ -27,6 +28,7 @@ mod loot_messages;
 mod mail_messages;
 mod merchant_messages;
 mod mirror_timer_messages;
+mod pet_messages;
 mod protocol_check;
 mod protocol_layout;
 mod quest_messages;
@@ -54,6 +56,7 @@ pub use loot_messages::*;
 pub use mail_messages::*;
 pub use merchant_messages::*;
 pub use mirror_timer_messages::*;
+pub use pet_messages::*;
 pub use protocol_check::{
     ProtocolCheckChannel, ProtocolCheckTimeout, ProtocolFingerprint, ProtocolRejected,
     ProtocolVerified, defer_lightyear_protocol_check,
@@ -145,6 +148,7 @@ fn register_replicated_components(app: &mut App) {
     app.protocol_component::<CreatureClassification>()
         .replicate();
     app.protocol_component::<UnitVignette>().replicate();
+    app.protocol_component::<UnitSummonedBy>().replicate();
 }
 
 #[cfg(test)]
@@ -226,6 +230,10 @@ mod world_time_tests;
 #[cfg(test)]
 #[path = "protocol_damage_meter_tests.rs"]
 mod damage_meter_tests;
+
+#[cfg(test)]
+#[path = "protocol_pet_tests.rs"]
+mod pet_tests;
 
 #[cfg(test)]
 #[path = "protocol_player_motion_tests.rs"]
