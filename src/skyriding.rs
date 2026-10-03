@@ -18,8 +18,8 @@
 //!
 //! The Skyriding abilities (`Glider::cast`) are DUMMY effects whose movement Retail runs in
 //! an unpublished server script (Wowhead 372608: "Server-side script"; TrinityCore a352b1fa
-//! defines `SMSG_MOVE_ADD_IMPULSE` but never sends it). Their impulses here are ours, capped
-//! by the published `AddImpulseMaxSpeed`; Aerial Halt is its DB2 aura.
+//! defines `SMSG_MOVE_ADD_IMPULSE` but never sends it). Their impulses are the assumed
+//! values below, capped by the published `AddImpulseMaxSpeed`; Aerial Halt is its DB2 aura.
 //!
 //! Lift and friction never add energy, so a skyrider's speed after falling `drop` yards is
 //! at most `sqrt(v0² + 2·GRAVITY·drop)` (`speed_after`), the server's bound.
@@ -29,26 +29,37 @@ use bevy::math::Vec3;
 /// `Movement::gravity` (TrinityCore MovementTypedefs.h:81), yards/s².
 pub const GRAVITY: f32 = 19.291_103;
 
-/// Upward speed of a takeoff and of Skyward Ascent, yards/s: Skyward Ascent 372610 (and
-/// Lift Off 374763) effect 0 DUMMY base points 450, read as 450% of `BASE_MOVEMENT_SPEED` 7
-/// (PaperDollFrame.lua:38). The reading is an assumption.
-pub const LAUNCH_SPEED: f32 = 4.5 * 7.0;
-
 /// Surge Forward ("Flap forward."): a Skyriding Charge, impulse along the facing.
 pub const SURGE_FORWARD: u32 = 372_608;
 /// Skyward Ascent ("Flap upward."): a Skyriding Charge, impulse straight up.
 pub const SKYWARD_ASCENT: u32 = 372_610;
+/// Whirling Surge ("Spiral forward a great distance, increasing speed."): no charge, 30 s
+/// category cooldown; impulse along the facing (the spiral is visual only).
+pub const WHIRLING_SURGE: u32 = 361_584;
 /// Aerial Halt ("Flap back, reducing forward movement."): APPLY_AURA
 /// MOD_ADV_FLYING_AIR_FRICTION 513 at 10000% for SpellDuration 327 (500 ms).
 pub const AERIAL_HALT: u32 = 403_092;
 
-/// Surge Forward's impulse, yards/s. Its effect 0 DUMMY carries no base points; this is
-/// Skyward Ascent's 450% reading turned forward, an assumption until a source exists.
-pub const SURGE_SPEED: f32 = LAUNCH_SPEED;
+// --- Assumed values: unpublished, tune here (listed in game-server docs/specs/skyriding.md).
+// Retail runs these movements in server scripts (Wowhead 372608: "Server-side script");
+// only Skyward Ascent / Lift Off 374763 effect 0 DUMMY carries a number, 450.
+
+/// Upward speed of a takeoff and of Skyward Ascent, yards/s: the 450 read as 450% of
+/// `BASE_MOVEMENT_SPEED` 7 (PaperDollFrame.lua:38).
+pub const LAUNCH_SPEED: f32 = 4.5 * 7.0;
+/// Surge Forward's impulse along the facing, yards/s: the same 450% reading (its own DUMMY
+/// carries no base points).
+pub const SURGE_SPEED: f32 = 4.5 * 7.0;
+/// Whirling Surge's impulse along the facing, yards/s: Surge Forward's (its DUMMY aura
+/// carries no base points).
+pub const WHIRLING_SURGE_SPEED: f32 = 4.5 * 7.0;
+
+// --- End of assumed values.
+
 /// Aerial Halt's air friction multiplier: `ApplyPct(AirFriction, 10000)` (TC
 /// `Unit::UpdateAdvFlyingSpeed`, Unit.cpp:9080).
 pub const HALT_FRICTION_FACTOR: f32 = 10_000.0 / 100.0;
-/// Aerial Halt's aura duration, seconds.
+/// Aerial Halt's aura duration, seconds (SpellDuration 327).
 pub const HALT_SECS: f32 = 0.5;
 
 /// The `FlightCapability` fields the model reads.
@@ -127,6 +138,9 @@ impl Glider {
     pub fn cast(&mut self, capability: &FlightCapability, spell_id: u32, yaw: f32) -> bool {
         match spell_id {
             SURGE_FORWARD => self.impulse(capability, facing(yaw, self.pitch) * SURGE_SPEED),
+            WHIRLING_SURGE => {
+                self.impulse(capability, facing(yaw, self.pitch) * WHIRLING_SURGE_SPEED);
+            }
             SKYWARD_ASCENT => self.impulse(capability, Vec3::Y * LAUNCH_SPEED),
             AERIAL_HALT => self.halt_secs = HALT_SECS,
             _ => return false,
@@ -216,6 +230,7 @@ pub fn impulse_bound(capability: &FlightCapability, speed: f32, impulse_speed: f
 pub fn ability_impulse(spell_id: u32) -> Option<f32> {
     match spell_id {
         SURGE_FORWARD => Some(SURGE_SPEED),
+        WHIRLING_SURGE => Some(WHIRLING_SURGE_SPEED),
         SKYWARD_ASCENT => Some(LAUNCH_SPEED),
         _ => None,
     }

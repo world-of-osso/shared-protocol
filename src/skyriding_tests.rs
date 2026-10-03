@@ -217,3 +217,15 @@ fn other_spells_leave_the_glider_alone() {
     assert!(!flyer.cast(&SKYRIDING, 32235, 0.0));
     assert_eq!(flyer, glider(30.0, 0.0));
 }
+
+#[test]
+fn whirling_surge_surges_forward_like_surge_forward() {
+    let mut flyer = glider(30.0, 0.0);
+    assert!(flyer.cast(&SKYRIDING, WHIRLING_SURGE, 0.0));
+    assert!(
+        (flyer.velocity - Vec3::new(0.0, 0.0, 30.0 + WHIRLING_SURGE_SPEED)).length() < 1e-3,
+        "{:?}",
+        flyer.velocity
+    );
+    assert_eq!(ability_impulse(WHIRLING_SURGE), Some(WHIRLING_SURGE_SPEED));
+}
