@@ -378,6 +378,11 @@ pub struct PlayerInput {
     pub running: bool,
     /// Whether the player is swimming.
     pub swimming: bool,
+    /// Whether the player is flying (`MOVEMENTFLAG_FLYING`): no gravity, and the reported
+    /// height is free above the ground. The server honours it only while the player can
+    /// fly (`PlayerMotion::CAN_FLY`; TrinityCore MovementHandler.cpp:128 strips
+    /// `MOVEMENTFLAG_FLYING` from a mover without a flying aura).
+    pub flying: bool,
     /// Feet position the client moved the player to this frame, in world space.
     pub position: [f32; 3],
     /// `MovementControl::epoch` of that position: input from before a server teleport

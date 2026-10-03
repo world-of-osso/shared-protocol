@@ -329,6 +329,11 @@ impl PlayerMotion {
     /// Airborne: a jump until it lands.
     pub const FALLING: u32 = 0x0000_0800;
     pub const SWIMMING: u32 = 0x0010_0000;
+    /// The unit may fly: set by the server while a SPELL_AURA_FLY (201) or
+    /// SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED (207) aura is on it (`Unit::SetCanFly`).
+    pub const CAN_FLY: u32 = 0x0080_0000;
+    /// The unit is flying: no gravity (a `PlayerInput::flying` the server accepted).
+    pub const FLYING: u32 = 0x0100_0000;
 
     /// Whether every bit of `flags` is set.
     pub fn contains(self, flags: u32) -> bool {

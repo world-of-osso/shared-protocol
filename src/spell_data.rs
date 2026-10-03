@@ -174,6 +174,11 @@ pub enum CastFailReason {
     /// The target is not in line of sight (`SPELL_FAILED_LINE_OF_SIGHT`, "Target not in
     /// line of sight").
     LineOfSight,
+    /// The spell cannot be cast in combat (`SPELL_FAILED_AFFECTING_COMBAT`, "You are in
+    /// combat").
+    AffectingCombat,
+    /// The caster is mounted (`SPELL_FAILED_NOT_MOUNTED`, "You are mounted").
+    NotMounted,
 }
 
 /// Context needed to validate a cast attempt.
