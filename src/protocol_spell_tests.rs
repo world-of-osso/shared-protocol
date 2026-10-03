@@ -214,12 +214,14 @@ fn cooldown_and_charges_round_trip() {
         remaining_ms: 1_320,
         is_gcd: true,
     });
+    // Surge Forward spending one Skyriding Charge (ChargeCategory 2391, 6, 10.35 s).
     assert_wire_round_trip(&SpellChargesUpdate {
-        spell_id: 1_856,
-        current: 1,
-        max: 2,
-        recharge_ms: 120_000,
-        remaining_ms: 45_000,
+        spell_id: 372_608,
+        category: 2_391,
+        current: 5,
+        max: 6,
+        recharge_ms: 10_350,
+        remaining_ms: 10_350,
     });
 }
 

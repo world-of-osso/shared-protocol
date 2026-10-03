@@ -38,10 +38,14 @@ pub struct SpellCooldownUpdate {
     pub is_gcd: bool,
 }
 
-/// Charge state of a charge-based spell.
+/// Charge state of a charge category (TrinityCore `SMSG_SET_SPELL_CHARGES`, whose
+/// `Category` is the `SpellCategories.ChargeCategory` every spell of the category spends).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct SpellChargesUpdate {
+    /// The spell that last spent a charge.
     pub spell_id: u32,
+    /// `ChargeCategory` (Skyriding Charges 2391 for Surge Forward and Skyward Ascent).
+    pub category: u32,
     pub current: u8,
     pub max: u8,
     /// Time to regain one charge.
