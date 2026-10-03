@@ -394,6 +394,8 @@ fn register_spell_messages(app: &mut App) {
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<CancelAura>()
         .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<CancelMountAura>()
+        .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<CommitTraitConfig>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<SetSpecialization>()

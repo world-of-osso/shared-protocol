@@ -378,6 +378,7 @@ fn trait_and_specialization_messages_round_trip() {
     assert_wire_round_trip(&SpecializationChanged { spec_id: 66 });
     assert_wire_round_trip(&SetSpecialization { spec_id: 65 });
     assert_wire_round_trip(&CancelAura { spell_id: 1_459 });
+    assert_wire_round_trip(&CancelMountAura);
 }
 
 #[test]
@@ -417,6 +418,7 @@ fn protocol_plugin_registers_spell_components_and_messages() {
     assert!(app.is_message_registered::<SpecializationChanged>());
     assert!(app.is_message_registered::<SetActionButton>());
     assert!(app.is_message_registered::<CancelAura>());
+    assert!(app.is_message_registered::<CancelMountAura>());
     assert!(app.is_message_registered::<CommitTraitConfig>());
     assert!(app.is_message_registered::<SetSpecialization>());
 }

@@ -167,6 +167,11 @@ pub struct CancelAura {
     pub spell_id: u32,
 }
 
+/// Client dismounts (Retail `Dismount()` → `CMSG_CANCEL_MOUNT_AURA`, TrinityCore
+/// `HandleCancelMountAuraOpcode`): the server removes its cancellable mount auras.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct CancelMountAura;
+
 /// One chosen trait entry (DB2 `TraitNode`/`TraitNodeEntry` ids).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct TraitEntrySelection {
