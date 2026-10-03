@@ -9,6 +9,7 @@ fn glider(speed: f32, pitch: f32) -> Glider {
         velocity: facing(0.0, pitch) * speed,
         pitch,
         gliding: true,
+        halt_secs: 0.0,
     }
 }
 
@@ -141,4 +142,78 @@ fn the_energy_bound_has_concrete_numbers() {
     // 30 yd/s climbs at most 30² / 38.58 = 23.33 yards.
     assert!((max_climb(30.0) - 23.327).abs() < 0.01);
     assert_eq!(speed_after(&SKYRIDING, 30.0, -24.0), None);
+}
+
+#[test]
+fn surge_forward_flaps_along_the_facing() {
+    let mut flyer = glider(30.0, 0.0);
+    assert!(flyer.cast(&SKYRIDING, SURGE_FORWARD, 0.0));
+    // 30 + 31.5 yd/s straight ahead (yaw 0 faces +Z).
+    assert!(
+        (flyer.velocity - Vec3::new(0.0, 0.0, 61.5)).length() < 1e-3,
+        "{:?}",
+        flyer.velocity
+    );
+    let speed = flyer.speed();
+    assert!(speed <= impulse_bound(&SKYRIDING, 30.0, SURGE_SPEED) + 1e-3);
+}
+
+#[test]
+fn skyward_ascent_flaps_upward() {
+    let mut flyer = glider(30.0, 0.0);
+    assert!(flyer.cast(&SKYRIDING, SKYWARD_ASCENT, 1.0));
+    assert!(
+        (flyer.velocity - Vec3::new(0.0, 31.5, 30.0)).length() < 1e-3,
+        "{:?}",
+        flyer.velocity
+    );
+    // |v + up| ≤ |v| + 31.5: the server's bound holds.
+    assert!(flyer.speed() <= impulse_bound(&SKYRIDING, 30.0, LAUNCH_SPEED));
+}
+
+#[test]
+fn an_impulse_stops_at_add_impulse_max_speed() {
+    let mut flyer = glider(90.0, 0.0);
+    flyer.cast(&SKYRIDING, SURGE_FORWARD, 0.0);
+    assert!((flyer.speed() - 100.0).abs() < 1e-3, "{}", flyer.speed());
+    assert_eq!(impulse_bound(&SKYRIDING, 90.0, SURGE_SPEED), 100.0);
+    // Already past it (no published path, but the bound never shrinks a speed).
+    assert_eq!(impulse_bound(&SKYRIDING, 120.0, SURGE_SPEED), 120.0);
+}
+
+#[test]
+fn over_max_vel_the_mount_decelerates_by_over_max_deceleration() {
+    let mut flyer = glider(90.0, 0.0);
+    fly(&mut flyer, 0.0, 1.0);
+    // OverMaxDeceleration 7 on top of AirFriction 1.5.
+    assert!((flyer.speed() - 81.5).abs() < 0.3, "{}", flyer.speed());
+    fly(&mut flyer, 0.0, 4.0);
+    // Down to MaxVel 65 after 25 / 8.5 = 2.9 s, then by air friction alone.
+    assert!(
+        (flyer.speed() - (65.0 - 1.5 * 2.06)).abs() < 0.5,
+        "{}",
+        flyer.speed()
+    );
+}
+
+#[test]
+fn aerial_halt_stops_forward_movement_for_half_a_second() {
+    let mut flyer = glider(60.0, 0.0);
+    assert!(flyer.cast(&SKYRIDING, AERIAL_HALT, 0.0));
+    fly(&mut flyer, 0.0, 0.4);
+    // AirFriction 1.5 × 10000% = 150 yd/s²: 60 yd/s is gone in 0.4 s.
+    assert!(flyer.velocity.z.abs() < 1.0, "{:?}", flyer.velocity);
+    fly(&mut flyer, 0.0, 0.2);
+    assert_eq!(flyer.halt_secs, 0.0);
+    // Falling again under plain air friction.
+    let falling = flyer.speed();
+    fly(&mut flyer, 0.0, 0.5);
+    assert!(flyer.speed() > falling, "{} after {falling}", flyer.speed());
+}
+
+#[test]
+fn other_spells_leave_the_glider_alone() {
+    let mut flyer = glider(30.0, 0.0);
+    assert!(!flyer.cast(&SKYRIDING, 32235, 0.0));
+    assert_eq!(flyer, glider(30.0, 0.0));
 }
