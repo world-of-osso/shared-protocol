@@ -320,26 +320,32 @@ pub enum CreatureMotion {
     PartialEq,
     Eq,
 )]
-pub struct PlayerMotion(pub u32);
+pub struct PlayerMotion(pub u64);
 
 impl PlayerMotion {
-    pub const FORWARD: u32 = 0x0000_0001;
-    pub const BACKWARD: u32 = 0x0000_0002;
-    pub const STRAFE_LEFT: u32 = 0x0000_0004;
-    pub const STRAFE_RIGHT: u32 = 0x0000_0008;
+    pub const FORWARD: u64 = 0x0000_0001;
+    pub const BACKWARD: u64 = 0x0000_0002;
+    pub const STRAFE_LEFT: u64 = 0x0000_0004;
+    pub const STRAFE_RIGHT: u64 = 0x0000_0008;
     /// Walk mode (run toggled off).
-    pub const WALKING: u32 = 0x0000_0100;
+    pub const WALKING: u64 = 0x0000_0100;
     /// Airborne: a jump until it lands.
-    pub const FALLING: u32 = 0x0000_0800;
-    pub const SWIMMING: u32 = 0x0010_0000;
+    pub const FALLING: u64 = 0x0000_0800;
+    pub const SWIMMING: u64 = 0x0010_0000;
     /// The unit may fly: set by the server while a SPELL_AURA_FLY (201) or
     /// SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED (207) aura is on it (`Unit::SetCanFly`).
-    pub const CAN_FLY: u32 = 0x0080_0000;
+    pub const CAN_FLY: u64 = 0x0080_0000;
     /// The unit is flying: no gravity (a `PlayerInput::flying` the server accepted).
-    pub const FLYING: u32 = 0x0100_0000;
+    pub const FLYING: u64 = 0x0100_0000;
+    /// The unit may skyride: set by the server while a SPELL_AURA_ADV_FLYING (446) aura is
+    /// on it (`AuraEffect::HandleModAdvFlying` → `Unit::SetCanAdvFly`, Unit.cpp:14027).
+    pub const CAN_ADV_FLY: u64 = 0x0000_2000_0000_0000;
+    /// The unit is skyriding: a `FLYING` flight of a unit that `CAN_ADV_FLY`, moved by
+    /// momentum (`crate::skyriding`).
+    pub const ADV_FLYING: u64 = 0x0000_4000_0000_0000;
 
     /// Whether every bit of `flags` is set.
-    pub fn contains(self, flags: u32) -> bool {
+    pub fn contains(self, flags: u64) -> bool {
         self.0 & flags == flags
     }
 }

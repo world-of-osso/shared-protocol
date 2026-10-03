@@ -15,6 +15,8 @@ fn player_motion_bits_are_trinitycore_movement_flags() {
     assert_eq!(PlayerMotion::WALKING, 0x0000_0100);
     assert_eq!(PlayerMotion::FALLING, 0x0000_0800);
     assert_eq!(PlayerMotion::SWIMMING, 0x0010_0000);
+    assert_eq!(PlayerMotion::CAN_ADV_FLY, 0x0000_2000_0000_0000);
+    assert_eq!(PlayerMotion::ADV_FLYING, 0x0000_4000_0000_0000);
     assert_eq!(PlayerMotion::default(), PlayerMotion(0));
 }
 
@@ -34,6 +36,13 @@ fn player_motion_round_trips_and_replicates() {
     for motion in [
         PlayerMotion(PlayerMotion::BACKWARD | PlayerMotion::WALKING | PlayerMotion::SWIMMING),
         PlayerMotion(PlayerMotion::STRAFE_RIGHT | PlayerMotion::FALLING),
+        PlayerMotion(
+            PlayerMotion::FORWARD
+                | PlayerMotion::CAN_FLY
+                | PlayerMotion::FLYING
+                | PlayerMotion::CAN_ADV_FLY
+                | PlayerMotion::ADV_FLYING,
+        ),
         PlayerMotion::default(),
     ] {
         let decoded: PlayerMotion = bitcode::decode(&bitcode::encode(&motion)).unwrap();
