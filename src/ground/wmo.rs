@@ -10,9 +10,9 @@ const MOGP_UNREACHABLE: u32 = 0x80;
 /// MOGP flag: antiportal occluder, not geometry.
 const MOGP_ANTIPORTAL: u32 = 0x0400_0000;
 
-const MOPY_DETAIL: u8 = 0x04;
-const MOPY_COLLISION: u8 = 0x08;
-const MOPY_RENDER: u8 = 0x20;
+const MOPY_DETAIL: u16 = 0x04;
+const MOPY_COLLISION: u16 = 0x08;
+const MOPY_RENDER: u16 = 0x20;
 /// MOPY material id of a collision-only face.
 const MOPY_COLLISION_ONLY_MATERIAL: u8 = 0xFF;
 
@@ -69,6 +69,7 @@ impl WmoGroupCollision {
             let (tag, payload) = chunk?;
             match &tag {
                 b"MOPY" => group.collidable = parse_mopy(payload),
+                b"MPY2" => group.collidable = parse_mpy2(payload),
                 b"MOVI" => group.indices = parse_u16s(payload),
                 b"MOVT" => group.vertices = parse_vec3s(payload)?,
                 b"MOBN" => group.nodes = parse_mobn(payload)?,
@@ -204,9 +205,9 @@ impl WmoGroupCollision {
 /// AzerothCore vmap4_extractor `wmo.cpp`: a face collides when flagged
 /// COLLISION, when it renders and is not DETAIL, or when its material is the
 /// collision-only id.
-fn face_collides(flags: u8, material_id: u8) -> bool {
+fn face_collides(flags: u16, collision_only: bool) -> bool {
     let render_face = flags & MOPY_RENDER != 0 && flags & MOPY_DETAIL == 0;
-    flags & MOPY_COLLISION != 0 || render_face || material_id == MOPY_COLLISION_ONLY_MATERIAL
+    flags & MOPY_COLLISION != 0 || render_face || collision_only
 }
 
 /// Two-sided Möller–Trumbore; returns the segment parameter of the hit.
@@ -246,7 +247,24 @@ fn file_to_local_bevy(point: Vec3) -> Vec3 {
 fn parse_mopy(payload: &[u8]) -> Vec<bool> {
     payload
         .chunks_exact(2)
-        .map(|entry| face_collides(entry[0], entry[1]))
+        .map(|entry| {
+            face_collides(
+                u16::from(entry[0]),
+                entry[1] == MOPY_COLLISION_ONLY_MATERIAL,
+            )
+        })
+        .collect()
+}
+
+/// Forever MPY2 widens MOPY flags and material indices to little-endian u16s.
+fn parse_mpy2(payload: &[u8]) -> Vec<bool> {
+    payload
+        .chunks_exact(4)
+        .map(|entry| {
+            let flags = u16::from_le_bytes([entry[0], entry[1]]);
+            let material = u16::from_le_bytes([entry[2], entry[3]]);
+            face_collides(flags, material == u16::MAX)
+        })
         .collect()
 }
 
