@@ -291,7 +291,15 @@ fn combat_log_event_round_trips_every_kind() {
         CombatLogKind::Death,
     ]
     .into_iter()
-    .chain(misses.into_iter().map(CombatLogKind::Miss));
+    .chain(misses.into_iter().map(CombatLogKind::Miss))
+    .chain(
+        [
+            EnvironmentalKind::Fatigue,
+            EnvironmentalKind::Drowning,
+            EnvironmentalKind::Falling,
+        ]
+        .map(CombatLogKind::Environmental),
+    );
     for kind in kinds {
         assert_wire_round_trip(&CombatLogEvent {
             source: Some(0x0000_0002_0000_0010),
@@ -306,6 +314,8 @@ fn combat_log_event_round_trips_every_kind() {
             crit: true,
             glancing: false,
             periodic: false,
+            extra_spell_id: Some(116),
+            timestamp_unix_ms: 1_791_100_800_123,
             kind,
         });
     }
@@ -322,6 +332,8 @@ fn combat_log_event_round_trips_every_kind() {
         crit: false,
         glancing: false,
         periodic: true,
+        extra_spell_id: None,
+        timestamp_unix_ms: 0,
         kind: CombatLogKind::Miss(MissKind::Block),
     });
 }

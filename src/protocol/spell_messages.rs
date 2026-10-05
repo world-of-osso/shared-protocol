@@ -118,6 +118,22 @@ pub enum CombatLogKind {
     CastStart,
     CastSuccess,
     Death,
+    /// `ENVIRONMENTAL_DAMAGE` (`SMSG_ENVIRONMENTAL_DAMAGE_LOG`): no source, no spell, the
+    /// amount in `amount` and the overkill in `overflow`.
+    Environmental(EnvironmentalKind),
+}
+
+/// CLEU `environmentalType` of an `Environmental` line (TrinityCore `EnviromentalDamage`).
+/// Only the types the server deals: Fire, Lava and Slime have no source yet.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub enum EnvironmentalKind {
+    /// `DAMAGE_EXHAUSTED`, "Fatigue".
+    Fatigue,
+    /// `DAMAGE_DROWNING`, "Drowning".
+    Drowning,
+    /// `DAMAGE_FALL`, "Falling"; `DAMAGE_FALL_TO_VOID` is logged as this too
+    /// (`Player::EnvironmentalDamage`).
+    Falling,
 }
 
 /// One combat log entry; entities are server entity bits.
@@ -141,6 +157,14 @@ pub struct CombatLogEvent {
     /// fires, Unit.cpp:2475).
     pub glancing: bool,
     pub periodic: bool,
+    /// CLEU `extraSpellId`: the interrupted spell of an `Interrupt` (`SPELL_INTERRUPT`,
+    /// `SMSG_SPELL_INTERRUPT_LOG.InterruptedSpellID`) and the removed aura of a `Dispel`
+    /// (`SPELL_DISPEL`, `SMSG_SPELL_DISPELL_LOG` `DispellData.SpellID`), whose `spell_id` is
+    /// the dispelling spell.
+    pub extra_spell_id: Option<u32>,
+    /// Server wall clock when the line was logged, Unix milliseconds (CLEU `timestamp`,
+    /// Unix seconds with millisecond precision).
+    pub timestamp_unix_ms: u64,
     pub kind: CombatLogKind,
 }
 
