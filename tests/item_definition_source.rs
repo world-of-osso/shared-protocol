@@ -2,8 +2,8 @@ use serde::{Serialize, de::DeserializeOwned};
 use serde_json::{Value, json};
 use shared::components::EquipmentAppearance;
 use shared::protocol::{
-    BagContents, BagSlotItem, EquipmentSlot, EquipmentSnapshot, EquippedItem, InventoryDelta,
-    InventorySlotChange, InventorySnapshot, ItemLocation, ItemStack,
+    AuctionBrowseItem, BagContents, BagSlotItem, BuybackItem, EquipmentSlot, EquipmentSnapshot,
+    EquippedItem, InventoryDelta, InventorySlotChange, InventorySnapshot, ItemLocation, ItemStack,
 };
 use std::fmt::Debug;
 
@@ -14,6 +14,71 @@ fn wire_round_trip<T: Serialize + DeserializeOwned + PartialEq + Debug>(value: &
     assert_eq!(read, bytes.len());
     assert_eq!(&decoded, value);
     decoded
+}
+
+fn assert_owned_view_sources_remain_distinct<T>(mut authored: Value)
+where
+    T: Serialize + DeserializeOwned + PartialEq + Debug,
+{
+    let config = bincode::config::standard();
+    let mut encoded = Vec::new();
+    for source in ["Retail", "Forever70205"] {
+        authored["definition_source"] = json!(source);
+        let value: T = serde_json::from_value(authored.clone()).unwrap();
+        encoded.push(bincode::serde::encode_to_vec(&value, config).unwrap());
+        assert_eq!(
+            serde_json::to_value(wire_round_trip(&value)).unwrap(),
+            authored
+        );
+    }
+    assert_ne!(encoded[0], encoded[1]);
+}
+
+fn assert_owned_view_requires_known_source<T: DeserializeOwned>(mut authored: Value) {
+    authored
+        .as_object_mut()
+        .unwrap()
+        .remove("definition_source");
+    assert!(serde_json::from_value::<T>(authored.clone()).is_err());
+    for invalid in [Value::Null, json!("Forever70206")] {
+        authored["definition_source"] = invalid;
+        assert!(serde_json::from_value::<T>(authored.clone()).is_err());
+    }
+}
+
+fn auction_browse_json() -> Value {
+    json!({
+        "item_id": 2947, "definition_source": "Retail", "name": "Authored item",
+        "quality": 1, "required_level": 1, "lowest_unit_price": 10,
+        "total_quantity": 3
+    })
+}
+
+fn buyback_json() -> Value {
+    json!({
+        "slot": 2, "item_id": 2947, "definition_source": "Retail",
+        "name": "Authored item", "quality": 1, "count": 3, "price": 30
+    })
+}
+
+#[test]
+fn item_definition_source_auction_browse_colliding_ids_remain_distinct_on_wire() {
+    assert_owned_view_sources_remain_distinct::<AuctionBrowseItem>(auction_browse_json());
+}
+
+#[test]
+fn item_definition_source_buyback_colliding_ids_remain_distinct_on_wire() {
+    assert_owned_view_sources_remain_distinct::<BuybackItem>(buyback_json());
+}
+
+#[test]
+fn item_definition_source_auction_browse_requires_known_source() {
+    assert_owned_view_requires_known_source::<AuctionBrowseItem>(auction_browse_json());
+}
+
+#[test]
+fn item_definition_source_buyback_requires_known_source() {
+    assert_owned_view_requires_known_source::<BuybackItem>(buyback_json());
 }
 
 fn stack_json(source: &str) -> Value {

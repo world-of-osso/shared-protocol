@@ -65,6 +65,7 @@ pub struct BuybackItem {
     /// Buyback slot, the `slot` of `BuybackItemRequest`.
     pub slot: u8,
     pub item_id: u32,
+    pub definition_source: crate::item_data::ItemDefinitionSource,
     pub name: String,
     pub quality: u8,
     pub count: u32,

@@ -58,6 +58,7 @@ fn merchant_messages_round_trip() {
         items: vec![BuybackItem {
             slot: 0,
             item_id: 2379,
+            definition_source: crate::item_data::ItemDefinitionSource::Retail,
             name: "Tarnished Chain Vest".into(),
             quality: 1,
             count: 1,

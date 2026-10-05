@@ -24,6 +24,7 @@ fn grouped_browse_preserves_global_prices_quantities_and_item_pagination() {
         total_results: 75,
         items: vec![AuctionBrowseItem {
             item_id: 2589,
+            definition_source: shared::item_data::ItemDefinitionSource::Retail,
             name: "Linen Cloth".into(),
             quality: 1,
             required_level: 1,
