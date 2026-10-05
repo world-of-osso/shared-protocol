@@ -165,6 +165,7 @@ fn find_or_create_entry(
         appearance.entries.push(EquippedAppearanceEntry {
             slot,
             item_id: None,
+            definition_source: None,
             display_info_id: None,
             inventory_type: 0,
             hidden: false,

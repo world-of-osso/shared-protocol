@@ -19,6 +19,7 @@ fn linen(guid: u64, count: u32) -> ItemStack {
     ItemStack {
         item_guid: guid,
         item_id: 2589,
+        definition_source: crate::item_data::ItemDefinitionSource::Retail,
         count,
         durability: None,
         soulbound: false,

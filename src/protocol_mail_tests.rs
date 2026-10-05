@@ -38,6 +38,7 @@ fn linen_attachment() -> MailAttachment {
         item: ItemStack {
             item_guid: 90,
             item_id: 2589,
+            definition_source: crate::item_data::ItemDefinitionSource::Retail,
             count: 20,
             durability: None,
             soulbound: false,

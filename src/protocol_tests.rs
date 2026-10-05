@@ -186,6 +186,7 @@ fn sample_auction_listing() -> AuctionListingSummary {
         item: AuctionInventoryItem {
             item_guid: 12,
             item_id: 2589,
+            definition_source: crate::item_data::ItemDefinitionSource::Retail,
             name: "Linen Cloth".into(),
             quality: 1,
             required_level: 1,
@@ -240,6 +241,7 @@ fn equipment_appearance_round_trips() {
             EquippedAppearanceEntry {
                 slot: EquipmentVisualSlot::Head,
                 item_id: Some(19019),
+                definition_source: Some(crate::item_data::ItemDefinitionSource::Retail),
                 display_info_id: Some(12345),
                 inventory_type: 1,
                 hidden: false,
@@ -247,6 +249,7 @@ fn equipment_appearance_round_trips() {
             EquippedAppearanceEntry {
                 slot: EquipmentVisualSlot::MainHand,
                 item_id: Some(17182),
+                definition_source: Some(crate::item_data::ItemDefinitionSource::Retail),
                 display_info_id: Some(54321),
                 inventory_type: 21,
                 hidden: false,

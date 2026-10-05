@@ -20,6 +20,7 @@ fn linen(count: u32) -> ItemStack {
     ItemStack {
         item_guid: 50,
         item_id: 2589,
+        definition_source: crate::item_data::ItemDefinitionSource::Retail,
         count,
         durability: None,
         soulbound: false,
@@ -51,6 +52,7 @@ fn inventory_snapshots_and_delta_round_trip() {
             item: ItemStack {
                 item_guid: 51,
                 item_id: 25,
+                definition_source: crate::item_data::ItemDefinitionSource::Retail,
                 count: 1,
                 durability: Some(ItemDurability {
                     current: 30,

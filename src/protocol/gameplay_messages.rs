@@ -38,6 +38,7 @@ pub enum AuctionSortDir {
 pub struct AuctionInventoryItem {
     pub item_guid: u64,
     pub item_id: u32,
+    pub definition_source: crate::item_data::ItemDefinitionSource,
     pub name: String,
     pub quality: u8,
     pub required_level: u16,
@@ -210,6 +211,7 @@ pub enum TradePhase {
 pub struct TradeItemSnapshot {
     pub item_guid: u64,
     pub item_id: u32,
+    pub definition_source: crate::item_data::ItemDefinitionSource,
     pub name: String,
     pub quality: u8,
     pub stack_count: u32,

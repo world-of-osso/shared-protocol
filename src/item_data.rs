@@ -9,6 +9,26 @@ use serde::{Deserialize, Serialize};
 
 use crate::components::{CombatRatings, EquipmentVisualSlot, UnitStats, weapon_damage_per_second};
 
+/// Definition namespace paired with the unchanged authored item ID.
+/// Forever70205 is the fixed supported Forever build 1.60.1.70205.
+#[derive(
+    bevy::prelude::Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+)]
+pub enum ItemDefinitionSource {
+    Retail,
+    Forever70205,
+}
+
 /// Equipment slot for an item (matches AzerothCore `InventoryType`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum EquipSlot {

@@ -215,6 +215,7 @@ pub struct ItemDurability {
 pub struct ItemStack {
     pub item_guid: u64,
     pub item_id: u32,
+    pub definition_source: crate::item_data::ItemDefinitionSource,
     pub count: u32,
     /// `None` when the item has no durability or the server does not track it.
     pub durability: Option<ItemDurability>,

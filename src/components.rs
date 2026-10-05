@@ -449,6 +449,10 @@ pub enum EquipmentVisualSlot {
 pub struct EquippedAppearanceEntry {
     pub slot: EquipmentVisualSlot,
     pub item_id: Option<u32>,
+    /// Paired with `item_id`; both are None for a display-only entry.
+    /// Require the field even when null: missing source is not compatibility.
+    #[serde(deserialize_with = "Option::deserialize")]
+    pub definition_source: Option<crate::item_data::ItemDefinitionSource>,
     pub display_info_id: Option<u32>,
     pub inventory_type: u8,
     pub hidden: bool,
