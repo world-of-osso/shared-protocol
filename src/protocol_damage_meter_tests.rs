@@ -59,6 +59,36 @@ fn damage_meter_snapshot_round_trips_on_the_wire() {
 }
 
 #[test]
+fn threat_update_and_clear_round_trip() {
+    let update = ThreatUpdate {
+        creature: 42,
+        victim: Some(17),
+        entries: vec![ThreatUnit {
+            unit: 17,
+            name: "Tank".into(),
+            class_id: 2,
+            raw_threat: 143.0,
+            status: 3,
+            raw_percent: 100.0,
+            scaled_percent: 100.0,
+        }],
+    };
+    let clear = ThreatUpdate {
+        creature: 42,
+        victim: None,
+        entries: vec![],
+    };
+    for message in [update, clear] {
+        let config = bincode::config::standard();
+        let bytes = bincode::serde::encode_to_vec(&message, config).unwrap();
+        let (decoded, read): (ThreatUpdate, usize) =
+            bincode::serde::decode_from_slice(&bytes, config).unwrap();
+        assert_eq!(decoded, message);
+        assert_eq!(read, bytes.len());
+    }
+}
+
+#[test]
 fn protocol_plugin_registers_the_damage_meter_snapshot() {
     let mut app = App::new();
     app.init_resource::<ProtocolHasher>()
@@ -67,4 +97,5 @@ fn protocol_plugin_registers_the_damage_meter_snapshot() {
     app.add_plugins(ProtocolPlugin);
 
     assert!(app.is_message_registered::<DamageMeterSnapshot>());
+    assert!(app.is_message_registered::<ThreatUpdate>());
 }
