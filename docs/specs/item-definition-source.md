@@ -4,11 +4,11 @@ Owned-item wire records distinguish Retail definitions from fixed Forever build 
 
 ## What it must do
 
-- [ ] Serialize exactly the supported sources `Retail` and `Forever70205`; equal authored IDs with different sources remain distinguishable after wire roundtrip.
-- [ ] Preserve source through `ItemStack`, owned bag/equipment snapshots and inventory deltas, including the receiving owner's post-transfer view.
-- [ ] Preserve source through replicated equipment appearance using both derived bitcode and serde wire encoding. An item-bearing entry pairs `item_id: Some(id)` with `definition_source: Some(source)`; display-only entries explicitly carry both as `None`.
-- [ ] Preserve owned source through trade views and auction sell-inventory/listing items.
-- [ ] Reject missing or unknown owned source; equipment appearance must explicitly supply source or null. Never infer source from race or substitute Retail on decode.
+- [x] Serialize exactly the supported sources `Retail` and `Forever70205`; equal authored IDs with different sources remain distinguishable after wire roundtrip.
+- [x] Preserve source through `ItemStack`, owned bag/equipment snapshots and inventory deltas, including the receiving owner's post-transfer view.
+- [x] Preserve source through replicated equipment appearance using both derived bitcode and serde wire encoding. An item-bearing entry pairs `item_id: Some(id)` with `definition_source: Some(source)`; display-only entries explicitly carry both as `None`.
+- [x] Preserve owned source through trade views and auction sell-inventory/listing items.
+- [x] Reject missing or unknown owned source; equipment appearance must explicitly supply source or null. Never infer source from race or substitute Retail on decode.
 
 ## How it works
 
@@ -26,6 +26,8 @@ Owned-item wire records distinguish Retail definitions from fixed Forever build 
 
 - `tests/item_definition_source.rs`: same GUID/ID with different sources, bag/equipment/delta and appearance roundtrips, trade/auction views, missing/unknown-source rejection.
 - Existing inventory, bank, mail and equipment appearance fixtures explicitly choose Retail.
+
+Development proof at `391aace` (2026-10-05): `agent-run shared-item-source cargo test --locked --test item_definition_source` passed 6/6 after behavioral RED; `cargo test --locked --lib protocol::inventory_tests::inventory_snapshots_and_delta_round_trip` through the same runner passed 1/1 and compiled existing unit fixtures. No broad/final gate or client/server integration claim.
 
 ## Known gaps (current cycle)
 
