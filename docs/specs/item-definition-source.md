@@ -28,11 +28,13 @@ Owned-item wire records distinguish Retail definitions from fixed Forever build 
 - `tests/item_definition_source.rs`: same GUID/ID with different sources, bag/equipment/delta and appearance roundtrips, trade/auction/buyback views, missing/null/unknown-source rejection.
 - Existing inventory, bank, mail and equipment appearance fixtures explicitly choose Retail.
 
+Commerce source additions at `55cd79b` have retained 13 passing targeted wire tests (handoff evidence); independent final shared/client/server gates remain open.
+
 Development proof at `391aace` (2026-10-05): `agent-run shared-item-source cargo test --locked --test item_definition_source` passed 6/6 after behavioral RED; `cargo test --locked --lib protocol::inventory_tests::inventory_snapshots_and_delta_round_trip` through the same runner passed 1/1 and compiled existing unit fixtures. No broad/final gate or client/server integration claim.
 
 ## Known gaps (current cycle)
 
-- [ ] Main owns server persistence/constructors, definition catalogs and client lookup integration, including engine IPC ItemInfo query/response metadata. There is no ItemInfo query/response in this shared crate.
+- [ ] Final coordinated client/server integration remains open. Server immutable GUID markers, frozen pre-source character disk DTO and source-qualified runtime catalogs are implemented; engine source-local metadata and explicit IPC query source have bounded CPU proof. These are consumer responsibilities, not wire-roundtrip or native E2E acceptance. There is no ItemInfo query/response in this shared crate.
 - [ ] Producers must keep optional equipment item/source fields paired; the wire record does not validate the pair.
 
 ## Out of scope
