@@ -37,4 +37,13 @@ fn rezrtap_tap_roundtrip_and_viewer_group() {
         bitcode::decode::<UnitTap>(&bitcode::encode(&tap)).unwrap(),
         tap
     );
+    let config = bincode::config::standard();
+    let bytes = bincode::serde::encode_to_vec(&tap, config).unwrap();
+    let (decoded, _): (UnitTap, usize) = bincode::serde::decode_from_slice(&bytes, config).unwrap();
+    assert_eq!(decoded, tap);
+    assert_eq!(
+        bytes.len(),
+        3,
+        "two one-byte character IDs and vector length"
+    );
 }
