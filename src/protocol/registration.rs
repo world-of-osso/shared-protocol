@@ -240,6 +240,12 @@ fn register_reputation_messages(app: &mut App) {
 }
 
 fn register_achievement_messages(app: &mut App) {
+    app.register_protocol_message::<DungeonProgress>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<QueryAchievementCatalog>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<AchievementCatalogPage>()
+        .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<AchievementStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
 }
