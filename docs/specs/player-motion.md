@@ -6,7 +6,7 @@
 
 - [x] Preserve Retail movement bit values, including FALLING (0x800).
 - [x] Carry unjumped FALLING and FALLING with JUMP_STARTED through bitcode and bincode; retain replication registration.
-- [ ] Encode ordinary forward FALLING in 3 bincode bytes and the same flags with jump origin in 9 bytes.
+- [x] Encode ordinary forward FALLING in 3 bincode bytes and the same flags with jump origin in 9 bytes.
 
 ## How it works
 
