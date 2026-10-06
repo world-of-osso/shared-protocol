@@ -115,13 +115,12 @@ impl GuildRankError {
         match self {
             Self::NotInGuild => "You are not in a guild.", // ERR_GUILD_PLAYER_NOT_IN_GUILD
             Self::Permissions => "You don't have permission to do that.", // ERR_GUILD_PERMISSIONS
-            Self::RankTooHigh => "That player's rank is too high.", // ERR_GUILD_RANK_TOO_HIGH
-            Self::RankTooLow => "That player is already at the lowest rank.", // ERR_GUILD_RANK_TOO_LOW
+            Self::RankTooHigh => "That player's rank is too high", // ERR_GUILD_RANK_TOO_HIGH_S (%s = That player)
+            Self::RankTooLow => "That player is already at the lowest rank", // ERR_GUILD_RANK_TOO_LOW_S
             Self::RankInUse => "That guild rank is currently in use.", // ERR_GUILD_RANK_IN_USE
-            Self::TooManyRanks => "You already have too many guild ranks.", // ERR_GUILD_RANKS_TOO_MANY
-            Self::TooFewRanks => "You must have at least 2 guild ranks.", // ERR_GUILD_RANKS_TOO_FEW
-            Self::InvalidName => "Invalid guild rank name.", // ERR_GUILD_RANK_NAME_INVALID
-            Self::MemberNotFound => "That player is not in your guild.", // ERR_GUILD_PLAYER_NOT_IN_GUILD_S (name omitted)
+            Self::TooManyRanks | Self::TooFewRanks => "You don't have permission to do that.", // ERR_GUILD_PERMISSIONS (Retail disables the buttons)
+            Self::InvalidName => "Invalid guild name.", // ERR_GUILD_NAME_INVALID
+            Self::MemberNotFound => "That player is not in your guild.", // ERR_GUILD_PLAYER_NOT_IN_GUILD_S (%s = That player)
             Self::WrongTab => "Incorrect bank tab",                      // ERR_GUILD_BANK_WRONG_TAB
         }
     }
