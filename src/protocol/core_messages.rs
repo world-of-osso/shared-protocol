@@ -20,6 +20,8 @@ pub enum ChatType {
     Yell,
     Party,
     Guild,
+    /// Officer guild channel, gated by per-rank listen/speak rights.
+    Officer,
     Whisper(String),
     Emote,
     /// Server system message (MOTD, announcements).
