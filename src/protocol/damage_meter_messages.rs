@@ -11,6 +11,9 @@ use super::CombatLogEvent;
 /// Export limits shared by the server and client. Older recaps are discarded, not totals.
 pub const DAMAGE_METER_MAX_SOURCES: usize = 40;
 pub const DAMAGE_METER_MAX_SPELLS: usize = 64;
+/// Each action category retains 16 cast/affected spell pairs per member.
+/// Together with damage and recaps, both sessions fit the 256 KiB payload bound.
+pub const DAMAGE_METER_MAX_ACTION_SPELLS: usize = 16;
 pub const DAMAGE_METER_MAX_NAME_BYTES: usize = 48;
 pub const DAMAGE_METER_MAX_DEATH_RECAPS: usize = 2;
 pub const DAMAGE_METER_MAX_RECAP_EVENTS: usize = 8;
@@ -61,11 +64,24 @@ pub struct DamageMeterSource {
     /// Shield points consumed, credited to the shield caster (not damage absorbed by this unit).
     pub absorbs: u64,
     pub interrupts: u64,
+    /// Successful interrupts by casting spell and interrupted spell, highest count first.
+    pub interrupt_spells: Vec<DamageMeterActionSpell>,
     /// Successfully removed auras, not attempted dispel casts.
     pub dispels: u64,
+    /// Successful dispels by casting spell and removed aura, highest count first.
+    pub dispel_spells: Vec<DamageMeterActionSpell>,
     pub deaths: u64,
     /// Latest deaths, chronological; bounded independently of the lifetime death count.
     pub death_recaps: Vec<DamageMeterDeathRecap>,
+}
+
+/// Counted action spells (`combatSpells`) plus the combat log's affected spell identity.
+/// Detail is bounded independently of category totals; absent affected identity stays absent.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct DamageMeterActionSpell {
+    pub spell_id: u32,
+    pub affected_spell_id: Option<u32>,
+    pub total_amount: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]

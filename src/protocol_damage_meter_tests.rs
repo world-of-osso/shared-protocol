@@ -37,6 +37,15 @@ fn damage_meter_maximum_snapshot_fits_payload_bound() {
     source.interrupts = u64::MAX;
     source.dispels = u64::MAX;
     source.deaths = u64::MAX;
+    source.interrupt_spells = vec![
+        DamageMeterActionSpell {
+            spell_id: u32::MAX,
+            affected_spell_id: Some(u32::MAX),
+            total_amount: u64::MAX,
+        };
+        DAMAGE_METER_MAX_ACTION_SPELLS
+    ];
+    source.dispel_spells = source.interrupt_spells.clone();
     source.spells = vec![
         DamageMeterSpell {
             spell_id: u32::MAX,
@@ -65,6 +74,7 @@ fn damage_meter_maximum_snapshot_fits_payload_bound() {
         "{} bytes",
         bytes.len()
     );
+    println!("maximum damage meter snapshot: {} bytes", bytes.len());
     let (decoded, read): (DamageMeterSnapshot, usize) =
         bincode::serde::decode_from_slice(&bytes, config).unwrap();
     assert_eq!(read, bytes.len());
@@ -88,7 +98,17 @@ fn frostbolt_session(session_id: u32, duration_secs: f32, active: bool) -> Damag
             overhealing: 40,
             absorbs: 25,
             interrupts: 2,
+            interrupt_spells: vec![DamageMeterActionSpell {
+                spell_id: 2139,
+                affected_spell_id: Some(116),
+                total_amount: 2,
+            }],
             dispels: 3,
+            dispel_spells: vec![DamageMeterActionSpell {
+                spell_id: 527,
+                affected_spell_id: Some(589),
+                total_amount: 3,
+            }],
             deaths: 1,
             death_recaps: vec![DamageMeterDeathRecap {
                 timestamp_unix_ms: 1234,
