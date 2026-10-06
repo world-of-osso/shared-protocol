@@ -30,6 +30,16 @@ fn player_motion_contains_only_its_set_flags() {
     assert!(!strafing_jump.contains(PlayerMotion::FORWARD | PlayerMotion::FALLING));
 }
 
+#[test]
+fn player_motion_airborne_wire_cost_is_bounded() {
+    let encode = |flags| {
+        bincode::serde::encode_to_vec(PlayerMotion(flags), bincode::config::standard()).unwrap()
+    };
+    let walkoff = PlayerMotion::FORWARD | PlayerMotion::FALLING;
+    assert_eq!(encode(walkoff).len(), 3);
+    assert_eq!(encode(walkoff | PlayerMotion::JUMP_STARTED).len(), 9);
+}
+
 /// A backpedalling walker swimming and a strafing jumper survive both component encodings
 /// (bitcode for replication, bincode serde for the wire) and replicate.
 #[test]
