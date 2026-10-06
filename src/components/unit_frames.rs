@@ -330,7 +330,8 @@ pub enum CreatureMotion {
 /// `SMSG_MOVE_UPDATE` the server rebroadcasts from a player's `CMSG_MOVE_*`
 /// (TrinityCore `HandleMovementOpcode`). Bits keep TrinityCore `MovementFlags` values
 /// (MovementInfo.h); other clients pick the remote unit's animation from them. The server
-/// sets it from each applied `PlayerInput`.
+/// sets direction/modes from each applied `PlayerInput` and airborne state from gravity.
+/// `JUMP_STARTED` is a project marker, not a Retail movement flag.
 #[derive(
     Component,
     Reflect,
@@ -354,8 +355,12 @@ impl PlayerMotion {
     pub const STRAFE_RIGHT: u64 = 0x0000_0008;
     /// Walk mode (run toggled off).
     pub const WALKING: u64 = 0x0000_0100;
-    /// Airborne: a jump until it lands.
+    /// Airborne under gravity, whether a jump or an unjumped fall.
     pub const FALLING: u64 = 0x0000_0800;
+    /// This airborne interval began with a jump; cleared on landing, swimming or flight.
+    /// Project-only bit outside Retail's defined flags. Retail carries jump origin in
+    /// CMSG_MOVE_JUMP, not FALLING_FAR (which describes a falling phase, not its origin).
+    pub const JUMP_STARTED: u64 = 0x8000_0000_0000_0000;
     pub const SWIMMING: u64 = 0x0010_0000;
     /// The unit may fly: set by the server while a SPELL_AURA_FLY (201) or
     /// SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED (207) aura is on it (`Unit::SetCanFly`).
