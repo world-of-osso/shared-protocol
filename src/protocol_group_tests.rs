@@ -80,6 +80,7 @@ fn roster_portrait_round_trips_on_the_wire() {
         ready_count: 1,
         total_count: 2,
         members: vec![GroupMemberSnapshot {
+            character_id: 42,
             name: "Alice".into(),
             role: GroupRoleSnapshot::Tank,
             is_leader: true,

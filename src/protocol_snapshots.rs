@@ -79,6 +79,8 @@ pub struct GroupPortraitAppearance {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct GroupMemberSnapshot {
+    /// Stable identity for tap eligibility, including offline/out-of-interest members.
+    pub character_id: u64,
     pub name: String,
     pub role: GroupRoleSnapshot,
     pub is_leader: bool,

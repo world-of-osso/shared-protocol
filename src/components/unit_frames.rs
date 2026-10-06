@@ -261,7 +261,7 @@ impl UnitFlags {
 )]
 pub struct UnitThreatList(pub Vec<u64>);
 
-/// Server entity bits of eligible creature tappers. Empty means unclaimed.
+/// Stable character IDs of eligible creature tappers. Empty means unclaimed.
 /// Clients compare against their local player and current group roster.
 #[derive(
     Component,
