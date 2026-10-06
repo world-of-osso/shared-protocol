@@ -89,7 +89,7 @@ fn roster_portrait_round_trips_on_the_wire() {
             level: 80,
             entity: Some(42),
             portrait: GroupPortraitAppearance {
-                race: 4,
+                race: 52,
                 appearance: crate::components::CharacterAppearance {
                     sex: 1,
                     skin_color: 3,
@@ -102,7 +102,20 @@ fn roster_portrait_round_trips_on_the_wire() {
                         option_id: 101,
                         choice_id: 202,
                     }],
-                    visage: None,
+                    visage: Some(crate::components::FormAppearance {
+                        skin_color: 6,
+                        face: 4,
+                        eye_color: 3,
+                        hair_style: 2,
+                        hair_color: 1,
+                        facial_style: 5,
+                        customization_choices: vec![
+                            crate::components::CustomizationChoiceSelection {
+                                option_id: 303,
+                                choice_id: 404,
+                            },
+                        ],
+                    }),
                 },
                 head: Some(crate::components::EquippedAppearanceEntry {
                     slot: crate::components::EquipmentVisualSlot::Head,
@@ -116,10 +129,15 @@ fn roster_portrait_round_trips_on_the_wire() {
         loot_method: LootMode::RoundRobin,
     };
     let config = bincode::config::standard();
-    let bytes = bincode::serde::encode_to_vec(&roster, config).unwrap();
-    let (decoded, _): (GroupRosterSnapshot, usize) =
-        bincode::serde::decode_from_slice(&bytes, config).unwrap();
-    assert_eq!(decoded, roster);
+    let mut roster = roster;
+    for head in [roster.members[0].portrait.head.clone(), None] {
+        roster.members[0].portrait.head = head;
+        let bytes = bincode::serde::encode_to_vec(&roster, config).unwrap();
+        let (decoded, consumed): (GroupRosterSnapshot, usize) =
+            bincode::serde::decode_from_slice(&bytes, config).unwrap();
+        assert_eq!(consumed, bytes.len());
+        assert_eq!(decoded, roster);
+    }
 }
 
 #[test]
