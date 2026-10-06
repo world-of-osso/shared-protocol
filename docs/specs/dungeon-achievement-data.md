@@ -4,10 +4,10 @@ Phase-2 wire contract in `src/protocol/achievement_catalog_messages.rs`. Server 
 
 ## What it must do
 
-- [ ] Round-trip DungeonProgress copy identity, ordered named encounters, defeated state, unknown/known optionality and raw flags.
-- [ ] Round-trip each QueryAchievementCatalog variant and response variant, including continuation IDs, signed category parents, earned UTC dates and u64 criterion counters.
-- [ ] Register DungeonProgress server-to-client on InstanceChannel; catalog request/response on AchievementChannel.
-- [ ] Bound server catalog pages to 32 categories / 8 achievements / 16 criterion lines; metadata names/criterion descriptions 256 bytes and achievement descriptions 2048 bytes.
+- [x] Round-trip DungeonProgress copy identity, ordered named encounters, defeated state, unknown optionality and raw flags.
+- [x] Round-trip each QueryAchievementCatalog variant and response variant, including continuation IDs, category parents, earned UTC dates and u64 criterion counters.
+- [x] Register DungeonProgress server-to-client on InstanceChannel; catalog request/response on AchievementChannel.
+- [x] Bound server catalog pages to 32 categories / 8 achievements / 16 criterion lines; metadata names/criterion descriptions 256 bytes and achievement descriptions 2048 bytes.
 
 ## How it works
 
@@ -28,7 +28,7 @@ Phase-2 wire contract in `src/protocol/achievement_catalog_messages.rs`. Server 
 
 ## Known gaps (current cycle)
 
-Targeted tests pending; client implementation follows separately.
+Four targeted wire tests pass at `f115ea5`; the maximum category page is 56,397 bytes. Server host fixtures exercise actual delivery and pagination. Client implementation follows separately; no optional DB2 flag interpretation is invented.
 
 ## Out of scope
 
