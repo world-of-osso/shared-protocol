@@ -6,6 +6,17 @@
 
 use serde::{Deserialize, Serialize};
 
+use super::CombatLogEvent;
+
+/// Export limits shared by the server and client. Older recaps are discarded, not totals.
+pub const DAMAGE_METER_MAX_SOURCES: usize = 40;
+pub const DAMAGE_METER_MAX_SPELLS: usize = 64;
+pub const DAMAGE_METER_MAX_NAME_BYTES: usize = 48;
+pub const DAMAGE_METER_MAX_DEATH_RECAPS: usize = 2;
+pub const DAMAGE_METER_MAX_RECAP_EVENTS: usize = 8;
+/// Conservative upper bound for the standard bincode snapshot payload (before framing).
+pub const DAMAGE_METER_MAX_PAYLOAD_BYTES: usize = 256 * 1024;
+
 /// Owner-only snapshot of the two session types a window can show
 /// (`Enum.DamageMeterSessionType`: `Overall` 0, `Current` 1).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
@@ -30,7 +41,7 @@ pub struct DamageMeterSession {
     pub sources: Vec<DamageMeterSource>,
 }
 
-/// `DamageMeterCombatSource`: one player's damage in a session.
+/// `DamageMeterCombatSource`: one player's category totals in a session.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct DamageMeterSource {
     /// Server entity bits (`sourceGUID`).
@@ -44,6 +55,24 @@ pub struct DamageMeterSource {
     pub amount_per_second: f32,
     /// `DamageMeterCombatSessionSource.combatSpells`, highest `total_amount` first.
     pub spells: Vec<DamageMeterSpell>,
+    /// Effective healing: logged amount minus overheal, clamped to zero.
+    pub healing_done: u64,
+    pub overhealing: u64,
+    /// Shield points consumed, credited to the shield caster (not damage absorbed by this unit).
+    pub absorbs: u64,
+    pub interrupts: u64,
+    /// Successfully removed auras, not attempted dispel casts.
+    pub dispels: u64,
+    pub deaths: u64,
+    /// Latest deaths, chronological; bounded independently of the lifetime death count.
+    pub death_recaps: Vec<DamageMeterDeathRecap>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct DamageMeterDeathRecap {
+    pub timestamp_unix_ms: u64,
+    /// Last events targeting the victim, chronological, excluding the Death line itself.
+    pub events: Vec<CombatLogEvent>,
 }
 
 /// `DamageMeterCombatSpell`: one spell's damage by one source.
