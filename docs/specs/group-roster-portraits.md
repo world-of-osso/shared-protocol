@@ -4,10 +4,10 @@ The group roster carries enough character appearance to build a member's head wi
 
 ## What it must do
 
-- [ ] `GroupMemberSnapshot.portrait` carries `race`, canonical `appearance: CharacterAppearance`, and `head: Option<EquippedAppearanceEntry>`.
-- [ ] Serialization preserves sex, core face/skin/eye/hair/facial selectors, stable customization option/choice IDs, alternate-form selections, and head item/display/hidden state.
-- [ ] Every roster includes each member's last known portrait, including offline members, independent of zone or replication interest.
-- [ ] Joining, relogging, changing character appearance, or changing/removing/hiding head equipment sends a roster; unchanged portraits and non-head equipment do not cause periodic portrait messages.
+- [x] `GroupMemberSnapshot.portrait` carries `race`, canonical `appearance: CharacterAppearance`, and `head: Option<EquippedAppearanceEntry>`.
+- [x] Serialization preserves sex, core face/skin/eye/hair/facial selectors, stable customization option/choice IDs, alternate-form selections, and head item/display/hidden state.
+- [x] Every roster includes each member's last known portrait, including offline members, independent of zone or replication interest.
+- [x] Joining, relogging, changing character appearance, or changing/removing/hiding head equipment sends a roster; unchanged portraits and non-head equipment do not cause periodic portrait messages.
 
 ## How it works
 
@@ -22,6 +22,7 @@ The group roster carries enough character appearance to build a member's head wi
 
 - `src/protocol_group_tests.rs::roster_portrait_round_trips_on_the_wire`.
 - game-server `crates/server/src/group/tests.rs`: `roster_portrait_*` loopback delivery tests.
+- Verified 2026-10-06: protocol `e0a6d19` round trip passes (1/1); server `cb40477` roster fixtures pass (4/4), including actual persisted head-item equip through inventory networking. Both use the locked, capped local server-build helper.
 
 ## Known gaps (current cycle)
 
