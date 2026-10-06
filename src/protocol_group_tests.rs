@@ -74,7 +74,7 @@ fn group_member_states_round_trip_on_the_wire() {
 }
 
 #[test]
-fn group_roster_round_trips_on_the_wire() {
+fn roster_portrait_round_trips_on_the_wire() {
     let roster = GroupRosterSnapshot {
         is_raid: true,
         ready_count: 1,
@@ -88,14 +88,56 @@ fn group_roster_round_trips_on_the_wire() {
             class: 2,
             level: 80,
             entity: Some(42),
+            portrait: GroupPortraitAppearance {
+                race: 52,
+                appearance: crate::components::CharacterAppearance {
+                    sex: 1,
+                    skin_color: 3,
+                    face: 2,
+                    eye_color: 5,
+                    hair_style: 7,
+                    hair_color: 8,
+                    facial_style: 4,
+                    customization_choices: vec![crate::components::CustomizationChoiceSelection {
+                        option_id: 101,
+                        choice_id: 202,
+                    }],
+                    visage: Some(crate::components::FormAppearance {
+                        skin_color: 6,
+                        face: 4,
+                        eye_color: 3,
+                        hair_style: 2,
+                        hair_color: 1,
+                        facial_style: 5,
+                        customization_choices: vec![
+                            crate::components::CustomizationChoiceSelection {
+                                option_id: 303,
+                                choice_id: 404,
+                            },
+                        ],
+                    }),
+                },
+                head: Some(crate::components::EquippedAppearanceEntry {
+                    slot: crate::components::EquipmentVisualSlot::Head,
+                    item_id: Some(19019),
+                    display_info_id: Some(12345),
+                    inventory_type: 1,
+                    hidden: true,
+                }),
+            },
         }],
         loot_method: LootMode::RoundRobin,
     };
     let config = bincode::config::standard();
-    let bytes = bincode::serde::encode_to_vec(&roster, config).unwrap();
-    let (decoded, _): (GroupRosterSnapshot, usize) =
-        bincode::serde::decode_from_slice(&bytes, config).unwrap();
-    assert_eq!(decoded, roster);
+    let mut roster = roster;
+    for head in [roster.members[0].portrait.head.clone(), None] {
+        roster.members[0].portrait.head = head;
+        let bytes = bincode::serde::encode_to_vec(&roster, config).unwrap();
+        let (decoded, consumed): (GroupRosterSnapshot, usize) =
+            bincode::serde::decode_from_slice(&bytes, config).unwrap();
+        assert_eq!(consumed, bytes.len());
+        assert_eq!(decoded, roster);
+    }
 }
 
 #[test]
