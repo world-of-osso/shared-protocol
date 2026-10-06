@@ -74,7 +74,7 @@ fn group_member_states_round_trip_on_the_wire() {
 }
 
 #[test]
-fn group_roster_round_trips_on_the_wire() {
+fn roster_portrait_round_trips_on_the_wire() {
     let roster = GroupRosterSnapshot {
         is_raid: true,
         ready_count: 1,
@@ -88,6 +88,30 @@ fn group_roster_round_trips_on_the_wire() {
             class: 2,
             level: 80,
             entity: Some(42),
+            portrait: GroupPortraitAppearance {
+                race: 4,
+                appearance: crate::components::CharacterAppearance {
+                    sex: 1,
+                    skin_color: 3,
+                    face: 2,
+                    eye_color: 5,
+                    hair_style: 7,
+                    hair_color: 8,
+                    facial_style: 4,
+                    customization_choices: vec![crate::components::CustomizationChoiceSelection {
+                        option_id: 101,
+                        choice_id: 202,
+                    }],
+                    visage: None,
+                },
+                head: Some(crate::components::EquippedAppearanceEntry {
+                    slot: crate::components::EquipmentVisualSlot::Head,
+                    item_id: Some(19019),
+                    display_info_id: Some(12345),
+                    inventory_type: 1,
+                    hidden: true,
+                }),
+            },
         }],
         loot_method: LootMode::RoundRobin,
     };

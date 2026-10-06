@@ -68,6 +68,15 @@ pub struct GroupRosterSnapshot {
     pub loot_method: crate::loot::LootMode,
 }
 
+/// Canonical head customization and only the equipped head visual, independent of
+/// entity replication. Stable customization IDs cannot be classified by the server.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Default)]
+pub struct GroupPortraitAppearance {
+    pub race: u8,
+    pub appearance: crate::components::CharacterAppearance,
+    pub head: Option<crate::components::EquippedAppearanceEntry>,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct GroupMemberSnapshot {
     pub name: String,
@@ -80,6 +89,8 @@ pub struct GroupMemberSnapshot {
     pub level: u8,
     /// Player entity bits while the member is in the world.
     pub entity: Option<u64>,
+    /// Last known head appearance, retained while offline or outside interest.
+    pub portrait: GroupPortraitAppearance,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
