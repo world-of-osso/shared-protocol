@@ -11,6 +11,7 @@ use crate::components::{
     WorldArrival, Zone,
 };
 
+mod achievement_catalog_messages;
 mod bank_messages;
 mod channels;
 mod core_messages;
@@ -42,6 +43,7 @@ mod trainer_messages;
 mod transfer_messages;
 mod world_time_messages;
 
+pub use achievement_catalog_messages::*;
 pub use bank_messages::*;
 pub use channels::*;
 pub use core_messages::*;
