@@ -1,5 +1,5 @@
 //! Retail's built-in damage meter (`Blizzard_DamageMeter`, `C_DamageMeter`): the server
-//! accumulates the damage done by the recipient and its group and sends each owner its
+//! accumulates combat category totals for the recipient and its group and sends each owner its
 //! sessions. The Retail UI never reads combat log events; it only asks `C_DamageMeter`
 //! for aggregated sessions (`GetCombatSessionFromType`, DamageMeterSessionWindow.lua
 //! 561-579), so the aggregation is not client Lua.
