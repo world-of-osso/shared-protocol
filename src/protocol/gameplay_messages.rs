@@ -567,6 +567,23 @@ pub struct BarberShopStateUpdate {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct QueryDeathStatus;
 
+/// Owner-only offer, valid for `time_left_ms` after receipt.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ResurrectionOffer {
+    pub caster: u64,
+    pub caster_name: String,
+    pub spell_id: u32,
+    pub time_left_ms: u32,
+}
+
+/// Echo the offer identity so a stale popup cannot accept a different caster's offer.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ResurrectionResponse {
+    pub caster: u64,
+    pub spell_id: u32,
+    pub accept: bool,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ReleaseSpirit;
 

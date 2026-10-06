@@ -338,6 +338,10 @@ fn register_barber_shop_messages(app: &mut App) {
 }
 
 fn register_death_messages(app: &mut App) {
+    app.register_protocol_message::<ResurrectionOffer>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<ResurrectionResponse>()
+        .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<QueryDeathStatus>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<ReleaseSpirit>()

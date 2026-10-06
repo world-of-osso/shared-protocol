@@ -261,6 +261,31 @@ impl UnitFlags {
 )]
 pub struct UnitThreatList(pub Vec<u64>);
 
+/// Server entity bits of eligible creature tappers. Empty means unclaimed.
+/// Clients compare against their local player and current group roster.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    Default,
+)]
+pub struct UnitTap(pub Vec<u64>);
+
+impl UnitTap {
+    pub fn denied(&self, viewer: u64, group: &[u64]) -> bool {
+        !self.0.is_empty()
+            && !self.0.contains(&viewer)
+            && !group.iter().any(|member| self.0.contains(member))
+    }
+}
+
 /// Entity bits of the unit's current target (`None` = no target), for target-of-target.
 #[derive(
     Component,

@@ -7,8 +7,8 @@ use crate::components::{
     EquipmentAppearance, Gold, GuildMembership, Health, Mana, ModelDisplay, Mounted,
     MovementControl, MovementSpeed, Npc, Player, PlayerMotion, PlayerStandState, Position,
     PresenceStatus, Rotation, UnitAuras, UnitFactionTemplate, UnitFlags, UnitLevel, UnitPose,
-    UnitPowers, UnitRunes, UnitStats, UnitSummonedBy, UnitTarget, UnitThreatList, UnitVignette,
-    WorldArrival, Zone,
+    UnitPowers, UnitRunes, UnitStats, UnitSummonedBy, UnitTap, UnitTarget, UnitThreatList,
+    UnitVignette, WorldArrival, Zone,
 };
 
 mod achievement_catalog_messages;
@@ -146,6 +146,7 @@ fn register_replicated_components(app: &mut App) {
     app.protocol_component::<PlayerMotion>().replicate();
     app.protocol_component::<UnitPose>().replicate();
     app.protocol_component::<UnitThreatList>().replicate();
+    app.protocol_component::<UnitTap>().replicate();
     app.protocol_component::<UnitRunes>().replicate();
     // The character sheet's stats: the server shows them to the owning client only.
     app.protocol_component::<UnitStats>().replicate();
