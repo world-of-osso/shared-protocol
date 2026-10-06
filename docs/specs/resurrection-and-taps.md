@@ -4,11 +4,11 @@ Shared wire contract for player resurrection consent and viewer-relative creatur
 
 ## What it must do
 
-- [ ] Server-to-client `ResurrectionOffer` carries caster entity/name, spell and remaining milliseconds on DeathChannel.
-- [ ] Client-to-server `ResurrectionResponse` identifies the caster/spell offer and acceptance or decline on DeathChannel.
-- [ ] Replicated `UnitTap` contains stable character IDs; absent/empty means untapped. The viewer or any current group member being a tapper exempts that viewer from denial.
-- [ ] Group roster entries carry stable character IDs independently of entity visibility/online state.
-- [ ] Both message directions and tap membership round-trip without loss.
+- [x] Server-to-client `ResurrectionOffer` carries caster entity/name, spell and remaining milliseconds on DeathChannel.
+- [x] Client-to-server `ResurrectionResponse` identifies the caster/spell offer and acceptance or decline on DeathChannel.
+- [x] Replicated `UnitTap` contains stable character IDs; absent/empty means untapped. The viewer or any current group member being a tapper exempts that viewer from denial.
+- [x] Group roster entries carry stable character IDs independently of entity visibility/online state.
+- [x] Both message directions and tap membership round-trip without loss.
 
 ## How it works
 
@@ -30,7 +30,7 @@ Shared wire contract for player resurrection consent and viewer-relative creatur
 
 ## Known gaps (current cycle)
 
-- [ ] Updated targeted tests pending.
+None in the requested wire scope. Targeted offer/tap tests pass 2/2 and roster wire test passes 1/1 at `566d820`; logs `/tmp/claude/rezrtap-protocol-{final,roster}.out`.
 
 ## Out of scope
 
