@@ -214,7 +214,7 @@ fn auction_query_layout_traces_subcategory_alternatives_and_new_sorts() {
         layout_hash::<BeforeSort>(),
         layout_hash::<AuctionSortField>()
     );
-    assert_eq!(
+    assert_ne!(
         layout_hash::<QueryAuctionBrowse>(),
         layout_hash::<QueryAuctions>()
     );
