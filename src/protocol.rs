@@ -120,6 +120,7 @@ fn register_replicated_components(app: &mut App) {
     app.protocol_component::<Mana>().replicate();
     app.protocol_component::<Gold>().replicate();
     app.protocol_component::<Player>().replicate();
+    app.protocol_component::<ActiveSpec>().replicate();
     app.protocol_component::<Npc>().replicate();
     app.protocol_component::<ModelDisplay>().replicate();
     app.protocol_component::<Rotation>().replicate();

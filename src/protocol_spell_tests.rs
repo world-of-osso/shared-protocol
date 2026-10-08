@@ -391,6 +391,8 @@ fn trait_and_specialization_messages_round_trip() {
     });
     assert_wire_round_trip(&SpecializationChanged { spec_id: 66 });
     assert_wire_round_trip(&SetSpecialization { spec_id: 65 });
+    // ChrSpecialization 72: Fury Warrior.
+    assert_wire_round_trip(&crate::components::ActiveSpec(72));
     assert_wire_round_trip(&CancelAura { spell_id: 1_459 });
     assert_wire_round_trip(&CancelMountAura);
 }
@@ -412,6 +414,7 @@ fn protocol_plugin_registers_spell_components_and_messages() {
     assert!(components.is_registered::<crate::level_scaling::LevelScaling>());
     assert!(components.is_registered::<UnitFactionTemplate>());
     assert!(components.is_registered::<UnitTarget>());
+    assert!(components.is_registered::<crate::components::ActiveSpec>());
 
     assert!(app.is_message_registered::<KnownSpellsSnapshot>());
     assert!(app.is_message_registered::<SpellsLearned>());

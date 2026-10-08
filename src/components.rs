@@ -412,6 +412,23 @@ pub struct Player {
     pub appearance: CharacterAppearance,
 }
 
+/// A player's active `ChrSpecialization` ID; 0 when the class has no spec data.
+/// Visible to every client, as TrinityCore's `UF::PlayerData::CurrentSpecID`.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+)]
+pub struct ActiveSpec(pub u32);
+
 #[derive(
     Reflect,
     Serialize,
