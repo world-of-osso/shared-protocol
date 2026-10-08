@@ -73,7 +73,7 @@ pub struct BuybackItem {
     pub price: u32,
 }
 
-/// The player's filled buyback slots in slot order.
+/// The player's filled buyback slots, oldest sale first.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Default)]
 pub struct BuybackList {
     pub items: Vec<BuybackItem>,

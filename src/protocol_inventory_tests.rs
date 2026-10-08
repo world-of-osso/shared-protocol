@@ -106,6 +106,42 @@ fn inventory_requests_and_error_round_trip() {
 }
 
 #[test]
+fn bank_locations_round_trip_through_swap_split_and_delta() {
+    let last_slot = ItemLocation::Bank {
+        tab: 5,
+        slot: (BANK_TAB_SLOTS - 1) as u8,
+    };
+    let bank = ItemLocation::Bank { tab: 0, slot: 3 };
+    let bag = ItemLocation::Bag { bag: 0, slot: 3 };
+    assert_ne!(bank, bag);
+    assert_wire_round_trip(&SwapItem {
+        from: bag,
+        to: last_slot,
+    });
+    assert_wire_round_trip(&SwapItem {
+        from: bank,
+        to: ItemLocation::Bank { tab: 1, slot: 0 },
+    });
+    assert_wire_round_trip(&SplitItem {
+        from: last_slot,
+        to: bag,
+        count: 7,
+    });
+    assert_wire_round_trip(&InventoryDelta {
+        changes: vec![
+            InventorySlotChange {
+                location: bank,
+                item: Some(linen(12)),
+            },
+            InventorySlotChange {
+                location: bag,
+                item: None,
+            },
+        ],
+    });
+}
+
+#[test]
 fn inventory_errors_use_retail_wording() {
     assert_eq!(
         InventoryErrorReason::WrongSlot.message(),
