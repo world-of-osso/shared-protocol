@@ -153,6 +153,8 @@ fn register_replicated_components(app: &mut App) {
     app.protocol_component::<CombatRatings>().replicate();
     app.protocol_component::<DerivedStats>().replicate();
     app.protocol_component::<PlayerStandState>().replicate();
+    app.protocol_component::<crate::death::DeathState>()
+        .replicate();
     app.protocol_component::<CreatureClassification>()
         .replicate();
     app.protocol_component::<UnitVignette>().replicate();
