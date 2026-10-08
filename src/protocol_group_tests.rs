@@ -124,6 +124,7 @@ fn roster_portrait_round_trips_on_the_wire() {
                     display_info_id: Some(12345),
                     inventory_type: 1,
                     hidden: true,
+                    definition_source: Some(crate::item_data::ItemDefinitionSource::Retail),
                 }),
             },
         }],
