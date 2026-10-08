@@ -3,7 +3,7 @@ use bevy::prelude::*;
 pub use crate::protocol_snapshots::*;
 
 use crate::components::{
-    CombatRatings, CombatStatus, CreatureClassification, CreatureMotion, DerivedStats,
+    ActiveSpec, CombatRatings, CombatStatus, CreatureClassification, CreatureMotion, DerivedStats,
     EquipmentAppearance, Gold, GuildMembership, Health, Mana, ModelDisplay, Mounted,
     MovementControl, MovementSpeed, Npc, Player, PlayerMotion, PlayerStandState, Position,
     PresenceStatus, Rotation, UnitAuras, UnitFactionTemplate, UnitFlags, UnitLevel, UnitPose,
