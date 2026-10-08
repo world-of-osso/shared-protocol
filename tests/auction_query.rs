@@ -1,5 +1,6 @@
 use shared::protocol::{
-    AuctionBrowseItem, AuctionBrowseResults, AuctionSearchQuery, QueryAuctionBrowse,
+    AuctionBrowseItem, AuctionBrowseResults, AuctionItemFilter, AuctionSearchQuery,
+    AuctionSortField, QueryAuctionBrowse, QueryAuctions,
 };
 
 #[test]
@@ -45,7 +46,7 @@ fn auction_query_preserves_exact_item_and_category_filters_on_wire() {
         "text": "leather", "page": 1, "page_size": 50,
         "min_level": null, "max_level": null, "quality": null,
         "usable_only": false, "sort_field": "Buyout", "sort_dir": "Asc",
-        "faction": 0, "item_id": 2318, "class_id": 7
+        "faction": 0, "item_id": 2318, "class_id": 7, "subcategory_filters": []
     });
     let query: AuctionSearchQuery = serde_json::from_value(input.clone()).unwrap();
     assert_eq!(serde_json::to_value(&query).unwrap(), input);
@@ -55,4 +56,47 @@ fn auction_query_preserves_exact_item_and_category_filters_on_wire() {
         bincode::serde::decode_from_slice(&bytes, config).unwrap();
     assert_eq!(decoded, query);
     assert_eq!(used, bytes.len());
+}
+
+#[test]
+fn subcategory_and_bid_quantity_sorts_round_trip_in_existing_queries() {
+    for sort_field in [AuctionSortField::Bid, AuctionSortField::Quantity] {
+        let query = AuctionSearchQuery {
+            sort_field,
+            class_id: Some(4),
+            subcategory_filters: vec![
+                AuctionItemFilter {
+                    class_id: 4,
+                    subclass_id: Some(1),
+                    inventory_type: Some(5),
+                },
+                AuctionItemFilter {
+                    class_id: 4,
+                    subclass_id: Some(1),
+                    inventory_type: Some(20),
+                },
+            ],
+            page: 1,
+            ..Default::default()
+        };
+        let browse = QueryAuctionBrowse {
+            query: query.clone(),
+        };
+        let items = QueryAuctions { query };
+        let config = bincode::config::standard();
+        let bytes = bincode::serde::encode_to_vec(&browse, config).unwrap();
+        let (decoded, used): (QueryAuctionBrowse, usize) =
+            bincode::serde::decode_from_slice(&bytes, config).unwrap();
+        assert_eq!(decoded, browse);
+        assert_eq!(used, bytes.len());
+        let bytes = bincode::serde::encode_to_vec(&items, config).unwrap();
+        let (decoded, used): (QueryAuctions, usize) =
+            bincode::serde::decode_from_slice(&bytes, config).unwrap();
+        assert_eq!(decoded, items);
+        assert_eq!(used, bytes.len());
+        assert_eq!(
+            serde_json::from_value::<QueryAuctions>(serde_json::to_value(&items).unwrap()).unwrap(),
+            items
+        );
+    }
 }

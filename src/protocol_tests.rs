@@ -167,6 +167,7 @@ fn sample_auction_query() -> AuctionSearchQuery {
     AuctionSearchQuery {
         item_id: None,
         class_id: None,
+        subcategory_filters: Vec::new(),
         text: "linen".into(),
         page: 0,
         page_size: 20,

@@ -159,3 +159,63 @@ fn nested_enum_changes_change_the_layout() {
     assert_ne!(before, layout_hash::<added_nested_variant::Probe>());
     assert_ne!(before, layout_hash::<added_variant_field::Probe>());
 }
+
+#[test]
+fn auction_query_layout_traces_subcategory_alternatives_and_new_sorts() {
+    use crate::protocol::{
+        AuctionItemFilter, AuctionSearchQuery, AuctionSortField, QueryAuctionBrowse, QueryAuctions,
+    };
+    #[derive(Serialize, serde::Deserialize)]
+    struct BeforeQuery {
+        item_id: Option<u32>,
+        class_id: Option<u8>,
+        text: String,
+        page: u32,
+        page_size: u32,
+        min_level: Option<u16>,
+        max_level: Option<u16>,
+        quality: Option<u8>,
+        usable_only: bool,
+        sort_field: BeforeSort,
+        sort_dir: crate::protocol::AuctionSortDir,
+        faction: u8,
+    }
+    #[derive(Serialize, serde::Deserialize)]
+    enum BeforeSort {
+        Name,
+        MinBid,
+        Buyout,
+        TimeLeft,
+        Quality,
+        RequiredLevel,
+    }
+    #[derive(Serialize, serde::Deserialize)]
+    struct WithFilters {
+        item_id: Option<u32>,
+        class_id: Option<u8>,
+        subcategory_filters: Vec<AuctionItemFilter>,
+        text: String,
+        page: u32,
+        page_size: u32,
+        min_level: Option<u16>,
+        max_level: Option<u16>,
+        quality: Option<u8>,
+        usable_only: bool,
+        sort_field: BeforeSort,
+        sort_dir: crate::protocol::AuctionSortDir,
+        faction: u8,
+    }
+    assert_ne!(layout_hash::<BeforeQuery>(), layout_hash::<WithFilters>());
+    assert_ne!(
+        layout_hash::<WithFilters>(),
+        layout_hash::<AuctionSearchQuery>()
+    );
+    assert_ne!(
+        layout_hash::<BeforeSort>(),
+        layout_hash::<AuctionSortField>()
+    );
+    assert_ne!(
+        layout_hash::<QueryAuctionBrowse>(),
+        layout_hash::<QueryAuctions>()
+    );
+}
