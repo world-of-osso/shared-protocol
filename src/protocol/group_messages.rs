@@ -111,6 +111,38 @@ impl RaidTargetIcons {
     }
 }
 
+/// Half the side of a world map in yards (TrinityCore `MAP_HALFSIZE`, 32 grids × 533.33):
+/// valid world x/y lie in `-MINIMAP_PING_MAP_HALFSIZE..=MINIMAP_PING_MAP_HALFSIZE`.
+pub const MINIMAP_PING_MAP_HALFSIZE: f32 = 17_066.666;
+
+/// Client pings its minimap at world position `x`/`y` on its current map
+/// (`Minimap:PingLocation`; TrinityCore `CMSG_MINIMAP_PING`).
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq)]
+pub struct MinimapPingRequest {
+    pub x: f32,
+    pub y: f32,
+}
+
+impl MinimapPingRequest {
+    /// Finite and inside the map (`MINIMAP_PING_MAP_HALFSIZE`).
+    pub fn is_valid(&self) -> bool {
+        [self.x, self.y]
+            .iter()
+            .all(|v| v.is_finite() && v.abs() <= MINIMAP_PING_MAP_HALFSIZE)
+    }
+}
+
+/// A group member pinged the minimap at world `x`/`y` (TrinityCore `SMSG_MINIMAP_PING`,
+/// Retail `MINIMAP_PING` event). Sent to the sender's other group members only.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct MinimapPing {
+    /// Server entity bits of the pinging player.
+    pub sender: u64,
+    pub sender_name: String,
+    pub x: f32,
+    pub y: f32,
+}
+
 /// Server asks the invitee to accept a party invite: the `PARTY_INVITE` popup data.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct GroupInvitePrompt {
@@ -302,6 +334,7 @@ pub(super) fn register_group_messages(app: &mut App) {
     for_client::<StartReadyCheck>(app);
     for_client::<RespondReadyCheck>(app);
     for_client::<SetRaidTarget>(app);
+    for_client::<MinimapPingRequest>(app);
     app.register_protocol_message::<GroupInvitePrompt>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<GroupInviteCancelled>()
@@ -311,6 +344,8 @@ pub(super) fn register_group_messages(app: &mut App) {
     app.register_protocol_message::<ReadyCheckUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<RaidTargetIcons>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<MinimapPing>()
         .add_direction(NetworkDirection::ServerToClient);
     app.add_channel::<GroupChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),

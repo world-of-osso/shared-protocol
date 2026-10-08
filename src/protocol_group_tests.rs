@@ -191,3 +191,47 @@ fn raid_target_icons_name_the_icon_of_a_unit() {
     assert_eq!(icons.icon_of(77), Some(1));
     assert_eq!(icons.icon_of(78), None);
 }
+
+#[test]
+fn minimap_ping_messages_register_and_round_trip_on_the_wire() {
+    let mut app = App::new();
+    app.init_resource::<ProtocolHasher>()
+        .init_resource::<ReplicationRules>()
+        .init_resource::<ReplicationRegistry>();
+    app.add_plugins(ProtocolPlugin);
+    assert!(app.is_message_registered::<MinimapPingRequest>());
+    assert!(app.is_message_registered::<MinimapPing>());
+
+    let config = bincode::config::standard();
+    let request = MinimapPingRequest {
+        x: -8913.25,
+        y: -130.5,
+    };
+    let bytes = bincode::serde::encode_to_vec(request, config).unwrap();
+    let (decoded, _): (MinimapPingRequest, usize) =
+        bincode::serde::decode_from_slice(&bytes, config).unwrap();
+    assert_eq!(decoded, request);
+
+    let ping = MinimapPing {
+        sender: 4_294_967_337,
+        sender_name: "Alice".into(),
+        x: -8913.25,
+        y: -130.5,
+    };
+    let bytes = bincode::serde::encode_to_vec(&ping, config).unwrap();
+    let (decoded, consumed): (MinimapPing, usize) =
+        bincode::serde::decode_from_slice(&bytes, config).unwrap();
+    assert_eq!(consumed, bytes.len());
+    assert_eq!(decoded, ping);
+}
+
+#[test]
+fn minimap_ping_request_accepts_only_finite_positions_on_the_map() {
+    let ping = |x, y| MinimapPingRequest { x, y };
+    assert!(ping(-8913.25, -130.5).is_valid());
+    assert!(ping(MINIMAP_PING_MAP_HALFSIZE, -MINIMAP_PING_MAP_HALFSIZE).is_valid());
+    assert!(!ping(17_100.0, 0.0).is_valid());
+    assert!(!ping(0.0, -17_100.0).is_valid());
+    assert!(!ping(f32::NAN, 0.0).is_valid());
+    assert!(!ping(0.0, f32::INFINITY).is_valid());
+}
