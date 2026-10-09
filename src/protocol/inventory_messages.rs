@@ -192,7 +192,7 @@ impl EquipmentSlot {
     }
 }
 
-/// Where an item sits: a container slot or an equipment slot.
+/// Where an item sits: a container slot, an equipment slot or a character bank slot.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum ItemLocation {
     /// `bag` 0 is the backpack, 1-4 the equipped bags, 5 the reagent bag;
@@ -202,6 +202,14 @@ pub enum ItemLocation {
         slot: u8,
     },
     Equipment(EquipmentSlot),
+    /// Character bank tab `tab` (0-based, in purchase order; Retail container
+    /// `Enum.BagIndex.CharacterBankTab_1` + `tab`), `slot` 0-based below
+    /// `BANK_TAB_SLOTS`. Requests naming it need an open banker (TrinityCore
+    /// `HandleSwapItem` `IsBankPos` + `CanUseBank`).
+    Bank {
+        tab: u8,
+        slot: u8,
+    },
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
@@ -270,14 +278,16 @@ pub struct InventoryDelta {
     pub changes: Vec<InventorySlotChange>,
 }
 
-/// Move the item at `from` to `to`; equips, unequips or swaps depending on the slots.
+/// Move the item at `from` to `to`; equips, unequips, merges onto a stack of the same
+/// item or swaps depending on the slots.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct SwapItem {
     pub from: ItemLocation,
     pub to: ItemLocation,
 }
 
-/// Move `count` items from the stack at `from` into the empty location `to`.
+/// Move `count` items from the stack at `from` into the empty location `to`, or onto
+/// a stack of the same item at `to` with room for all of them.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct SplitItem {
     pub from: ItemLocation,
