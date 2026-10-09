@@ -6,9 +6,23 @@
 use serde::{Deserialize, Serialize};
 
 /// Player alive/dead state.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(
+    bevy::prelude::Component,
+    bevy::prelude::Reflect,
+    Debug,
+    Clone,
+    Copy,
+    Default,
+    PartialEq,
+    Eq,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+)]
 pub enum DeathState {
     /// Player is alive.
+    #[default]
     Alive,
     /// Player has just died (HP reached 0). Corpse at death location.
     Dead,

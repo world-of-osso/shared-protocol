@@ -159,3 +159,68 @@ fn nested_enum_changes_change_the_layout() {
     assert_ne!(before, layout_hash::<added_nested_variant::Probe>());
     assert_ne!(before, layout_hash::<added_variant_field::Probe>());
 }
+
+// Keep Serde type names identical to the real types: otherwise a renamed
+// fixture alone changes the fingerprint and does not prove the field delta.
+mod auction_before_filters {
+    use serde::{Deserialize, Serialize};
+    #[derive(Serialize, Deserialize)]
+    pub enum AuctionSortField {
+        Name,
+        MinBid,
+        Buyout,
+        TimeLeft,
+        Quality,
+        RequiredLevel,
+    }
+    #[derive(Serialize, Deserialize)]
+    pub struct AuctionSearchQuery {
+        item_id: Option<u32>,
+        class_id: Option<u8>,
+        text: String,
+        page: u32,
+        page_size: u32,
+        min_level: Option<u16>,
+        max_level: Option<u16>,
+        quality: Option<u8>,
+        usable_only: bool,
+        sort_field: AuctionSortField,
+        sort_dir: crate::protocol::AuctionSortDir,
+        faction: u8,
+    }
+}
+mod auction_with_filters {
+    use serde::{Deserialize, Serialize};
+    #[derive(Serialize, Deserialize)]
+    pub struct AuctionSearchQuery {
+        item_id: Option<u32>,
+        class_id: Option<u8>,
+        subcategory_filters: Vec<crate::protocol::AuctionItemFilter>,
+        text: String,
+        page: u32,
+        page_size: u32,
+        min_level: Option<u16>,
+        max_level: Option<u16>,
+        quality: Option<u8>,
+        usable_only: bool,
+        sort_field: super::auction_before_filters::AuctionSortField,
+        sort_dir: crate::protocol::AuctionSortDir,
+        faction: u8,
+    }
+}
+#[test]
+fn auction_query_layout_traces_subcategory_alternatives_and_new_sorts() {
+    use crate::protocol::{AuctionSearchQuery, AuctionSortField};
+    assert_ne!(
+        layout_hash::<auction_before_filters::AuctionSearchQuery>(),
+        layout_hash::<auction_with_filters::AuctionSearchQuery>()
+    );
+    assert_ne!(
+        layout_hash::<auction_with_filters::AuctionSearchQuery>(),
+        layout_hash::<AuctionSearchQuery>()
+    );
+    assert_ne!(
+        layout_hash::<auction_before_filters::AuctionSortField>(),
+        layout_hash::<AuctionSortField>()
+    );
+}

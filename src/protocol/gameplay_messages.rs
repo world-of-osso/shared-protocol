@@ -26,6 +26,10 @@ pub enum AuctionSortField {
     TimeLeft,
     Quality,
     RequiredLevel,
+    /// Displayed current bid, or minimum bid before the first bid.
+    Bid,
+    /// Stack quantity for listings; global total quantity for browse items.
+    Quantity,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
@@ -59,12 +63,23 @@ pub struct AuctionListingSummary {
     pub time_left: AuctionTimeLeft,
 }
 
+/// One Retail category-tree filter. Multiple filters in a node are alternatives.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct AuctionItemFilter {
+    pub class_id: u8,
+    pub subclass_id: Option<u8>,
+    pub inventory_type: Option<u8>,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct AuctionSearchQuery {
     /// Exact item filter, applied before pagination.
     pub item_id: Option<u32>,
     /// Retail item class filter, applied before pagination.
     pub class_id: Option<u8>,
+    /// OR of class/subclass/inventory filters, ANDed with the other query fields.
+    /// Empty means no subcategory restriction; filtering precedes grouping/paging.
+    pub subcategory_filters: Vec<AuctionItemFilter>,
     pub text: String,
     pub page: u32,
     pub page_size: u32,
@@ -83,6 +98,7 @@ impl Default for AuctionSearchQuery {
         Self {
             item_id: None,
             class_id: None,
+            subcategory_filters: Vec::new(),
             text: String::new(),
             page: 0,
             page_size: 50,
