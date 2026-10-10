@@ -574,8 +574,32 @@ fn spell_failure_round_trips_interrupts_and_failures() {
 }
 
 #[test]
+fn disenchant_item_target_and_refusals_round_trip() {
+    assert_wire_round_trip(&SpellCastIntent {
+        destination: None,
+        spell_id: Some(13262),
+        spell: "Disenchant".into(),
+        target_entity: None,
+        target_item_guid: Some(0x1234_5678_9abc_def0),
+        witness: None,
+    });
+    for reason in [
+        CastFailReason::CantBeDisenchanted,
+        CastFailReason::CantBeDisenchantedSkill,
+        CastFailReason::NotKnown,
+    ] {
+        assert_wire_round_trip(&CastFailed {
+            spell_id: 13262,
+            reason,
+            detail: None,
+        });
+    }
+}
+
+#[test]
 fn spell_cast_intent_round_trips_witness_ray_and_line_of_sight_failure() {
     assert_wire_round_trip(&SpellCastIntent {
+        target_item_guid: None,
         destination: None,
         spell_id: Some(133),
         spell: "Fireball".into(),
@@ -586,6 +610,7 @@ fn spell_cast_intent_round_trips_witness_ray_and_line_of_sight_failure() {
         }),
     });
     assert_wire_round_trip(&SpellCastIntent {
+        target_item_guid: None,
         destination: Some([30.0, 2.0, -10.0]),
         spell_id: Some(189110),
         spell: "Infernal Strike".into(),

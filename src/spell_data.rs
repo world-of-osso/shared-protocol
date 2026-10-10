@@ -179,6 +179,12 @@ pub enum CastFailReason {
     AffectingCombat,
     /// The caster is mounted (`SPELL_FAILED_NOT_MOUNTED`, "You are mounted").
     NotMounted,
+    /// `SPELL_FAILED_CANT_BE_DISENCHANTED`.
+    CantBeDisenchanted,
+    /// `SPELL_FAILED_CANT_BE_DISENCHANTED_SKILL`.
+    CantBeDisenchantedSkill,
+    /// `SPELL_FAILED_NOT_KNOWN`.
+    NotKnown,
 }
 
 /// Context needed to validate a cast attempt.

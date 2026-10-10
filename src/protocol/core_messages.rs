@@ -140,6 +140,8 @@ pub struct SpellCastIntent {
     pub spell_id: Option<u32>,
     pub spell: String,
     pub target_entity: Option<u64>,
+    /// Owned bag item GUID for item-targeted casts; not a unit entity.
+    pub target_item_guid: Option<u64>,
     /// Line-of-sight witness: a segment the client found clear of baked geometry, from
     /// its eye point to a point inside the target's body, in world space. The server
     /// checks it against its own positions and the same bake
