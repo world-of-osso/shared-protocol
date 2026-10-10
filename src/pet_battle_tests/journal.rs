@@ -42,6 +42,24 @@ fn collection_wire_carries_journal_and_64_bit_summon_identity() {
 }
 
 #[test]
+fn assigned_guid_survives_journal_serialization_without_collision() {
+    let mut journal = PetJournal::default();
+    let guid = u64::from(u32::MAX) + 100;
+    journal
+        .add_with_guid(39, 7, PetQuality::Rare, 4, guid)
+        .unwrap();
+    assert_eq!(
+        journal.add_with_guid(40, 1, PetQuality::Common, 3, guid),
+        Err(PetJournalError::DuplicateId)
+    );
+    let bytes = bitcode::serialize(&journal).unwrap();
+    let mut restored: PetJournal = bitcode::deserialize(&bytes).unwrap();
+    assert_eq!(restored.get(guid).unwrap().species_id, 39);
+    assert_eq!(restored.get(guid).unwrap().level, 7);
+    assert!(restored.add(40, 1, PetQuality::Common).unwrap() > guid);
+}
+
+#[test]
 fn quality_from_id() {
     assert_eq!(PetQuality::from_id(0), Some(PetQuality::Poor));
     assert_eq!(PetQuality::from_id(1), Some(PetQuality::Common));

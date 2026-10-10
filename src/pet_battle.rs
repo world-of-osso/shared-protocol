@@ -31,6 +31,8 @@ pub const MAX_PET_LEVEL: u8 = 25;
 pub const MAX_JOURNAL_SIZE: usize = 1000;
 /// Maximum duplicates of the same species.
 pub const MAX_PER_SPECIES: usize = 3;
+/// Non-attackable minion, immune to players and NPCs; never the combat pet frame.
+pub const COMPANION_UNIT_FLAGS: u32 = 0x2 | 0x100 | 0x200;
 
 /// A single pet instance owned by an account.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -62,6 +64,8 @@ pub enum PetJournalError {
     PetNotFound,
     /// Name is empty.
     EmptyName,
+    /// An explicitly assigned instance GUID already exists in this journal.
+    DuplicateId,
 }
 
 /// Account-wide pet collection.
@@ -109,6 +113,27 @@ impl PetJournal {
             xp: 0,
         });
         Ok(id)
+    }
+
+    /// Add an instance using the server's global pet GUID allocator.
+    pub fn add_with_guid(
+        &mut self,
+        species_id: u32,
+        level: u8,
+        quality: PetQuality,
+        breed_id: u8,
+        guid: u64,
+    ) -> Result<u64, PetJournalError> {
+        if self.get(guid).is_some() {
+            return Err(PetJournalError::DuplicateId);
+        }
+        self.add_with_breed(species_id, level, quality, breed_id)?;
+        self.pets
+            .last_mut()
+            .expect("successful add appends a pet")
+            .id = guid;
+        self.next_id = self.next_id.max(guid);
+        Ok(guid)
     }
 
     /// Remove a pet from the journal (release).
