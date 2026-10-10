@@ -3,7 +3,7 @@
 Disenchant carries an owned bag item GUID separately from unit and ground targets.
 
 ## What it must do
-- [ ] Round-trip `SpellCastIntent.target_item_guid` without truncation.
+- [x] Round-trip `SpellCastIntent.target_item_guid` without truncation.
 - [ ] Append Retail `CantBeDisenchanted`, `CantBeDisenchantedSkill`, and `NotKnown` refusals without reordering existing variants.
 
 ## How it works
@@ -17,7 +17,7 @@ Disenchant carries an owned bag item GUID separately from unit and ground target
 - `src/protocol_spell_tests.rs`: `disenchant_item_target_and_refusals_round_trip`.
 
 ## Known gaps (current cycle)
-- [ ] Targeted wire test pending.
+Targeted wire test1/1 passes; variants are appended by source inspection. Full protocol suite not rerun.
 
 ## Out of scope
 - Server eligibility, inventory disposal, loot and client cursor behavior live in consuming repositories.
