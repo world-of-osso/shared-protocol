@@ -53,6 +53,7 @@ fn group_member_states_round_trip_on_the_wire() {
                 z: 82.1,
             },
             debuffs: vec![AuraView {
+                overrides: Vec::new(),
                 instance_id: 7,
                 spell_id: 589,
                 caster: Some(99),

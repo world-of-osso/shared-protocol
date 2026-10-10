@@ -126,6 +126,13 @@ fn unit_auras_round_trip() {
     let auras = UnitAuras {
         auras: vec![
             AuraView {
+                overrides: vec![
+                    crate::components::AuraOverride::ActionBar {
+                        spell_id: 85288,
+                        replacement: 335097,
+                    },
+                    crate::components::AuraOverride::Animation(1013),
+                ],
                 instance_id: 1,
                 spell_id: 465,
                 caster: Some(0x0000_0001_0000_002A),
@@ -138,6 +145,7 @@ fn unit_auras_round_trip() {
                 flags: AuraView::FLAG_PASSIVE | AuraView::FLAG_FROM_PLAYER,
             },
             AuraView {
+                overrides: Vec::new(),
                 instance_id: 7,
                 spell_id: 589,
                 caster: None,
@@ -568,6 +576,7 @@ fn spell_failure_round_trips_interrupts_and_failures() {
 #[test]
 fn spell_cast_intent_round_trips_witness_ray_and_line_of_sight_failure() {
     assert_wire_round_trip(&SpellCastIntent {
+        destination: None,
         spell_id: Some(133),
         spell: "Fireball".into(),
         target_entity: Some(0x0000_0003_0000_0011),
@@ -577,8 +586,9 @@ fn spell_cast_intent_round_trips_witness_ray_and_line_of_sight_failure() {
         }),
     });
     assert_wire_round_trip(&SpellCastIntent {
-        spell_id: None,
-        spell: "Fireball".into(),
+        destination: Some([30.0, 2.0, -10.0]),
+        spell_id: Some(189110),
+        spell: "Infernal Strike".into(),
         target_entity: None,
         witness: None,
     });
