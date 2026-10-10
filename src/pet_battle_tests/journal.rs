@@ -1,6 +1,21 @@
 use super::*;
 
 #[test]
+fn journal_persists_breed_with_instance_identity() {
+    let mut journal = PetJournal::default();
+    let id = journal.add_with_breed(39, 7, PetQuality::Rare, 4).unwrap();
+    let bytes = bitcode::serialize(&journal).unwrap();
+    let mut restored: PetJournal = bitcode::deserialize(&bytes).unwrap();
+    assert_eq!(restored.get(id).unwrap().breed_id, 4);
+    assert_eq!(restored.get(id).unwrap().level, 7);
+    assert_eq!(restored.get(id).unwrap().quality, PetQuality::Rare);
+    let second = restored
+        .add_with_breed(39, 1, PetQuality::Common, 3)
+        .unwrap();
+    assert_ne!(second, id);
+}
+
+#[test]
 fn quality_from_id() {
     assert_eq!(PetQuality::from_id(0), Some(PetQuality::Poor));
     assert_eq!(PetQuality::from_id(1), Some(PetQuality::Common));
