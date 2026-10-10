@@ -348,6 +348,23 @@ pub struct VerticalVelocity(pub f32);
 )]
 pub struct UnitScale(pub f32);
 
+/// Aura105 feather fall; authoritative even when client reports its height.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Default,
+)]
+pub struct FeatherFall(pub bool);
+
 impl Default for UnitScale {
     fn default() -> Self {
         Self(1.0)
