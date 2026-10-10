@@ -135,6 +135,8 @@ pub struct CombatEvent {
 /// Client requests to start casting a spell.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct SpellCastIntent {
+    /// Explicit ground destination in server/Bevy coordinates; validated by server.
+    pub destination: Option<[f32; 3]>,
     pub spell_id: Option<u32>,
     pub spell: String,
     pub target_entity: Option<u64>,
