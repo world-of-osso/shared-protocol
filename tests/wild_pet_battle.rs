@@ -89,6 +89,7 @@ fn wild_pet_battle_wire_preserves_round_actions_and_end_rewards() {
             xp_gained: 50,
             level: 8,
             xp: 12,
+            next_level_xp: 100,
         }],
         captured_pet_id: Some(0x100000099),
         combat_text: vec!["Captured Rabbit".into()],

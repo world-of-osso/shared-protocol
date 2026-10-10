@@ -94,6 +94,7 @@ pub struct BattlePetXpReward {
     pub xp_gained: u32,
     pub level: u8,
     pub xp: u32,
+    pub next_level_xp: u32,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum WildPetBattleUpdate {
