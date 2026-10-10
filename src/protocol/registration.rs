@@ -428,6 +428,10 @@ fn register_spell_messages(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<TraitConfigSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<TraitLoadoutsSnapshot>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<TraitLoadoutRequest>()
+        .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<TraitCommitResult>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<SpecializationChanged>()
