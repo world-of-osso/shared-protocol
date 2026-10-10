@@ -56,13 +56,18 @@ pub struct BattleAbilitySnapshot {
     /// Zero-based ability family for the Retail effectiveness badge.
     pub family: u8,
     pub cooldown: u32,
+    /// Authoritative ability lockdown turns; displayed as max(cooldown, lockout).
+    pub lockout: u32,
     pub usable: bool,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct BattleAuraSnapshot {
     pub ability_id: u32,
+    pub name: String,
     pub icon: u32,
+    /// Negative means indefinite and has no duration label.
     pub rounds_remaining: i32,
+    pub is_buff: bool,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct BattlePetSnapshot {
@@ -107,6 +112,9 @@ pub struct WildPetBattleSnapshot {
     pub initial_selection_required: bool,
     pub replacement_required: bool,
     pub feedback: Vec<BattleCombatFeedback>,
+    pub weather: Option<BattleAuraSnapshot>,
+    /// Team pads are separate from individual pet auras, including across swaps.
+    pub team_auras: [Vec<BattleAuraSnapshot>; 2],
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum WildPetBattleOutcome {
