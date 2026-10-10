@@ -127,6 +127,8 @@ fn register_replicated_components(app: &mut App) {
     app.protocol_component::<MovementSpeed>().replicate();
     app.protocol_component::<CombatStatus>().replicate();
     app.protocol_component::<Mounted>().replicate();
+    app.protocol_component::<crate::components::VehiclePassenger>()
+        .replicate();
     app.protocol_component::<MovementControl>().replicate();
     app.protocol_component::<WorldArrival>().replicate();
     app.protocol_component::<Zone>().replicate();

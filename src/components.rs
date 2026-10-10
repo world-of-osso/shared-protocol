@@ -382,10 +382,36 @@ impl Default for UnitScale {
     Debug,
     Clone,
     PartialEq,
+    Default,
 )]
 pub struct Mounted {
     /// Display ID of the mount.
     pub mount_display_id: u32,
+    /// Vehicle DB2 ID, zero for a mount without passenger seats.
+    pub vehicle_id: u32,
+    /// Vehicle.SeatID indices, containing server entity bits (not client-local entities).
+    pub seats: [Option<u64>; 8],
+}
+
+/// A player riding another player's mount; removed on exit or ejection.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+)]
+pub struct VehiclePassenger {
+    pub driver: u64,
+    pub seat_index: u8,
+    /// VehicleSeat DB2 row used for the attachment, offsets and passenger animation.
+    pub seat_id: u32,
 }
 
 /// The player's map arrivals (`HandleMoveWorldportAck`). The server bumps it in the
