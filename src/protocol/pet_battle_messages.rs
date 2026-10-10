@@ -1,5 +1,30 @@
-//! Authoritative wild PvE state and decisions. Slot APIs are one-based like Retail.
+//! Authoritative pet battle state and decisions. Slot APIs are one-based like Retail.
 use serde::{Deserialize, Serialize};
+
+/// Retail Find Battle and queue-ready popup decisions.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum PetBattleQueueRequest {
+    Join,
+    Leave,
+    Accept { proposal_id: u64 },
+    Decline { proposal_id: u64 },
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
+pub enum PetBattleQueueState {
+    #[default]
+    Idle,
+    Queued,
+    Proposal {
+        proposal_id: u64,
+        accepted: bool,
+    },
+    InBattle,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PetBattleQueueUpdate {
+    pub state: PetBattleQueueState,
+    pub error: Option<String>,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SetBattlePetLoadout {

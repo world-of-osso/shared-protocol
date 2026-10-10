@@ -36,6 +36,10 @@ pub(super) fn register_messages(app: &mut App) {
 }
 
 fn register_pet_battle_messages(app: &mut App) {
+    app.register_protocol_message::<PetBattleQueueRequest>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<PetBattleQueueUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<SetBattlePetLoadout>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<StartWildPetBattle>()
