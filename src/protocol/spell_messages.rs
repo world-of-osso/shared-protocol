@@ -225,7 +225,49 @@ pub struct CommitTraitConfig {
     pub entries: Vec<TraitEntrySelection>,
 }
 
-/// Server answer to `CommitTraitConfig`.
+/// Saved user loadout (the unnamed active/default allocation is not a saved row).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct TraitLoadoutInfo {
+    pub id: u32,
+    pub name: String,
+}
+
+/// Authoritative per-spec loadout list; ID zero denotes Default Loadout.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct TraitLoadoutsSnapshot {
+    pub spec_id: u32,
+    pub selected_id: u32,
+    pub configs: Vec<TraitLoadoutInfo>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub enum TraitLoadoutOperation {
+    Create {
+        name: String,
+        entries: Vec<TraitEntrySelection>,
+    },
+    Rename {
+        id: u32,
+        name: String,
+    },
+    Delete {
+        id: u32,
+    },
+    Activate {
+        id: u32,
+    },
+}
+
+/// Owner-only lifecycle request on TalentChannel. Results use TraitCommitResult;
+/// accepted mutations publish a fresh list. Create/activate also replace the
+/// allocation snapshot; rename/delete preserve the client's pending edits.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct TraitLoadoutRequest {
+    pub spec_id: u32,
+    pub operation: TraitLoadoutOperation,
+}
+
+/// Server answer to `CommitTraitConfig` or `TraitLoadoutRequest`.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct TraitCommitResult {
     pub ok: bool,

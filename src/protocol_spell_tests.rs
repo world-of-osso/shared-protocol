@@ -399,6 +399,35 @@ fn trait_and_specialization_messages_round_trip() {
     });
     assert_wire_round_trip(&SpecializationChanged { spec_id: 66 });
     assert_wire_round_trip(&SetSpecialization { spec_id: 65 });
+    assert_wire_round_trip(&TraitLoadoutsSnapshot {
+        spec_id: 70,
+        selected_id: 2,
+        configs: vec![TraitLoadoutInfo {
+            id: 2,
+            name: "Raid".into(),
+        }],
+    });
+    for operation in [
+        TraitLoadoutOperation::Create {
+            name: "Raid".into(),
+            entries: vec![TraitEntrySelection {
+                node_id: 81544,
+                entry_id: 102514,
+                rank: 1,
+            }],
+        },
+        TraitLoadoutOperation::Rename {
+            id: 2,
+            name: "Dungeons".into(),
+        },
+        TraitLoadoutOperation::Delete { id: 2 },
+        TraitLoadoutOperation::Activate { id: 2 },
+    ] {
+        assert_wire_round_trip(&TraitLoadoutRequest {
+            spec_id: 70,
+            operation,
+        });
+    }
     // ChrSpecialization 72: Fury Warrior.
     assert_wire_round_trip(&crate::components::ActiveSpec(72));
     assert_wire_round_trip(&CancelAura { spell_id: 1_459 });
@@ -439,6 +468,8 @@ fn protocol_plugin_registers_spell_components_and_messages() {
     assert!(app.is_message_registered::<AttackStopped>());
     assert!(app.is_message_registered::<ActionBarSnapshot>());
     assert!(app.is_message_registered::<TraitConfigSnapshot>());
+    assert!(app.is_message_registered::<TraitLoadoutsSnapshot>());
+    assert!(app.is_message_registered::<TraitLoadoutRequest>());
     assert!(app.is_message_registered::<TraitCommitResult>());
     assert!(app.is_message_registered::<SpecializationChanged>());
     assert!(app.is_message_registered::<SetActionButton>());
