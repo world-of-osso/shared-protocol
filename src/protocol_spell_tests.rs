@@ -586,9 +586,9 @@ fn spell_cast_intent_round_trips_witness_ray_and_line_of_sight_failure() {
         }),
     });
     assert_wire_round_trip(&SpellCastIntent {
-        destination: None,
-        spell_id: None,
-        spell: "Fireball".into(),
+        destination: Some([30.0, 2.0, -10.0]),
+        spell_id: Some(189110),
+        spell: "Infernal Strike".into(),
         target_entity: None,
         witness: None,
     });
