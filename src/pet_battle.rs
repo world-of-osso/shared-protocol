@@ -72,6 +72,9 @@ pub enum PetJournalError {
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub struct PetJournal {
     pub pets: Vec<OwnedPet>,
+    /// Ordered combat team; absent in phase1 persisted journals until equipped.
+    #[serde(default)]
+    pub battle_slots: [Option<u64>; 3],
     next_id: u64,
 }
 
@@ -112,6 +115,9 @@ impl PetJournal {
             quality,
             xp: 0,
         });
+        if let Some(slot) = self.battle_slots.iter_mut().find(|slot| slot.is_none()) {
+            *slot = Some(id);
+        }
         Ok(id)
     }
 
@@ -127,7 +133,12 @@ impl PetJournal {
         if self.get(guid).is_some() {
             return Err(PetJournalError::DuplicateId);
         }
-        self.add_with_breed(species_id, level, quality, breed_id)?;
+        let local_id = self.add_with_breed(species_id, level, quality, breed_id)?;
+        for slot in &mut self.battle_slots {
+            if *slot == Some(local_id) {
+                *slot = Some(guid);
+            }
+        }
         self.pets
             .last_mut()
             .expect("successful add appends a pet")
@@ -144,6 +155,27 @@ impl PetJournal {
             .position(|p| p.id == pet_id)
             .ok_or(PetJournalError::PetNotFound)?;
         self.pets.remove(idx);
+        for slot in &mut self.battle_slots {
+            if *slot == Some(pet_id) {
+                *slot = None;
+            }
+        }
+        Ok(())
+    }
+
+    /// Validate ownership and distinctness before replacing the entire loadout.
+    pub fn set_battle_slots(&mut self, slots: [Option<u64>; 3]) -> Result<(), PetJournalError> {
+        for (index, slot) in slots.iter().enumerate() {
+            if let Some(id) = slot {
+                if self.get(*id).is_none() {
+                    return Err(PetJournalError::PetNotFound);
+                }
+                if slots[..index].contains(slot) {
+                    return Err(PetJournalError::DuplicateId);
+                }
+            }
+        }
+        self.battle_slots = slots;
         Ok(())
     }
 

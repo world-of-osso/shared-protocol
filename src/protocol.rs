@@ -30,6 +30,7 @@ mod loot_messages;
 mod mail_messages;
 mod merchant_messages;
 mod mirror_timer_messages;
+mod pet_battle_messages;
 mod pet_messages;
 mod protocol_check;
 mod protocol_layout;
@@ -61,6 +62,7 @@ pub use loot_messages::*;
 pub use mail_messages::*;
 pub use merchant_messages::*;
 pub use mirror_timer_messages::*;
+pub use pet_battle_messages::*;
 pub use pet_messages::*;
 pub use protocol_check::{
     ProtocolCheckChannel, ProtocolCheckTimeout, ProtocolFingerprint, ProtocolRejected,

@@ -28,10 +28,22 @@ pub(super) fn register_messages(app: &mut App) {
     register_death_messages(app);
     register_durability_messages(app);
     register_collection_messages(app);
+    register_pet_battle_messages(app);
     register_currency_messages(app);
     register_spell_messages(app);
     super::group_messages::register_group_messages(app);
     crate::protocol_snapshots::register_snapshot_messages(app);
+}
+
+fn register_pet_battle_messages(app: &mut App) {
+    app.register_protocol_message::<SetBattlePetLoadout>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<StartWildPetBattle>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<WildPetBattleActionRequest>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<WildPetBattleUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_core_messages(app: &mut App) {
