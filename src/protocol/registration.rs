@@ -364,6 +364,14 @@ fn register_durability_messages(app: &mut App) {
 }
 
 fn register_collection_messages(app: &mut App) {
+    app.register_protocol_message::<UseToy>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<SetToyFavourite>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<ToyCollectionUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<ToyResult>()
+        .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<SummonMount>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<DismissMount>()

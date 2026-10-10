@@ -648,6 +648,59 @@ pub struct SummonPet {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct DismissPet;
 
+/// Account Toy Box activation; uses the player's selected target when needed.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct UseToy {
+    pub item_id: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SetToyFavourite {
+    pub item_id: u32,
+    pub favourite: bool,
+}
+
+/// Full catalog plus account state, on world entry and every learning/favourite change.
+/// Separate from the legacy character mount/pet snapshot.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ToyCollectionUpdate {
+    pub toys: Vec<ToySnapshot>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ToySnapshot {
+    pub item_id: u32,
+    pub name: String,
+    pub icon_file_data_id: u32,
+    pub expansion_id: i32,
+    pub flags: u32,
+    pub source_type: i32,
+    pub source_text: String,
+    pub spell_id: Option<u32>,
+    pub learned: bool,
+    pub favourite: bool,
+    /// Missing metadata/effects are explicitly unusable, not invented.
+    pub unavailable_reason: Option<String>,
+}
+
+/// Success means cast started. SpellGo/CastFailed report subsequent cast outcome;
+/// SpellCooldownUpdate carries authoritative spell/category cooldowns.
+/// Also answers a rejected favourite request (operation distinguishes it).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ToyResult {
+    pub item_id: u32,
+    pub operation: ToyOperation,
+    pub spell_id: Option<u32>,
+    pub error: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ToyOperation {
+    Learn,
+    Favourite,
+    Use,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct CollectionStateUpdate {
     pub snapshot: Option<CollectionSnapshot>,
