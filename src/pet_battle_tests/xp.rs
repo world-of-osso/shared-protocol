@@ -31,6 +31,7 @@ fn xp_curve_increases() {
 fn award_xp_no_level_up() {
     let mut pet = OwnedPet {
         id: 1,
+        breed_id: 3,
         species_id: 1,
         custom_name: None,
         level: 1,
@@ -48,6 +49,7 @@ fn award_xp_no_level_up() {
 fn award_xp_single_level_up() {
     let mut pet = OwnedPet {
         id: 1,
+        breed_id: 3,
         species_id: 1,
         custom_name: None,
         level: 1,
@@ -64,6 +66,7 @@ fn award_xp_single_level_up() {
 fn award_xp_multiple_level_ups() {
     let mut pet = OwnedPet {
         id: 1,
+        breed_id: 3,
         species_id: 1,
         custom_name: None,
         level: 1,
@@ -80,6 +83,7 @@ fn award_xp_multiple_level_ups() {
 fn award_xp_caps_at_max_level() {
     let mut pet = OwnedPet {
         id: 1,
+        breed_id: 3,
         species_id: 1,
         custom_name: None,
         level: 24,
@@ -95,6 +99,7 @@ fn award_xp_caps_at_max_level() {
 fn award_xp_at_max_level_does_nothing() {
     let mut pet = OwnedPet {
         id: 1,
+        breed_id: 3,
         species_id: 1,
         custom_name: None,
         level: 25,
