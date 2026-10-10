@@ -7,8 +7,8 @@ use crate::components::{
     EquipmentAppearance, Gold, GuildMembership, Health, Mana, ModelDisplay, Mounted,
     MovementControl, MovementSpeed, Npc, Player, PlayerMotion, PlayerStandState, Position,
     PresenceStatus, Rotation, UnitAuras, UnitFactionTemplate, UnitFlags, UnitLevel, UnitPose,
-    UnitPowers, UnitRunes, UnitStats, UnitSummonedBy, UnitTap, UnitTarget, UnitThreatList,
-    UnitVignette, WorldArrival, Zone,
+    UnitPowers, UnitRunes, UnitScale, UnitStats, UnitSummonedBy, UnitTap, UnitTarget,
+    UnitThreatList, UnitVignette, WorldArrival, Zone,
 };
 
 mod achievement_catalog_messages;
@@ -137,6 +137,7 @@ fn register_replicated_components(app: &mut App) {
         .replicate();
     app.protocol_component::<UnitPowers>().replicate();
     app.protocol_component::<UnitAuras>().replicate();
+    app.protocol_component::<UnitScale>().replicate();
     app.protocol_component::<UnitLevel>().replicate();
     app.protocol_component::<crate::level_scaling::LevelScaling>()
         .replicate();

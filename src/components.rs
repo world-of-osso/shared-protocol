@@ -333,6 +333,27 @@ pub struct CombatStatus(pub bool);
 )]
 pub struct VerticalVelocity(pub f32);
 
+/// Object scale relative to the unit's native visual (additive aura61 percentages).
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+)]
+pub struct UnitScale(pub f32);
+
+impl Default for UnitScale {
+    fn default() -> Self {
+        Self(1.0)
+    }
+}
+
 /// Player is currently mounted. Removed on dismount.
 #[derive(
     Component,
