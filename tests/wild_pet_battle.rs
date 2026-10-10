@@ -76,6 +76,11 @@ fn wild_pet_battle_wire_preserves_round_actions_and_end_rewards() {
         replacement_required: false,
         feedback: vec![],
     };
+    round_trip(WildPetBattleUpdate::Start(WildPetBattleSnapshot {
+        initial_selection_required: true,
+        wild_creature: 0,
+        ..state.clone()
+    }));
     round_trip(WildPetBattleUpdate::Start(state.clone()));
     round_trip(WildPetBattleUpdate::State(state.clone()));
     round_trip(WildPetBattleUpdate::Round {
