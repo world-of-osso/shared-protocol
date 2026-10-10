@@ -153,13 +153,21 @@ pub struct AuraView {
     pub flags: u16,
 }
 
-/// Aura332 actionbar substitutions and aura312 animation replacement set IDs.
+/// Aura332 substitutions, aura293 ordered spell sets and aura312 animation sets.
 #[derive(
     Reflect, Serialize, Deserialize, bitcode::Encode, bitcode::Decode, Debug, Clone, PartialEq,
 )]
 pub enum AuraOverride {
-    ActionBar { spell_id: u32, replacement: u32 },
+    ActionBar {
+        spell_id: u32,
+        replacement: u32,
+    },
     Animation(u32),
+    /// Aura293 OverrideSpellData's ordered10 slots, including zero/empty entries.
+    SpellSet {
+        id: u32,
+        spells: Vec<u32>,
+    },
 }
 
 impl AuraView {
