@@ -259,7 +259,8 @@ pub enum TraitLoadoutOperation {
 }
 
 /// Owner-only lifecycle request on TalentChannel. Results use TraitCommitResult;
-/// accepted mutations always publish a fresh list and allocation snapshot.
+/// accepted mutations publish a fresh list. Create/activate also replace the
+/// allocation snapshot; rename/delete preserve the client's pending edits.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct TraitLoadoutRequest {
     pub spec_id: u32,
