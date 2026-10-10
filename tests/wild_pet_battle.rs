@@ -44,6 +44,10 @@ fn wild_pet_battle_wire_preserves_round_actions_and_end_rewards() {
                 species_id: 39,
                 name: "Mechanical Squirrel".into(),
                 display_id: 7937,
+                icon: 132145,
+                quality: 1,
+                xp: 25,
+                next_level_xp: 100,
                 family: 9,
                 level: 7,
                 health: 110,
@@ -54,11 +58,13 @@ fn wild_pet_battle_wire_preserves_round_actions_and_end_rewards() {
                     id: 110,
                     name: "Bite".into(),
                     icon: 132139,
+                    family: 7,
                     cooldown: 2,
                     usable: false,
                 }),
                 auras: vec![BattleAuraSnapshot {
                     ability_id: 194,
+                    icon: 132139,
                     rounds_remaining: 2,
                 }],
             }],
@@ -67,6 +73,7 @@ fn wild_pet_battle_wire_preserves_round_actions_and_end_rewards() {
         can_trap: false,
         turn_time_ms: 0,
         replacement_required: false,
+        feedback: vec![],
     };
     round_trip(WildPetBattleUpdate::Start(state.clone()));
     round_trip(WildPetBattleUpdate::State(state.clone()));

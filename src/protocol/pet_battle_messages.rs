@@ -28,12 +28,15 @@ pub struct BattleAbilitySnapshot {
     pub id: u32,
     pub name: String,
     pub icon: u32,
+    /// Zero-based ability family for the Retail effectiveness badge.
+    pub family: u8,
     pub cooldown: u32,
     pub usable: bool,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct BattleAuraSnapshot {
     pub ability_id: u32,
+    pub icon: u32,
     pub rounds_remaining: i32,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -42,6 +45,10 @@ pub struct BattlePetSnapshot {
     pub species_id: u32,
     pub name: String,
     pub display_id: u32,
+    pub icon: u32,
+    pub quality: u8,
+    pub xp: u32,
+    pub next_level_xp: u32,
     /// Zero-based DB2 family, independent of art skin.
     pub family: u8,
     pub level: u8,
@@ -51,6 +58,14 @@ pub struct BattlePetSnapshot {
     pub speed: i32,
     pub abilities: [BattleAbilitySnapshot; 3],
     pub auras: Vec<BattleAuraSnapshot>,
+}
+/// Server event amounts, not health deltas: preserves multi-hit, healing and misses.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct BattleCombatFeedback {
+    pub team: u8,
+    pub slot: u8,
+    pub text: String,
+    pub healing: bool,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct WildPetBattleSnapshot {
@@ -64,6 +79,7 @@ pub struct WildPetBattleSnapshot {
     /// Zero means untimed, including wild PvE.
     pub turn_time_ms: u32,
     pub replacement_required: bool,
+    pub feedback: Vec<BattleCombatFeedback>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum WildPetBattleOutcome {
