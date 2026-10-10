@@ -642,7 +642,7 @@ pub struct DismissMount;
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct SummonPet {
-    pub pet_id: u32,
+    pub pet_id: u64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -706,6 +706,9 @@ pub struct CollectionStateUpdate {
     pub snapshot: Option<CollectionSnapshot>,
     pub message: Option<String>,
     pub error: Option<String>,
+    /// Present for companion updates; mount-only updates leave the journal unchanged.
+    pub pet_journal: Option<crate::pet_battle::PetJournal>,
+    pub summoned_pet_id: Option<u64>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]

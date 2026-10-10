@@ -16,6 +16,32 @@ fn journal_persists_breed_with_instance_identity() {
 }
 
 #[test]
+fn collection_wire_carries_journal_and_64_bit_summon_identity() {
+    use crate::protocol::{CollectionStateUpdate, SummonPet};
+    let mut journal = PetJournal::default();
+    journal
+        .add_with_breed(39, 1, PetQuality::Common, 3)
+        .unwrap();
+    let update = CollectionStateUpdate {
+        snapshot: None,
+        message: None,
+        error: None,
+        pet_journal: Some(journal.clone()),
+        summoned_pet_id: Some(1),
+    };
+    let encoded = bitcode::serialize(&update).unwrap();
+    let decoded: CollectionStateUpdate = bitcode::deserialize(&encoded).unwrap();
+    assert_eq!(decoded.pet_journal.unwrap(), journal);
+    assert_eq!(decoded.summoned_pet_id, Some(1));
+    let request = SummonPet {
+        pet_id: u64::from(u32::MAX) + 1,
+    };
+    let encoded = bitcode::serialize(&request).unwrap();
+    let decoded: SummonPet = bitcode::deserialize(&encoded).unwrap();
+    assert_eq!(decoded, request);
+}
+
+#[test]
 fn quality_from_id() {
     assert_eq!(PetQuality::from_id(0), Some(PetQuality::Poor));
     assert_eq!(PetQuality::from_id(1), Some(PetQuality::Common));
