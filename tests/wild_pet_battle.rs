@@ -72,6 +72,7 @@ fn wild_pet_battle_wire_preserves_round_actions_and_end_rewards() {
         ],
         can_trap: false,
         turn_time_ms: 0,
+        initial_selection_required: false,
         replacement_required: false,
         feedback: vec![],
     };

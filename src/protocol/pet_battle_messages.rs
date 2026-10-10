@@ -103,6 +103,8 @@ pub struct WildPetBattleSnapshot {
     pub can_trap: bool,
     /// Zero means untimed, including wild PvE.
     pub turn_time_ms: u32,
+    /// PvP pre-battle selection: both owners must choose a living front pet.
+    pub initial_selection_required: bool,
     pub replacement_required: bool,
     pub feedback: Vec<BattleCombatFeedback>,
 }
