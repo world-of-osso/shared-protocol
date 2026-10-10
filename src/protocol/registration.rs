@@ -35,6 +35,10 @@ pub(super) fn register_messages(app: &mut App) {
 }
 
 fn register_core_messages(app: &mut App) {
+    app.register_protocol_message::<BoardVehicle>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<ExitVehicle>()
+        .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<PlayerInput>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<ChatMessage>()

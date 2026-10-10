@@ -3,6 +3,17 @@ use serde::{Deserialize, Serialize};
 use crate::components::{CharacterAppearance, EquipmentAppearance};
 use crate::protocol_snapshots::*;
 
+/// Ask to occupy an available enter/exit passenger seat on a group member's mount.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct BoardVehicle {
+    /// Server entity bits of the mount-summoning player.
+    pub driver: u64,
+}
+
+/// Leave the requesting player's passenger seat. No other player can be ejected by it.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct ExitVehicle;
+
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum AuctionDuration {
     Short,
