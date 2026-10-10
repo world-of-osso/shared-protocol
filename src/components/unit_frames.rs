@@ -133,6 +133,8 @@ pub struct UnitRunes {
     Reflect, Serialize, Deserialize, bitcode::Encode, bitcode::Decode, Debug, Clone, PartialEq,
 )]
 pub struct AuraView {
+    /// Data-backed cast/presentation overrides. Removing the aura restores base state.
+    pub overrides: Vec<AuraOverride>,
     /// Server-assigned id, unique per unit while the aura exists.
     pub instance_id: u32,
     pub spell_id: u32,
@@ -149,6 +151,15 @@ pub struct AuraView {
     pub dispel_type: u8,
     /// Bit set of `AuraView::FLAG_*`.
     pub flags: u16,
+}
+
+/// Aura332 actionbar substitutions and aura312 animation replacement set IDs.
+#[derive(
+    Reflect, Serialize, Deserialize, bitcode::Encode, bitcode::Decode, Debug, Clone, PartialEq,
+)]
+pub enum AuraOverride {
+    ActionBar { spell_id: u32, replacement: u32 },
+    Animation(u32),
 }
 
 impl AuraView {

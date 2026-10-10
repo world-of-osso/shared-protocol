@@ -126,6 +126,13 @@ fn unit_auras_round_trip() {
     let auras = UnitAuras {
         auras: vec![
             AuraView {
+                overrides: vec![
+                    crate::components::AuraOverride::ActionBar {
+                        spell_id: 85288,
+                        replacement: 335097,
+                    },
+                    crate::components::AuraOverride::Animation(1013),
+                ],
                 instance_id: 1,
                 spell_id: 465,
                 caster: Some(0x0000_0001_0000_002A),
@@ -138,6 +145,7 @@ fn unit_auras_round_trip() {
                 flags: AuraView::FLAG_PASSIVE | AuraView::FLAG_FROM_PLAYER,
             },
             AuraView {
+                overrides: Vec::new(),
                 instance_id: 7,
                 spell_id: 589,
                 caster: None,
