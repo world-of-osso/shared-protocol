@@ -1,6 +1,65 @@
 use super::*;
 
 #[test]
+fn journal_persists_breed_with_instance_identity() {
+    let mut journal = PetJournal::default();
+    let id = journal.add_with_breed(39, 7, PetQuality::Rare, 4).unwrap();
+    let bytes = bitcode::serialize(&journal).unwrap();
+    let mut restored: PetJournal = bitcode::deserialize(&bytes).unwrap();
+    assert_eq!(restored.get(id).unwrap().breed_id, 4);
+    assert_eq!(restored.get(id).unwrap().level, 7);
+    assert_eq!(restored.get(id).unwrap().quality, PetQuality::Rare);
+    let second = restored
+        .add_with_breed(39, 1, PetQuality::Common, 3)
+        .unwrap();
+    assert_ne!(second, id);
+}
+
+#[test]
+fn collection_wire_carries_journal_and_64_bit_summon_identity() {
+    use crate::protocol::{CollectionStateUpdate, SummonPet};
+    let mut journal = PetJournal::default();
+    journal
+        .add_with_breed(39, 1, PetQuality::Common, 3)
+        .unwrap();
+    let update = CollectionStateUpdate {
+        snapshot: None,
+        message: None,
+        error: None,
+        pet_journal: Some(journal.clone()),
+        summoned_pet_id: Some(1),
+    };
+    let encoded = bitcode::serialize(&update).unwrap();
+    let decoded: CollectionStateUpdate = bitcode::deserialize(&encoded).unwrap();
+    assert_eq!(decoded.pet_journal.unwrap(), journal);
+    assert_eq!(decoded.summoned_pet_id, Some(1));
+    let request = SummonPet {
+        pet_id: u64::from(u32::MAX) + 1,
+    };
+    let encoded = bitcode::serialize(&request).unwrap();
+    let decoded: SummonPet = bitcode::deserialize(&encoded).unwrap();
+    assert_eq!(decoded, request);
+}
+
+#[test]
+fn assigned_guid_survives_journal_serialization_without_collision() {
+    let mut journal = PetJournal::default();
+    let guid = u64::from(u32::MAX) + 100;
+    journal
+        .add_with_guid(39, 7, PetQuality::Rare, 4, guid)
+        .unwrap();
+    assert_eq!(
+        journal.add_with_guid(40, 1, PetQuality::Common, 3, guid),
+        Err(PetJournalError::DuplicateId)
+    );
+    let bytes = bitcode::serialize(&journal).unwrap();
+    let mut restored: PetJournal = bitcode::deserialize(&bytes).unwrap();
+    assert_eq!(restored.get(guid).unwrap().species_id, 39);
+    assert_eq!(restored.get(guid).unwrap().level, 7);
+    assert!(restored.add(40, 1, PetQuality::Common).unwrap() > guid);
+}
+
+#[test]
 fn quality_from_id() {
     assert_eq!(PetQuality::from_id(0), Some(PetQuality::Poor));
     assert_eq!(PetQuality::from_id(1), Some(PetQuality::Common));

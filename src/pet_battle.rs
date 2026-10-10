@@ -31,6 +31,8 @@ pub const MAX_PET_LEVEL: u8 = 25;
 pub const MAX_JOURNAL_SIZE: usize = 1000;
 /// Maximum duplicates of the same species.
 pub const MAX_PER_SPECIES: usize = 3;
+/// Non-attackable minion, immune to players and NPCs; never the combat pet frame.
+pub const COMPANION_UNIT_FLAGS: u32 = 0x2 | 0x100 | 0x200;
 
 /// A single pet instance owned by an account.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -39,6 +41,8 @@ pub struct OwnedPet {
     pub id: u64,
     /// Species template ID (which kind of pet).
     pub species_id: u32,
+    /// BattlePetBreedState's breed key (3 is balanced B/B).
+    pub breed_id: u8,
     /// Pet's custom name (or species default if None).
     pub custom_name: Option<String>,
     /// Current level (1–25).
@@ -60,10 +64,12 @@ pub enum PetJournalError {
     PetNotFound,
     /// Name is empty.
     EmptyName,
+    /// An explicitly assigned instance GUID already exists in this journal.
+    DuplicateId,
 }
 
 /// Account-wide pet collection.
-#[derive(Debug, Clone, PartialEq, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub struct PetJournal {
     pub pets: Vec<OwnedPet>,
     next_id: u64,
@@ -77,6 +83,17 @@ impl PetJournal {
         level: u8,
         quality: PetQuality,
     ) -> Result<u64, PetJournalError> {
+        self.add_with_breed(species_id, level, quality, 3)
+    }
+
+    /// Add an instance with the breed selected by the authoritative grant path.
+    pub fn add_with_breed(
+        &mut self,
+        species_id: u32,
+        level: u8,
+        quality: PetQuality,
+        breed_id: u8,
+    ) -> Result<u64, PetJournalError> {
         if self.pets.len() >= MAX_JOURNAL_SIZE {
             return Err(PetJournalError::JournalFull);
         }
@@ -89,12 +106,34 @@ impl PetJournal {
         self.pets.push(OwnedPet {
             id,
             species_id,
+            breed_id,
             custom_name: None,
             level: level.clamp(1, MAX_PET_LEVEL),
             quality,
             xp: 0,
         });
         Ok(id)
+    }
+
+    /// Add an instance using the server's global pet GUID allocator.
+    pub fn add_with_guid(
+        &mut self,
+        species_id: u32,
+        level: u8,
+        quality: PetQuality,
+        breed_id: u8,
+        guid: u64,
+    ) -> Result<u64, PetJournalError> {
+        if self.get(guid).is_some() {
+            return Err(PetJournalError::DuplicateId);
+        }
+        self.add_with_breed(species_id, level, quality, breed_id)?;
+        self.pets
+            .last_mut()
+            .expect("successful add appends a pet")
+            .id = guid;
+        self.next_id = self.next_id.max(guid);
+        Ok(guid)
     }
 
     /// Remove a pet from the journal (release).

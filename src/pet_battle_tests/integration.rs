@@ -30,6 +30,7 @@ fn stats_from_species_through_battle_to_xp() {
 
     let mut owned = OwnedPet {
         id: 1,
+        breed_id: 3,
         species_id: 42,
         custom_name: None,
         level: 10,
@@ -191,6 +192,7 @@ fn full_3v3_battle_with_swaps() {
 fn leveling_from_1_to_25_with_xp() {
     let mut pet = OwnedPet {
         id: 1,
+        breed_id: 3,
         species_id: 1,
         custom_name: None,
         level: 1,
