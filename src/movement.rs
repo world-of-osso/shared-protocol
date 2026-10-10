@@ -6,6 +6,18 @@ pub const MAX_SLOPE_ANGLE: f32 = 50.0 * std::f32::consts::PI / 180.0;
 /// Gravity in yards/s² (~2g for snappy game feel).
 pub const GRAVITY: f32 = 19.6;
 
+/// TrinityCore MovementUtil.cpp terminalSafefallVelocity (Retail feather fall).
+pub const FEATHER_FALL_SPEED: f32 = 7.0;
+
+/// Vertical displacement with gravity until the downward cap, then linear descent.
+pub fn feather_fall_displacement(impulse: f32, secs: f32) -> f32 {
+    let terminal_at = ((impulse + FEATHER_FALL_SPEED) / GRAVITY).max(0.0);
+    let accelerating = secs.min(terminal_at);
+    impulse * accelerating
+        - 0.5 * GRAVITY * accelerating * accelerating
+        - FEATHER_FALL_SPEED * (secs - accelerating)
+}
+
 /// Distance below which we snap to ground.
 pub const GROUND_SNAP_THRESHOLD: f32 = 0.3;
 
