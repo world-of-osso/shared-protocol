@@ -60,12 +60,15 @@ fn wild_pet_battle_wire_preserves_round_actions_and_end_rewards() {
                     icon: 132139,
                     family: 7,
                     cooldown: 2,
+                    lockout: 0,
                     usable: false,
                 }),
                 auras: vec![BattleAuraSnapshot {
                     ability_id: 194,
+                    name: "Metabolic Boost".into(),
                     icon: 132139,
                     rounds_remaining: 2,
+                    is_buff: true,
                 }],
             }],
             vec![],
@@ -75,6 +78,8 @@ fn wild_pet_battle_wire_preserves_round_actions_and_end_rewards() {
         initial_selection_required: false,
         replacement_required: false,
         feedback: vec![],
+        weather: None,
+        team_auras: Default::default(),
     };
     round_trip(WildPetBattleUpdate::Start(WildPetBattleSnapshot {
         initial_selection_required: true,
