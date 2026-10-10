@@ -8,6 +8,8 @@ Authoritative wild PvE battle transport in `src/protocol/pet_battle_messages.rs`
 - [ ] Persist three ordered owned distinct journal slots; releasing a pet clears its slot.
 - [ ] Both skins consume the same authoritative snapshots and action semantics.
 
+- [x] Preserve HUD species icon/quality/XP, ability family, aura icons and target-specific event feedback; rewards preserve the new level XP threshold. `tests/wild_pet_battle.rs` bincode round trips pass2/2 at1808cdd.
+
 ## How it works
 - [Server turn catalog and producer](../../../game-server/docs/wiki/systems/pet-battle-engine.md).
 - Messages use the existing reliable ordered CollectionChannel. Zero timer denotes untimed wild PvE.
@@ -21,7 +23,7 @@ Authoritative wild PvE battle transport in `src/protocol/pet_battle_messages.rs`
 - `tests/wild_pet_battle.rs`: actual bincode round trips and journal state/serialization behavior.
 
 ## Known gaps (current cycle)
-- [ ] Server and native client consumers, spawn/capture/XP lifecycle and live proof.
+- [x] [Server acceptance](../../../game-server/docs/specs/wild-pet-battles.md) and [native acceptance](../../../game-engine/docs/specs/wild-pet-battles.md) own runtime/live proof; wire tests alone do not certify Retail gameplay parity.
 
 ## Out of scope
 PvP matchmaking and unsupported turn effects are not added by this wire change.
