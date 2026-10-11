@@ -27,6 +27,12 @@ fn dungeon2_dungeon_progress_wire_round_trip() {
 
 #[test]
 fn dungeon2_catalog_requests_wire_round_trip() {
+    round_trip(QueryAchievementCatalog::Summary {
+        scope: AchievementScope::Account,
+    });
+    round_trip(QueryAchievementCatalog::Achievement {
+        achievement_id: 633,
+    });
     round_trip(QueryAchievementCatalog::Categories { after_id: 0 });
     round_trip(QueryAchievementCatalog::Category {
         category_id: 14808,
@@ -40,6 +46,22 @@ fn dungeon2_catalog_requests_wire_round_trip() {
 
 #[test]
 fn dungeon2_catalog_pages_wire_round_trip() {
+    round_trip(AchievementCatalogPage::Achievement {
+        achievement_id: 4899,
+        entry: None,
+    });
+    round_trip(AchievementCatalogPage::Summary(AchievementSummary {
+        scope: AchievementScope::All,
+        points: 10,
+        total: 100,
+        completed: 1,
+        categories: vec![AchievementCategoryTotals {
+            category_id: 14808,
+            total: 10,
+            completed: 1,
+        }],
+        recent: Vec::new(),
+    }));
     let criterion = AchievementCriterionLine {
         tree_id: 3386,
         order_index: 0,
@@ -67,6 +89,7 @@ fn dungeon2_catalog_pages_wire_round_trip() {
             description: "Defeat Hogger.".into(),
             points: 10,
             icon_fdid: 134163,
+            flags: 0,
             earned: true,
             earned_at: Some(1791262800),
             progress_supported: true,
@@ -100,6 +123,7 @@ fn dungeon2_maximum_category_payload_is_below_64_kib() {
         description: "x".repeat(ACHIEVEMENT_DESCRIPTION_MAX_BYTES),
         points: u32::MAX,
         icon_fdid: u32::MAX,
+        flags: u32::MAX,
         earned: true,
         earned_at: Some(i64::MAX),
         progress_supported: false,

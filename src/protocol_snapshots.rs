@@ -221,6 +221,8 @@ pub struct AchievementToastSnapshot {
     pub achievement_id: u32,
     pub name: String,
     pub points: u32,
+    /// Authored Achievement.IconFileID for the earned alert.
+    pub icon_fdid: u32,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
