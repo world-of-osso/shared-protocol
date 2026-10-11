@@ -102,4 +102,71 @@ fn protocol_plugin_registers_trainer_and_profession_messages() {
     assert!(app.is_message_registered::<TrainerBuyFailed>());
     assert!(app.is_message_registered::<ProfessionSnapshot>());
     assert!(app.is_message_registered::<CraftRecipe>());
+    assert!(app.is_message_registered::<ProfessionSpecializationRequest>());
+    assert!(app.is_message_registered::<ProfessionSpecializationStateUpdate>());
+    assert!(app.is_message_registered::<CraftingOrderRequest>());
+    assert!(app.is_message_registered::<CraftingOrderStateUpdate>());
+}
+
+#[test]
+fn fixed_output_order_and_specialization_requests_round_trip() {
+    assert_wire_round_trip(&ProfessionSpecializationRequest::Commit {
+        skill_line: 2830,
+        tree_id: 350,
+        purchases: vec![ProfessionTraitPurchase {
+            node_id: 28536,
+            entry_id: 36321,
+            ranks: 5,
+        }],
+    });
+    for kind in [
+        CraftingOrderKind::Public,
+        CraftingOrderKind::Guild,
+        CraftingOrderKind::Personal,
+    ] {
+        assert_wire_round_trip(&CraftingOrderRequest::Place {
+            spell_id: 413496,
+            kind,
+            recipient: Some("Tailor".into()),
+            commission: 12_345,
+            reagents: vec![CraftingOrderReagent {
+                item_id: 8170,
+                quantity: 4,
+                supplied: 4,
+            }],
+            duration_hours: 24,
+            note: "For my guild".into(),
+        });
+    }
+    for request in [
+        CraftingOrderRequest::Query {
+            skill_line: 2532,
+            kind: CraftingOrderKind::Guild,
+            mine: false,
+        },
+        CraftingOrderRequest::Claim {
+            order_id: 4_294_967_301,
+        },
+        CraftingOrderRequest::Release {
+            order_id: 4_294_967_301,
+        },
+        CraftingOrderRequest::Fulfill {
+            order_id: 4_294_967_301,
+        },
+        CraftingOrderRequest::Cancel {
+            order_id: 4_294_967_301,
+        },
+    ] {
+        assert_wire_round_trip(&request);
+    }
+    assert_wire_round_trip(&CraftingOrderStateUpdate {
+        snapshot: None,
+        message: None,
+        error: Some("Recipe does not accept crafting orders".into()),
+    });
+    assert_wire_round_trip(&ProfessionSpecializationStateUpdate {
+        snapshot: None,
+        message: None,
+        error: Some("Not enough knowledge".into()),
+    });
 }
