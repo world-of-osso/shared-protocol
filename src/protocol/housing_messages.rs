@@ -139,9 +139,9 @@ pub struct HousingReply {
 }
 
 pub(super) fn register_housing_protocol(app: &mut App) {
-    app.protocol_message::<HousingRequest>()
+    app.register_protocol_message::<HousingRequest>()
         .add_direction(NetworkDirection::ClientToServer);
-    app.protocol_message::<HousingReply>()
+    app.register_protocol_message::<HousingReply>()
         .add_direction(NetworkDirection::ServerToClient);
     app.add_channel::<HousingChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(Default::default()),
