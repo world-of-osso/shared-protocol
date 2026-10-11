@@ -32,6 +32,7 @@ mod merchant_messages;
 mod mirror_timer_messages;
 mod pet_battle_messages;
 mod pet_messages;
+mod pet_stable_messages;
 mod protocol_check;
 mod protocol_layout;
 mod quest_messages;
@@ -64,6 +65,7 @@ pub use merchant_messages::*;
 pub use mirror_timer_messages::*;
 pub use pet_battle_messages::*;
 pub use pet_messages::*;
+pub use pet_stable_messages::*;
 pub use protocol_check::{
     ProtocolCheckChannel, ProtocolCheckTimeout, ProtocolFingerprint, ProtocolRejected,
     ProtocolVerified, defer_lightyear_protocol_check,
@@ -94,6 +96,7 @@ impl Plugin for ProtocolPlugin {
         inventory_messages::register_inventory_protocol(app);
         quest_messages::register_quest_protocol(app);
         interaction_messages::register_interaction_protocol(app);
+        pet_stable_messages::register_pet_stable_protocol(app);
         experience_messages::register_experience_protocol(app);
         merchant_messages::register_merchant_protocol(app);
         bank_messages::register_bank_protocol(app);
