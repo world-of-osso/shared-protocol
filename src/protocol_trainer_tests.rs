@@ -160,6 +160,76 @@ fn fixed_output_order_and_specialization_requests_round_trip() {
         assert_wire_round_trip(&request);
     }
     assert_wire_round_trip(&CraftingOrderStateUpdate {
+        snapshot: Some(CraftingOrdersSnapshot {
+            skill_line: 2532,
+            kind: CraftingOrderKind::Personal,
+            mine: false,
+            orders: vec![CraftingOrderSnapshot {
+                id: 4_294_967_301,
+                spell_id: 413496,
+                item_id: 206434,
+                count: 1,
+                kind: CraftingOrderKind::Personal,
+                customer: "Customer".into(),
+                recipient: Some("Tailor".into()),
+                crafter: Some("Tailor".into()),
+                commission: 12_345,
+                reagents: vec![],
+                expires_at: 1_791_763_200,
+                note: "For my guild".into(),
+                status: CraftingOrderStatus::Claimed,
+                can_claim: false,
+                can_fulfill: true,
+                can_cancel: false,
+            }],
+        }),
+        message: Some("Claimed crafting order".into()),
+        error: None,
+    });
+    assert_wire_round_trip(&ProfessionSpecializationStateUpdate {
+        snapshot: Some(ProfessionSpecializationsSnapshot {
+            skill_line: 2830,
+            knowledge_currency_id: 2025,
+            knowledge_available: 25,
+            trees: vec![ProfessionSpecTreeSnapshot {
+                tree_id: 350,
+                name: "Leather Armor Crafting".into(),
+                root_node_id: 28532,
+                unlocked: true,
+                nodes: vec![ProfessionSpecNodeSnapshot {
+                    node_id: 28536,
+                    entry_id: 36321,
+                    name: "Leather Armor Crafting".into(),
+                    description: "Learn an additional sub-specialization".into(),
+                    icon: 134262,
+                    spell_id: 0,
+                    rank: 5,
+                    granted_rank: 0,
+                    max_rank: 30,
+                    pos_x: -100,
+                    pos_y: 200,
+                    kind: 1,
+                    available: true,
+                    costs: vec![ProfessionSpecCost {
+                        trait_currency_id: 9,
+                        amount: 1,
+                    }],
+                    path: Some(ProfessionSpecPath {
+                        left_group: 100,
+                        right_group: 101,
+                        trait_currency_id: 1451,
+                    }),
+                    perk: Some(ProfessionSpecPerk {
+                        required_points: 5,
+                        unlocks_subpath: true,
+                    }),
+                }],
+            }],
+        }),
+        message: Some("Applied specialization".into()),
+        error: None,
+    });
+    assert_wire_round_trip(&CraftingOrderStateUpdate {
         snapshot: None,
         message: None,
         error: Some("Recipe does not accept crafting orders".into()),
