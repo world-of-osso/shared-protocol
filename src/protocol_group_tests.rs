@@ -32,6 +32,52 @@ fn protocol_plugin_registers_group_messages() {
 }
 
 #[test]
+fn raid_assistant_assignment_round_trips_on_the_wire() {
+    let config = bincode::config::standard();
+    let request = SetGroupAssistant {
+        name: "Bob".into(),
+        assistant: true,
+    };
+    let bytes = bincode::serde::encode_to_vec(&request, config).unwrap();
+    let (decoded, _): (SetGroupAssistant, usize) =
+        bincode::serde::decode_from_slice(&bytes, config).unwrap();
+    assert_eq!(decoded, request);
+    let snapshot = GroupAssistants {
+        members: vec!["Bob".into()],
+    };
+    let bytes = bincode::serde::encode_to_vec(&snapshot, config).unwrap();
+    let (decoded, _): (GroupAssistants, usize) =
+        bincode::serde::decode_from_slice(&bytes, config).unwrap();
+    assert_eq!(decoded, snapshot);
+}
+
+#[test]
+fn countdown_start_and_cancel_round_trip_on_the_wire() {
+    let config = bincode::config::standard();
+    for seconds in [10, 0] {
+        let request = GroupCountdownRequest { seconds };
+        let bytes = bincode::serde::encode_to_vec(&request, config).unwrap();
+        let (decoded, consumed): (GroupCountdownRequest, usize) =
+            bincode::serde::decode_from_slice(&bytes, config).unwrap();
+        assert_eq!(decoded, request);
+        assert_eq!(consumed, bytes.len());
+    }
+    for remaining in [10.0, 6.5, 0.0] {
+        let update = GroupCountdownUpdate {
+            deadline_unix_ms: 10000,
+            initiator_name: "Alice".into(),
+            duration_secs: 10,
+            time_remaining_secs: remaining,
+        };
+        let bytes = bincode::serde::encode_to_vec(&update, config).unwrap();
+        let (decoded, consumed): (GroupCountdownUpdate, usize) =
+            bincode::serde::decode_from_slice(&bytes, config).unwrap();
+        assert_eq!(decoded, update);
+        assert_eq!(consumed, bytes.len());
+    }
+}
+
+#[test]
 fn group_member_states_round_trip_on_the_wire() {
     use crate::components::{AuraView, Position, PowerEntry, PowerType};
     let states = GroupMemberStates {
@@ -130,6 +176,7 @@ fn roster_portrait_round_trips_on_the_wire() {
             },
         }],
         loot_method: LootMode::RoundRobin,
+        loot_threshold: 2,
     };
     let config = bincode::config::standard();
     let mut roster = roster;

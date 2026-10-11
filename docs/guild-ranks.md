@@ -5,6 +5,13 @@ Rank IDs are zero-based positions, 2–10 ranks; rank 0 is immutable. Only the G
 edits ranks, flags and bank limits. Promotions/demotions require the corresponding flag
 and a strictly lower-ranked target; promotion never reaches the actor's rank.
 
+`GuildRankRequest::Leave` removes the actor; rank zero receives `LeaderCannotLeave`.
+`RemoveMember` requires removal rights and a strictly lower-ranked target. Success refreshes
+all affected online rosters, including the removed character's empty roster.
+`GuildInvitation` carries the authoritative inviter and guild on AuthChannel. It is sent
+to online targets and redelivered on world entry from the persisted invitation.
+`GuildDeclineInviteRequest` clears that pending invite; accept remains `GuildAcceptInviteRequest`.
+
 Snapshots contain ordered ranks/rights, member ranks, recipient rank, purchased tab names
 and a typed refusal. Tab withdrawal limits count stacks, not individual items. Zero denies
 withdrawals. Gold limits are copper/day, shared with guild repairs; zero denies spending.

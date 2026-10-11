@@ -68,9 +68,46 @@ pub struct SetGroupLootMethod {
     pub method: LootMode,
 }
 
+/// Leader sets the minimum quality (Uncommon/Rare/Epic) that starts group rolls.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct SetGroupLootThreshold {
+    pub quality: u8,
+}
+
+/// Raid leader grants or removes assistant permission (`SetAssistantLeader`).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SetGroupAssistant {
+    pub name: String,
+    pub assistant: bool,
+}
+
+/// Current raid assistants, sent alongside roster changes and assistant assignments.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Default)]
+pub struct GroupAssistants {
+    pub members: Vec<String>,
+}
+
 /// Leader starts a ready check (`DoReadyCheck`).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct StartReadyCheck;
+
+/// Leader requests Retail's player countdown (`C_PartyInfo.DoCountdown`).
+/// Zero cancels the current group countdown.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct GroupCountdownRequest {
+    pub seconds: u32,
+}
+
+/// Authoritative group countdown, sent on start, replacement, cancellation and expiry.
+/// A zero duration is cancellation; a positive duration with zero remaining is expiry.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct GroupCountdownUpdate {
+    /// Server UTC deadline, preventing delayed reliable messages from restarting a stale timer.
+    pub deadline_unix_ms: u64,
+    pub initiator_name: String,
+    pub duration_secs: u32,
+    pub time_remaining_secs: f32,
+}
 
 /// Member answers the active ready check (`ConfirmReadyCheck`).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -236,6 +273,8 @@ pub enum GroupMessageCode {
     SetLootRoundRobin,
     SetLootNeedBeforeGreed,
     SetLootPersonal,
+    SetLootGroup,
+    LootMethodUnavailable,
     ReadyCheckInProgress,
     ReadyCheckStarted,
     ReadyCheckAllReady,
@@ -274,6 +313,8 @@ impl GroupMessageCode {
             Self::SetLootRoundRobin => "ERR_SET_LOOT_ROUNDROBIN",
             Self::SetLootNeedBeforeGreed => "ERR_SET_LOOT_NBG",
             Self::SetLootPersonal => "ERR_SET_LOOT_PERSONAL",
+            Self::SetLootGroup => "ERR_SET_LOOT_GROUP",
+            Self::LootMethodUnavailable => "ERR_INVALID_LOOT_METHOD",
             Self::ReadyCheckInProgress => "ERR_READY_CHECK_IN_PROGRESS",
             Self::ReadyCheckStarted => "READY_CHECK_MESSAGE",
             Self::ReadyCheckAllReady => "READY_CHECK_ALL_READY",
@@ -314,6 +355,8 @@ impl GroupMessageCode {
             Self::SetLootRoundRobin => "Looting set to Round Robin.".into(),
             Self::SetLootNeedBeforeGreed => "Looting set to Need Before Greed.".into(),
             Self::SetLootPersonal => "Looting set to Personal.".into(),
+            Self::SetLootGroup => "Looting set to Group Loot.".into(),
+            Self::LootMethodUnavailable => "That loot method is unavailable.".into(),
             Self::ReadyCheckInProgress => "You are already running a ready check".into(),
             Self::ReadyCheckStarted => format!("{name} has initiated a ready check."),
             Self::ReadyCheckAllReady => "Everyone is Ready".into(),
@@ -330,9 +373,12 @@ pub(super) fn register_group_messages(app: &mut App) {
     for_client::<ConvertGroupToParty>(app);
     for_client::<SetRaidSubgroup>(app);
     for_client::<SetGroupRole>(app);
+    for_client::<SetGroupAssistant>(app);
     for_client::<SetGroupLootMethod>(app);
+    for_client::<SetGroupLootThreshold>(app);
     for_client::<StartReadyCheck>(app);
     for_client::<RespondReadyCheck>(app);
+    for_client::<GroupCountdownRequest>(app);
     for_client::<SetRaidTarget>(app);
     for_client::<MinimapPingRequest>(app);
     app.register_protocol_message::<GroupInvitePrompt>()
@@ -342,6 +388,10 @@ pub(super) fn register_group_messages(app: &mut App) {
     app.register_protocol_message::<GroupMemberStates>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<ReadyCheckUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<GroupCountdownUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<GroupAssistants>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<RaidTargetIcons>()
         .add_direction(NetworkDirection::ServerToClient);

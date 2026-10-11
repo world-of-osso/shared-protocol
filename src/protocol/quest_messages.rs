@@ -229,6 +229,59 @@ pub struct QuestLogUpdate {
     pub watched_quest_ids: Vec<u32>,
 }
 
+/// Party push uses a server-issued offer ID; recipients cannot accept arbitrary quests.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct PushQuestToParty {
+    pub quest_id: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct QuestShareOffer {
+    pub offer_id: u64,
+    pub sender_name: String,
+    pub quest_id: u32,
+    pub title: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct QuestPushResponse {
+    pub offer_id: u64,
+    pub accepted: bool,
+}
+
+/// Retail QuestPushReason results supported by the local eligibility rules.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub enum QuestPushReason {
+    Success,
+    Accepted,
+    Declined,
+    NotAllowed,
+    NotInParty,
+    Busy,
+    Dead,
+    AlreadyDone,
+    OnQuest,
+    LogFull,
+    LowLevel,
+    HighLevel,
+    Class,
+    Race,
+    Prerequisite,
+    Invalid,
+    TimerExpired,
+    CrossFactionRestricted,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct QuestPushResult {
+    pub quest_id: u32,
+    pub quest_title: String,
+    /// Recipient errors name the sharer and use *_TO_RECIPIENT_S GlobalStrings.
+    pub recipient: bool,
+    pub player_name: String,
+    pub reason: QuestPushReason,
+}
+
 /// Why a quest request was rejected (Retail `QuestFailedReasons` and quest
 /// giver errors).
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
@@ -251,6 +304,8 @@ pub enum QuestFailedReason {
     NotEnoughMoney,
     InventoryFull,
     InvalidRewardChoice,
+    TimedOut,
+    OnlyOneTimedQuest,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
@@ -303,6 +358,10 @@ pub(super) fn register_quest_protocol(app: &mut App) {
 }
 
 fn register_client_messages(app: &mut App) {
+    app.register_protocol_message::<PushQuestToParty>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<QuestPushResponse>()
+        .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<QuestGiverStatusQuery>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<QuestGiverHello>()
@@ -322,6 +381,10 @@ fn register_client_messages(app: &mut App) {
 }
 
 fn register_server_messages(app: &mut App) {
+    app.register_protocol_message::<QuestShareOffer>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<QuestPushResult>()
+        .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<QuestGiverStatusMultiple>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<QuestGiverQuestList>()
