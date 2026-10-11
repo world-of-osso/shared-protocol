@@ -158,6 +158,18 @@ fn inventory_errors_use_retail_wording() {
 }
 
 #[test]
+fn unique_equipped_error_round_trips_with_retail_wording() {
+    assert_wire_round_trip(&InventoryError {
+        reason: InventoryErrorReason::ItemUniqueEquippable,
+        detail: Some("Seal of Ascension".into()),
+    });
+    assert_eq!(
+        InventoryErrorReason::ItemUniqueEquippable.message(),
+        "You cannot equip more than one of those."
+    );
+}
+
+#[test]
 fn equipment_slots_use_retail_invslot_ids() {
     let ids: Vec<u8> = EquipmentSlot::ALL.iter().map(|s| s.inv_slot_id()).collect();
     assert_eq!(ids, (1..=19).collect::<Vec<u8>>());

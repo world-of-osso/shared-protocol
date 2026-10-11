@@ -360,6 +360,8 @@ pub enum InventoryErrorReason {
     CantSwap,
     /// `EQUIP_ERR_DESTROY_NONEMPTY_BAG`
     DestroyNonemptyBag,
+    /// `EQUIP_ERR_ITEM_UNIQUE_EQUIPPABLE` / ERR_ITEM_UNIQUE_EQUIPPABLE.
+    ItemUniqueEquippable,
 }
 
 impl InventoryErrorReason {
@@ -387,6 +389,7 @@ impl InventoryErrorReason {
             Self::WrongBagType => "That item doesn't go in that container.".into(),
             Self::CantSwap => "These items can't be swapped.".into(),
             Self::DestroyNonemptyBag => "You can only do that with empty bags.".into(),
+            Self::ItemUniqueEquippable => "You cannot equip more than one of those.".into(),
         }
     }
 }
