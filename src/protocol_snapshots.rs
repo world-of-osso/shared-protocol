@@ -429,6 +429,15 @@ pub struct BattlegroundSnapshot {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct WarModeSnapshot {
+    pub desired: bool,
+    pub active: bool,
+    pub can_enable: bool,
+    pub can_disable: bool,
+    pub enlisted_spell: Option<u32>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct PvpSnapshot {
     pub honor: u32,
     pub honor_max: u32,
@@ -437,6 +446,7 @@ pub struct PvpSnapshot {
     pub brackets: Vec<PvpBracketStatsSnapshot>,
     pub queue: Option<PvpQueueSnapshot>,
     pub battleground: Option<BattlegroundSnapshot>,
+    pub war_mode: Option<WarModeSnapshot>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]

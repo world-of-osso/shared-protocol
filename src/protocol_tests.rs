@@ -468,6 +468,13 @@ fn pvp_state_update_round_trip() {
                 },
             ],
             queue: None,
+            war_mode: Some(WarModeSnapshot {
+                desired: true,
+                active: false,
+                can_enable: true,
+                can_disable: true,
+                enlisted_spell: Some(282559),
+            }),
             battleground: Some(BattlegroundSnapshot {
                 match_id: 9,
                 battleground_id: 1014,
