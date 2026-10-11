@@ -18,6 +18,19 @@ where
 #[test]
 fn instance_messages_round_trip() {
     // Grim Batol (670) on Heroic (2), General Umbriss (DungeonEncounter 1051, Bit 3) killed.
+    assert_wire_round_trip(&SetRaidDifficulty {
+        difficulty_id: 15,
+        legacy: false,
+    });
+    assert_wire_round_trip(&SetRaidDifficulty {
+        difficulty_id: 4,
+        legacy: true,
+    });
+    assert_wire_round_trip(&RaidDifficultySet {
+        difficulty_id: 14,
+        legacy_difficulty_id: 3,
+    });
+    assert_wire_round_trip(&TransferAbortReason::NeedGroup);
     assert_wire_round_trip(&SetDungeonDifficulty { difficulty_id: 2 });
     assert_wire_round_trip(&DungeonDifficultySet { difficulty_id: 23 });
     assert_wire_round_trip(&WorldServerInfo {
@@ -63,6 +76,8 @@ fn protocol_plugin_registers_instance_messages() {
         .init_resource::<ReplicationRegistry>();
     app.add_plugins(ProtocolPlugin);
 
+    assert!(app.is_message_registered::<SetRaidDifficulty>());
+    assert!(app.is_message_registered::<RaidDifficultySet>());
     assert!(app.is_message_registered::<SetDungeonDifficulty>());
     assert!(app.is_message_registered::<DungeonDifficultySet>());
     assert!(app.is_message_registered::<WorldServerInfo>());
