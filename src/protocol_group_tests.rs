@@ -32,6 +32,26 @@ fn protocol_plugin_registers_group_messages() {
 }
 
 #[test]
+fn raid_assistant_assignment_round_trips_on_the_wire() {
+    let config = bincode::config::standard();
+    let request = SetGroupAssistant {
+        name: "Bob".into(),
+        assistant: true,
+    };
+    let bytes = bincode::serde::encode_to_vec(&request, config).unwrap();
+    let (decoded, _): (SetGroupAssistant, usize) =
+        bincode::serde::decode_from_slice(&bytes, config).unwrap();
+    assert_eq!(decoded, request);
+    let snapshot = GroupAssistants {
+        members: vec!["Bob".into()],
+    };
+    let bytes = bincode::serde::encode_to_vec(&snapshot, config).unwrap();
+    let (decoded, _): (GroupAssistants, usize) =
+        bincode::serde::decode_from_slice(&bytes, config).unwrap();
+    assert_eq!(decoded, snapshot);
+}
+
+#[test]
 fn countdown_start_and_cancel_round_trip_on_the_wire() {
     let config = bincode::config::standard();
     for seconds in [10, 0] {

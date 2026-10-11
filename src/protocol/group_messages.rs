@@ -68,6 +68,19 @@ pub struct SetGroupLootMethod {
     pub method: LootMode,
 }
 
+/// Raid leader grants or removes assistant permission (`SetAssistantLeader`).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SetGroupAssistant {
+    pub name: String,
+    pub assistant: bool,
+}
+
+/// Current raid assistants, sent alongside roster changes and assistant assignments.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Default)]
+pub struct GroupAssistants {
+    pub members: Vec<String>,
+}
+
 /// Leader starts a ready check (`DoReadyCheck`).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct StartReadyCheck;
@@ -346,6 +359,7 @@ pub(super) fn register_group_messages(app: &mut App) {
     for_client::<ConvertGroupToParty>(app);
     for_client::<SetRaidSubgroup>(app);
     for_client::<SetGroupRole>(app);
+    for_client::<SetGroupAssistant>(app);
     for_client::<SetGroupLootMethod>(app);
     for_client::<StartReadyCheck>(app);
     for_client::<RespondReadyCheck>(app);
@@ -361,6 +375,8 @@ pub(super) fn register_group_messages(app: &mut App) {
     app.register_protocol_message::<ReadyCheckUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<GroupCountdownUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<GroupAssistants>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<RaidTargetIcons>()
         .add_direction(NetworkDirection::ServerToClient);
