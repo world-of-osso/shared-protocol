@@ -21,6 +21,7 @@ mod experience_messages;
 mod gameplay_messages;
 mod group_messages;
 mod guild_bank_messages;
+mod guild_charter_messages;
 mod guild_rank_messages;
 mod instance_messages;
 mod interaction_messages;
@@ -32,6 +33,7 @@ mod merchant_messages;
 mod mirror_timer_messages;
 mod pet_battle_messages;
 mod pet_messages;
+mod pet_stable_messages;
 mod protocol_check;
 mod protocol_layout;
 mod quest_messages;
@@ -42,6 +44,7 @@ mod threat_messages;
 mod tooltip_messages;
 mod trainer_messages;
 mod transfer_messages;
+mod transmog_messages;
 mod world_time_messages;
 
 pub use achievement_catalog_messages::*;
@@ -54,6 +57,7 @@ pub use experience_messages::*;
 pub use gameplay_messages::*;
 pub use group_messages::*;
 pub use guild_bank_messages::*;
+pub use guild_charter_messages::*;
 pub use guild_rank_messages::*;
 pub use instance_messages::*;
 pub use interaction_messages::*;
@@ -64,6 +68,7 @@ pub use merchant_messages::*;
 pub use mirror_timer_messages::*;
 pub use pet_battle_messages::*;
 pub use pet_messages::*;
+pub use pet_stable_messages::*;
 pub use protocol_check::{
     ProtocolCheckChannel, ProtocolCheckTimeout, ProtocolFingerprint, ProtocolRejected,
     ProtocolVerified, defer_lightyear_protocol_check,
@@ -76,6 +81,7 @@ pub use threat_messages::*;
 pub use tooltip_messages::*;
 pub use trainer_messages::*;
 pub use transfer_messages::*;
+pub use transmog_messages::*;
 pub use world_time_messages::*;
 
 use registration::{register_channels, register_messages};
@@ -94,12 +100,15 @@ impl Plugin for ProtocolPlugin {
         inventory_messages::register_inventory_protocol(app);
         quest_messages::register_quest_protocol(app);
         interaction_messages::register_interaction_protocol(app);
+        pet_stable_messages::register_pet_stable_protocol(app);
         experience_messages::register_experience_protocol(app);
         merchant_messages::register_merchant_protocol(app);
         bank_messages::register_bank_protocol(app);
         guild_bank_messages::register_guild_bank_protocol(app);
         guild_rank_messages::register_guild_rank_protocol(app);
+        guild_charter_messages::register_guild_charter_protocol(app);
         trainer_messages::register_trainer_protocol(app);
+        transmog_messages::register_transmog_protocol(app);
         loot_messages::register_loot_protocol(app);
         mail_messages::register_mail_protocol(app);
         taxi_messages::register_taxi_protocol(app);

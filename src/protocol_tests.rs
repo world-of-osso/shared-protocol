@@ -95,6 +95,7 @@ fn guild_invite_messages_round_trip() {
         guild: Some(GuildSnapshot {
             guild_id: 3,
             guild_name: "Raid Team".into(),
+            created_at: Some(1728600000),
             motd: "Bring flasks".into(),
             info_text: "Wed/Sun raids".into(),
             members: vec![GuildMemberSnapshot {
@@ -467,11 +468,22 @@ fn pvp_state_update_round_trip() {
                     weekly_losses: 0,
                 },
             ],
-            queue: Some(PvpQueueSnapshot {
-                kind: PvpQueueKindSnapshot::Battleground {
-                    battleground_id: 1,
-                    name: "Warsong Gulch".into(),
-                },
+            queue: None,
+            battleground: Some(BattlegroundSnapshot {
+                match_id: 9,
+                battleground_id: 1014,
+                name: "Warsong Gulch".into(),
+                map_id: 2106,
+                team: crate::battleground::BgTeam::A,
+                phase: crate::battleground::BgPhase::Waiting,
+                accepted: false,
+                invitation_time_left_secs: None,
+                score_a: 0,
+                score_b: 0,
+                flags: Default::default(),
+                outcome: None,
+                players: Vec::new(),
+                honor_reward: None,
             }),
         }),
         message: Some("queued for Warsong Gulch".into()),

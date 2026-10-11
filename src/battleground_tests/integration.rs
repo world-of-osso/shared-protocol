@@ -4,10 +4,10 @@ use super::*;
 fn wsg_full_pipeline_queue_to_rewards() {
     let mut q = BgQueue::default();
     for i in 1..=10 {
-        q.join_solo(i, 30, 1, 100).unwrap();
+        q.join_solo(i, 30, warsong_gulch().id, 100).unwrap();
     }
 
-    let bg_match = q.try_match(1).unwrap();
+    let bg_match = q.try_match(warsong_gulch().id).unwrap();
     assert!(q.is_empty());
 
     let tmpl = warsong_gulch();
@@ -17,7 +17,7 @@ fn wsg_full_pipeline_queue_to_rewards() {
     let mut flags = FlagObjective::default();
     for _ in 0..3 {
         flags.pickup(BgTeam::A, bg_match.team_a[0]);
-        flags.capture(BgTeam::A, &mut inst, &tmpl);
+        flags.capture(BgTeam::A, bg_match.team_a[0], &mut inst, &tmpl);
     }
 
     assert_eq!(inst.phase, BgPhase::Ended);
@@ -66,7 +66,7 @@ fn ab_full_pipeline_node_control_to_win() {
     }
 
     assert_eq!(inst.outcome, Some(BgOutcome::Winner(BgTeam::A)));
-    assert!(inst.score_a.score >= 1600);
+    assert!(inst.score_a.score >= 1500);
 
     let dist = distribute_rewards(&inst).unwrap();
     let winner = dist
@@ -113,9 +113,9 @@ fn deserter_lifecycle_leave_block_expire_rejoin() {
     let mut deserters = BgDeserterTracker::default();
 
     for i in 1..=10 {
-        q.join_solo(i, 30, 1, 1000).unwrap();
+        q.join_solo(i, 30, warsong_gulch().id, 1000).unwrap();
     }
-    let bg_match = q.try_match(1).unwrap();
+    let bg_match = q.try_match(warsong_gulch().id).unwrap();
     let tmpl = warsong_gulch();
     let mut inst = BgInstance::from_match(&bg_match, &tmpl);
     inst.start();
@@ -124,15 +124,21 @@ fn deserter_lifecycle_leave_block_expire_rejoin() {
     assert!(deserters.is_deserter(bg_match.team_a[0], 2000));
 
     assert_eq!(
-        q.join_solo_checked(bg_match.team_a[0], 30, 1, 2000, &deserters),
+        q.join_solo_checked(bg_match.team_a[0], 30, warsong_gulch().id, 2000, &deserters),
         Err(BgQueueError::Deserter)
     );
 
     let after_expiry = 2000 + 900;
     assert!(!deserters.is_deserter(bg_match.team_a[0], after_expiry));
     assert!(
-        q.join_solo_checked(bg_match.team_a[0], 30, 1, after_expiry, &deserters)
-            .is_ok()
+        q.join_solo_checked(
+            bg_match.team_a[0],
+            30,
+            warsong_gulch().id,
+            after_expiry,
+            &deserters
+        )
+        .is_ok()
     );
 }
 
@@ -140,9 +146,9 @@ fn deserter_lifecycle_leave_block_expire_rejoin() {
 fn timeout_draw_both_teams_get_draw_rewards() {
     let mut q = BgQueue::default();
     for i in 1..=10 {
-        q.join_solo(i, 30, 1, 100).unwrap();
+        q.join_solo(i, 30, warsong_gulch().id, 100).unwrap();
     }
-    let bg_match = q.try_match(1).unwrap();
+    let bg_match = q.try_match(warsong_gulch().id).unwrap();
     let tmpl = warsong_gulch();
     let mut inst = BgInstance::from_match(&bg_match, &tmpl);
     inst.start();

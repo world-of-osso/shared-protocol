@@ -317,6 +317,18 @@ pub struct GuildInviteResponse {
     pub error: Option<String>,
 }
 
+/// Server notifies the invitee; also delivered on entering world for a persisted invite.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct GuildInvitation {
+    pub guild_id: u32,
+    pub guild_name: String,
+    pub inviter_name: String,
+}
+
+/// Client declines their pending guild invitation.
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct GuildDeclineInviteRequest;
+
 /// Client accepts their pending guild invitation.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct GuildAcceptInviteRequest;

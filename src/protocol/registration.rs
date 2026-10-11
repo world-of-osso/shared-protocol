@@ -33,6 +33,10 @@ pub(super) fn register_messages(app: &mut App) {
     register_spell_messages(app);
     super::group_messages::register_group_messages(app);
     crate::protocol_snapshots::register_snapshot_messages(app);
+    app.register_protocol_message::<RespondToBattlegroundInvite>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<LeaveBattleground>()
+        .add_direction(NetworkDirection::ClientToServer);
 }
 
 fn register_pet_battle_messages(app: &mut App) {
@@ -132,6 +136,10 @@ fn register_guild_and_chat_messages(app: &mut App) {
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<GuildInviteResponse>()
         .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<GuildInvitation>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<GuildDeclineInviteRequest>()
+        .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<GuildAcceptInviteRequest>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<GuildAcceptInviteResponse>()

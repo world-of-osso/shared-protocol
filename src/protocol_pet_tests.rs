@@ -62,6 +62,49 @@ fn pet_messages_round_trip_on_the_wire() {
 }
 
 #[test]
+fn pet_stable_operations_and_health_round_trip_on_the_wire() {
+    for operation in [
+        PetStableOperation::List,
+        PetStableOperation::Swap { from: 0, to: 204 },
+        PetStableOperation::Rename {
+            slot: 204,
+            name: "Ash".into(),
+        },
+        PetStableOperation::Abandon { slot: 204 },
+        PetStableOperation::Specialization {
+            slot: 0,
+            specialization: 79,
+        },
+    ] {
+        assert_wire_round_trip(&PetStableRequest { npc: 42, operation });
+    }
+    assert_wire_round_trip(&PetStableContents {
+        npc: 42,
+        current: Some(0),
+        unlocked_active: [true, true, false, false, false],
+        pets: vec![StablePetInfo {
+            slot: 204,
+            creature_entry: 299,
+            display_id: 1413,
+            name: "Ash".into(),
+            level: 10,
+            family: "Wolf".into(),
+            family_icon: 132203,
+            specialization: Some(74),
+            health: 0.0,
+            max_health: 378.0,
+        }],
+        specializations: vec![PetSpecializationInfo {
+            id: 74,
+            name: "Ferocity".into(),
+        }],
+    });
+    assert_wire_round_trip(&PetStableFailed {
+        error: PetStableError::NotInteracting,
+    });
+}
+
+#[test]
 fn protocol_plugin_registers_pet_component_and_messages() {
     let mut app = App::new();
     app.init_resource::<ProtocolHasher>()
