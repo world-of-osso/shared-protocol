@@ -63,6 +63,7 @@ fn protocol_plugin_registers_encounter_messages() {
     assert!(app.is_message_registered::<EncounterTimelineEvent>());
     assert_wire_round_trip(&EncounterTimelineEvent::Timers {
         caster: 3669,
+        sample_unix_ms: 1791749090000,
         timers: vec![EncounterTimer {
             event_id: 2,
             spell_id: 20805,

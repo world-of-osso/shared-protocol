@@ -70,6 +70,8 @@ pub struct EncounterTimer {
 pub enum EncounterTimelineEvent {
     Timers {
         caster: u64,
+        /// UTC sample time; receivers subtract delivery age, not restart timers.
+        sample_unix_ms: u64,
         timers: Vec<EncounterTimer>,
     },
     Cast {
@@ -81,6 +83,14 @@ pub enum EncounterTimelineEvent {
         caster: u64,
         phase: u32,
     },
+}
+
+/// Read the same UTC millisecond domain used by authoritative group countdowns.
+pub fn read_encounter_unix_ms() -> u64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .expect("encounter clock predates Unix epoch")
+        .as_millis() as u64
 }
 
 pub(super) fn register_encounter_protocol(app: &mut App) {
