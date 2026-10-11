@@ -23,6 +23,7 @@ fn kobold_camp_cleanup(current: u32) -> QuestEntrySnapshot {
         zone: String::new(),
         completed: false,
         expires_at: Some(2800),
+        timer_sampled_at: Some(1000),
         failed: false,
         repeatability: QuestRepeatability::Normal,
         objectives: vec![QuestObjectiveSnapshot {
