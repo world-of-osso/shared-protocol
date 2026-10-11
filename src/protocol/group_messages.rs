@@ -68,9 +68,40 @@ pub struct SetGroupLootMethod {
     pub method: LootMode,
 }
 
+/// Raid leader grants or removes assistant permission (`SetAssistantLeader`).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SetGroupAssistant {
+    pub name: String,
+    pub assistant: bool,
+}
+
+/// Current raid assistants, sent alongside roster changes and assistant assignments.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Default)]
+pub struct GroupAssistants {
+    pub members: Vec<String>,
+}
+
 /// Leader starts a ready check (`DoReadyCheck`).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct StartReadyCheck;
+
+/// Leader requests Retail's player countdown (`C_PartyInfo.DoCountdown`).
+/// Zero cancels the current group countdown.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct GroupCountdownRequest {
+    pub seconds: u32,
+}
+
+/// Authoritative group countdown, sent on start, replacement, cancellation and expiry.
+/// A zero duration is cancellation; a positive duration with zero remaining is expiry.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct GroupCountdownUpdate {
+    /// Server UTC deadline, preventing delayed reliable messages from restarting a stale timer.
+    pub deadline_unix_ms: u64,
+    pub initiator_name: String,
+    pub duration_secs: u32,
+    pub time_remaining_secs: f32,
+}
 
 /// Member answers the active ready check (`ConfirmReadyCheck`).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -330,9 +361,11 @@ pub(super) fn register_group_messages(app: &mut App) {
     for_client::<ConvertGroupToParty>(app);
     for_client::<SetRaidSubgroup>(app);
     for_client::<SetGroupRole>(app);
+    for_client::<SetGroupAssistant>(app);
     for_client::<SetGroupLootMethod>(app);
     for_client::<StartReadyCheck>(app);
     for_client::<RespondReadyCheck>(app);
+    for_client::<GroupCountdownRequest>(app);
     for_client::<SetRaidTarget>(app);
     for_client::<MinimapPingRequest>(app);
     app.register_protocol_message::<GroupInvitePrompt>()
@@ -342,6 +375,10 @@ pub(super) fn register_group_messages(app: &mut App) {
     app.register_protocol_message::<GroupMemberStates>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<ReadyCheckUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<GroupCountdownUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<GroupAssistants>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<RaidTargetIcons>()
         .add_direction(NetworkDirection::ServerToClient);
