@@ -129,6 +129,11 @@ pub const GAMEOBJECT_TYPE_SPELL_FOCUS: u8 = 8;
 /// TrinityCore `GAMEOBJECT_TYPE_CHAIR`: using it seats the player.
 pub const GAMEOBJECT_TYPE_CHAIR: u8 = 7;
 
+/// TDB1210 Mainline WSG227740/227741 use type36 (new flags).
+pub const GAMEOBJECT_TYPE_BATTLEGROUND_FLAG: u8 = 36;
+pub const WARSONG_ALLIANCE_FLAG_ENTRY: u32 = 227741;
+pub const WARSONG_HORDE_FLAG_ENTRY: u32 = 227740;
+
 /// A world game object (AzerothCore `gameobject_template`).
 #[derive(
     Component,
@@ -156,15 +161,24 @@ impl GameObjectInfo {
     /// (GameObject.cpp:2620-3530) gives the player an action the server implements. Others,
     /// such as decoration (`GENERIC`, no `Use` case) and spell foci (`SPELL_FOCUS`, which only
     /// triggers a linked trap), take no cursor, highlight or click.
+    pub fn is_battleground_flag(&self) -> bool {
+        self.go_type == GAMEOBJECT_TYPE_BATTLEGROUND_FLAG
+            && matches!(
+                self.entry,
+                WARSONG_ALLIANCE_FLAG_ENTRY | WARSONG_HORDE_FLAG_ENTRY
+            )
+    }
+
     pub fn is_usable(&self) -> bool {
-        matches!(
-            self.go_type,
-            GAMEOBJECT_TYPE_GUILD_BANK
-                | GAMEOBJECT_TYPE_MAILBOX
-                | GAMEOBJECT_TYPE_MEETINGSTONE
-                | GAMEOBJECT_TYPE_RITUAL
-                | GAMEOBJECT_TYPE_CHAIR
-        )
+        self.is_battleground_flag()
+            || matches!(
+                self.go_type,
+                GAMEOBJECT_TYPE_GUILD_BANK
+                    | GAMEOBJECT_TYPE_MAILBOX
+                    | GAMEOBJECT_TYPE_MEETINGSTONE
+                    | GAMEOBJECT_TYPE_RITUAL
+                    | GAMEOBJECT_TYPE_CHAIR
+            )
     }
 }
 
