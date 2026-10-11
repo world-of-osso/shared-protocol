@@ -29,6 +29,31 @@ pub struct DungeonEncounterProgress {
     pub flags: u32,
 }
 
+/// Copy-scoped replacement snapshot on InstanceChannel. None clears the scenario tracker.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ScenarioProgress {
+    pub map_id: u32,
+    pub instance_id: u32,
+    pub difficulty_id: u32,
+    pub scenario: Option<ScenarioStage>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ScenarioStage {
+    pub scenario_id: u32,
+    pub name: String,
+    /// Retail Scenario.Type, including 3 (dungeon display).
+    pub kind: u32,
+    pub step_id: u32,
+    /// One-based. num_stages + 1 denotes completion.
+    pub stage: u32,
+    pub num_stages: u32,
+    pub title: String,
+    pub description: String,
+    pub completed: bool,
+    pub criteria: Vec<AchievementCriterionLine>,
+}
+
 /// AchievementChannel, client to server. Each request produces one bounded page.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum QueryAchievementCatalog {
