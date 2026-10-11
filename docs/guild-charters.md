@@ -13,6 +13,8 @@ Clients reference owned charter item GUIDs; NPC and account authority stays serv
   required signature count and actor-specific owner/signing permission.
 - The server persists petitions, unique signer accounts and charter ownership;
   creation consumes the owned item and commits membership/ranks together.
+- GuildSnapshot.created_at carries the actual persisted creation timestamp; legacy
+  guilds without a recorded date remain None, not fabricated.
 - Both skins share the same Mainline controls and mechanics.
 
 ## References
