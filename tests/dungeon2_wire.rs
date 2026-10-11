@@ -30,6 +30,9 @@ fn dungeon2_catalog_requests_wire_round_trip() {
     round_trip(QueryAchievementCatalog::Summary {
         scope: AchievementScope::Account,
     });
+    round_trip(QueryAchievementCatalog::Achievement {
+        achievement_id: 633,
+    });
     round_trip(QueryAchievementCatalog::Categories { after_id: 0 });
     round_trip(QueryAchievementCatalog::Category {
         category_id: 14808,
@@ -43,6 +46,10 @@ fn dungeon2_catalog_requests_wire_round_trip() {
 
 #[test]
 fn dungeon2_catalog_pages_wire_round_trip() {
+    round_trip(AchievementCatalogPage::Achievement {
+        achievement_id: 4899,
+        entry: None,
+    });
     round_trip(AchievementCatalogPage::Summary(AchievementSummary {
         scope: AchievementScope::All,
         points: 10,

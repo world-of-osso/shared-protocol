@@ -36,6 +36,7 @@ pub enum QueryAchievementCatalog {
     Categories { after_id: u32 },
     Category { category_id: u32, after_id: u32 },
     Criteria { achievement_id: u32, after_id: u32 },
+    Achievement { achievement_id: u32 },
 }
 
 /// Account and character filters refer to the authored 0x20000 flag, not other characters' state.
@@ -109,6 +110,10 @@ pub struct AchievementCatalogEntry {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum AchievementCatalogPage {
     Summary(AchievementSummary),
+    Achievement {
+        achievement_id: u32,
+        entry: Option<AchievementCatalogEntry>,
+    },
     Categories {
         categories: Vec<AchievementCategoryEntry>,
         next_id: Option<u32>,
