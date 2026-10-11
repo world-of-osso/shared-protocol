@@ -57,7 +57,7 @@ pub struct ChallengeRun {
     pub resulting_level: Option<u32>,
     pub rating: Option<u32>,
 }
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq, Eq)]
 pub struct ChallengeSnapshot {
     pub font: Option<u64>,
     pub keys: Vec<KeystoneInfo>,
