@@ -59,6 +59,7 @@ pub struct ChallengeRun {
 }
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ChallengeSnapshot {
+    pub font: Option<u64>,
     pub keys: Vec<KeystoneInfo>,
     pub run: Option<ChallengeRun>,
     pub error: Option<String>,
