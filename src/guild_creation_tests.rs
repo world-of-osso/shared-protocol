@@ -376,7 +376,7 @@ fn register_tabard_not_guild_master() {
 const CLOSE_DIST_SQ: f32 = 25.0; // 5 yards squared
 const FAR_DIST_SQ: f32 = 400.0; // 20 yards squared
 
-fn npc_ctx<'a>(flags: u32, dist_sq: f32, gold: u32, name: &'a str) -> CharterNpcContext<'a> {
+fn npc_ctx<'a>(flags: u32, dist_sq: f32, gold: u64, name: &'a str) -> CharterNpcContext<'a> {
     CharterNpcContext {
         npc_flags: flags,
         distance_squared: dist_sq,

@@ -9,7 +9,7 @@ use std::collections::HashSet;
 use serde::{Deserialize, Serialize};
 
 /// Cost of a guild charter in copper (10 silver = 1000 copper).
-pub const CHARTER_COST: u32 = 1000;
+pub const CHARTER_COST: u64 = 1000;
 
 /// Number of signatures required to submit a petition.
 pub const REQUIRED_SIGNATURES: usize = 4;
@@ -122,7 +122,7 @@ impl PetitionManager {
         if is_guilded {
             return Err(PetitionError::AlreadyInGuild);
         }
-        if gold < u64::from(CHARTER_COST) {
+        if gold < CHARTER_COST {
             return Err(PetitionError::InsufficientFunds);
         }
         if name.is_empty() || name.len() > MAX_GUILD_NAME_LEN {
