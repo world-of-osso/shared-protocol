@@ -70,6 +70,8 @@ fn quest_share_messages_round_trip() {
     assert_wire_round_trip(&QuestPushResult {
         quest_id: 62,
         player_name: "Recipient".into(),
+        quest_title: "The Fargodeep Mine".into(),
+        recipient: false,
         reason: QuestPushReason::Accepted,
     });
 }

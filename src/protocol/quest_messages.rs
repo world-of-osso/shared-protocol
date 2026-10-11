@@ -275,6 +275,9 @@ pub enum QuestPushReason {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct QuestPushResult {
     pub quest_id: u32,
+    pub quest_title: String,
+    /// Recipient errors name the sharer and use *_TO_RECIPIENT_S GlobalStrings.
+    pub recipient: bool,
     pub player_name: String,
     pub reason: QuestPushReason,
 }
