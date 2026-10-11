@@ -62,19 +62,21 @@ pub struct BgTemplate {
 
 // -- Built-in BG templates --
 
-/// Warsong Gulch — 10v10 capture the flag.
+/// Mainline Warsong Gulch — local BattlemasterList row1014 (build12.1.0.69933),
+/// map2106 from TDB1210 start locations7051/7050. Three captures: world_state17303.
+/// The legacy duration below remains unsourced; lifecycle callers must not use it.
 pub fn warsong_gulch() -> BgTemplate {
     BgTemplate {
-        id: 1,
+        id: 1014,
         name: "Warsong Gulch".into(),
-        map_id: 489,
+        map_id: 2106,
         team_size: 10,
         min_players_per_team: 5,
         objective: BgObjective::FlagCapture,
         max_duration_secs: 25 * 60,
         win_score: 3,
         starting_reinforcements: 0,
-        bracket: LevelBracket::new(10, 60),
+        bracket: LevelBracket::new(10, 90),
     }
 }
 

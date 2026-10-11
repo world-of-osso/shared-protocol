@@ -12,6 +12,6 @@ Classic Arathi Basin (map529) ends at1500 resources, not1600. Source: local `gam
 
 ## Acceptance status — 2026-10-11
 
-Only that resource-limit correction is implemented here. No new lifecycle transport or messages. Existing template IDs, minimum counts, brackets, durations, node tick/capture policies, deserter duration and reward amounts remain unverified; their presence is not authentic Retail evidence. Existing static marks rewards are not an implementation of Mainline honor.
+Source-backed template correction also maps WSG to Mainline BattlemasterList1014/map2106, teams5–10 and levels10–90. Values decoded from local CASC FDID1360265, build12.1.0.69933, layout3414CBD7; matching wowdev/WoWDBDefs schema supplies field names only, not gameplay numbers. TDB world_state17303 supplies3 captures. No new lifecycle transport or messages. Other template IDs and policies, durations, node tick/capture policies, deserter duration and reward amounts remain unverified; their presence is not authentic Retail evidence. Existing static marks rewards are not an implementation of Mainline honor.
 
 Required but missing: invitation/acceptance, retained server match, transfer/origin persistence, live objective interactions, scoreboard, sourced honor award and both-skin live proof. Server multi-player queue/score regression is unit-level proof only, not a live or transport lifecycle test.
