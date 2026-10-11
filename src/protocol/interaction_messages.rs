@@ -110,6 +110,8 @@ pub enum NpcRole {
     GuildBanker,
     /// Retail `PlayerInteractionType::MailInfo`.
     Mailbox,
+    /// Retail `PlayerInteractionType::Transmogrifier`.
+    Transmogrifier,
 }
 
 /// AzerothCore `GAMEOBJECT_TYPE_GUILD_BANK`.
@@ -274,6 +276,23 @@ pub struct SummonRequest {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct SummonResponse {
     pub accept: bool,
+}
+
+#[cfg(test)]
+mod transmog_tests {
+    use super::*;
+
+    #[test]
+    fn transmog_service_opens_a_role_not_a_vendor() {
+        let opened: InteractionOpened =
+            serde_json::from_str(r#"{"npc":54442,"kind":{"Role":"Transmogrifier"}}"#)
+                .expect("Retail Transmogrifier service role");
+        assert_eq!(opened.npc, 54442);
+        assert_eq!(
+            serde_json::to_value(opened.kind).unwrap(),
+            serde_json::json!({"Role": "Transmogrifier"})
+        );
+    }
 }
 
 pub(super) fn register_interaction_protocol(app: &mut App) {
