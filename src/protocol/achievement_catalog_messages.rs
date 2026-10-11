@@ -30,13 +30,34 @@ pub struct DungeonEncounterProgress {
 }
 
 /// AchievementChannel, client to server. Each request produces one bounded page.
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum QueryAchievementCatalog {
-    Summary { scope: AchievementScope },
-    Categories { after_id: u32 },
-    Category { category_id: u32, after_id: u32 },
-    Criteria { achievement_id: u32, after_id: u32 },
-    Achievement { achievement_id: u32 },
+    Summary {
+        scope: AchievementScope,
+    },
+    Categories {
+        after_id: u32,
+    },
+    Category {
+        category_id: u32,
+        after_id: u32,
+    },
+    Criteria {
+        achievement_id: u32,
+        after_id: u32,
+    },
+    Achievement {
+        achievement_id: u32,
+    },
+    Statistics {
+        category_id: u32,
+        after_id: u32,
+    },
+    Search {
+        text: String,
+        scope: AchievementScope,
+        after_id: u32,
+    },
 }
 
 /// Account and character filters refer to the authored 0x20000 flag, not other characters' state.
@@ -104,12 +125,25 @@ pub struct AchievementCatalogEntry {
     pub progress_supported: bool,
     pub criteria: Vec<AchievementCriterionLine>,
     pub next_criteria_id: Option<u32>,
+    /// Unclamped authoritative counter for supported statistics; None means unevaluated.
+    pub statistic_value: Option<u64>,
 }
 
 /// AchievementChannel, server to client. Unknown IDs return empty terminal pages.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum AchievementCatalogPage {
     Summary(AchievementSummary),
+    Statistics {
+        category_id: u32,
+        achievements: Vec<AchievementCatalogEntry>,
+        next_id: Option<u32>,
+    },
+    Search {
+        text: String,
+        scope: AchievementScope,
+        achievements: Vec<AchievementCatalogEntry>,
+        next_id: Option<u32>,
+    },
     Achievement {
         achievement_id: u32,
         entry: Option<AchievementCatalogEntry>,
