@@ -78,7 +78,8 @@ pub fn warsong_gulch() -> BgTemplate {
     }
 }
 
-/// Arathi Basin — 15v15 node control (5 bases, 1600 resources to win).
+/// Arathi Basin — 15v15 node control (5 bases, 1500 resources to win).
+/// Resource limit: Map.csv build 12.1.0.69933, map 529 PvpLongDescription.
 pub fn arathi_basin() -> BgTemplate {
     BgTemplate {
         id: 2,
@@ -88,7 +89,7 @@ pub fn arathi_basin() -> BgTemplate {
         min_players_per_team: 8,
         objective: BgObjective::NodeControl,
         max_duration_secs: 25 * 60,
-        win_score: 1600,
+        win_score: 1500,
         starting_reinforcements: 0,
         bracket: LevelBracket::new(10, 60),
     }

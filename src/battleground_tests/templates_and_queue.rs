@@ -17,7 +17,7 @@ fn ab_template() {
     assert_eq!(ab.id, 2);
     assert_eq!(ab.team_size, 15);
     assert_eq!(ab.objective, BgObjective::NodeControl);
-    assert_eq!(ab.win_score, 1600);
+    assert_eq!(ab.win_score, 1500);
 }
 
 #[test]
