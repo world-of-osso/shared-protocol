@@ -62,23 +62,26 @@ pub struct BgTemplate {
 
 // -- Built-in BG templates --
 
-/// Warsong Gulch — 10v10 capture the flag.
+/// Mainline Warsong Gulch — local BattlemasterList row1014 (build12.1.0.69933),
+/// map2106 from TDB1210 start locations7051/7050. Three captures: world_state17303.
+/// The legacy duration below remains unsourced; lifecycle callers must not use it.
 pub fn warsong_gulch() -> BgTemplate {
     BgTemplate {
-        id: 1,
+        id: 1014,
         name: "Warsong Gulch".into(),
-        map_id: 489,
+        map_id: 2106,
         team_size: 10,
         min_players_per_team: 5,
         objective: BgObjective::FlagCapture,
         max_duration_secs: 25 * 60,
         win_score: 3,
         starting_reinforcements: 0,
-        bracket: LevelBracket::new(10, 60),
+        bracket: LevelBracket::new(10, 90),
     }
 }
 
-/// Arathi Basin — 15v15 node control (5 bases, 1600 resources to win).
+/// Arathi Basin — 15v15 node control (5 bases, 1500 resources to win).
+/// Resource limit: Map.csv build 12.1.0.69933, map 529 PvpLongDescription.
 pub fn arathi_basin() -> BgTemplate {
     BgTemplate {
         id: 2,
@@ -88,7 +91,7 @@ pub fn arathi_basin() -> BgTemplate {
         min_players_per_team: 8,
         objective: BgObjective::NodeControl,
         max_duration_secs: 25 * 60,
-        win_score: 1600,
+        win_score: 1500,
         starting_reinforcements: 0,
         bracket: LevelBracket::new(10, 60),
     }
@@ -354,7 +357,7 @@ pub enum BgTeam {
 }
 
 /// Phase of a battleground instance.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum BgPhase {
     /// Players are entering; waiting for min_players_per_team on each side.
     Waiting,
@@ -365,7 +368,7 @@ pub enum BgPhase {
 }
 
 /// Outcome of a finished battleground.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum BgOutcome {
     /// One team won by reaching win_score or depleting enemy reinforcements.
     Winner(BgTeam),

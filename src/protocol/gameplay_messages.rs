@@ -564,6 +564,19 @@ pub struct QueueForBattleground {
     pub battleground_id: u32,
 }
 
+/// Echo the match identity so a stale popup cannot accept another invitation.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct RespondToBattlegroundInvite {
+    pub match_id: u64,
+    pub accepted: bool,
+}
+
+/// Leave only the current match; stale scoreboard buttons cannot leave a new one.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct LeaveBattleground {
+    pub match_id: u64,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct QueueForRatedPvp {
     pub bracket: PvpBracketSnapshot,
@@ -571,6 +584,17 @@ pub struct QueueForRatedPvp {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct DequeueFromPvp;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SetWarModeDesired {
+    pub enabled: bool,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SelectPvpTalent {
+    pub slot: u8,
+    pub talent_id: u32,
+}
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct PvpStateUpdate {

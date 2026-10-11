@@ -71,6 +71,7 @@ pub struct GroupRosterSnapshot {
     pub total_count: u16,
     pub members: Vec<GroupMemberSnapshot>,
     pub loot_method: crate::loot::LootMode,
+    pub loot_threshold: u8,
 }
 
 /// Canonical head customization and only the equipped head visual, independent of
@@ -221,6 +222,8 @@ pub struct AchievementToastSnapshot {
     pub achievement_id: u32,
     pub name: String,
     pub points: u32,
+    /// Authored Achievement.IconFileID for the earned alert.
+    pub icon_fdid: u32,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -272,6 +275,8 @@ pub struct GuildMemberSnapshot {
 pub struct GuildSnapshot {
     pub guild_id: u32,
     pub guild_name: String,
+    /// Actual creation time, Unix seconds; legacy guilds with no recorded date stay None.
+    pub created_at: Option<u64>,
     pub motd: String,
     pub info_text: String,
     pub members: Vec<GuildMemberSnapshot>,
@@ -371,7 +376,8 @@ pub enum PvpBracketSnapshot {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct PvpBracketStatsSnapshot {
     pub bracket: PvpBracketSnapshot,
-    pub rating: u32,
+    /// No rating is claimed without an authoritative played-match result.
+    pub rating: Option<u32>,
     pub season_wins: u32,
     pub season_losses: u32,
     pub weekly_wins: u32,
@@ -389,14 +395,93 @@ pub struct PvpQueueSnapshot {
     pub kind: PvpQueueKindSnapshot,
 }
 
+/// Retail PVPMatchTable columns plus WSG objective counters, scoped to one match.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct BattlegroundPlayerScoreSnapshot {
+    pub character_id: u64,
+    pub name: String,
+    pub class: u8,
+    pub level: u8,
+    pub team: crate::battleground::BgTeam,
+    pub killing_blows: u32,
+    pub deaths: u32,
+    pub damage_done: u64,
+    pub healing_done: u64,
+    pub flag_captures: u32,
+    pub flag_returns: u32,
+    /// Unknown honor policies are absent, not synthetic zero rewards/badges.
+    pub honorable_kills: Option<u32>,
+    pub honor_level: Option<u32>,
+}
+
+/// Retained match invitation; absent expiry means the source timer is unknown,
+/// not an invented countdown. Waiting+accepted is entry pending, not a live match.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct BattlegroundSnapshot {
+    pub match_id: u64,
+    pub battleground_id: u32,
+    pub name: String,
+    pub map_id: u32,
+    pub team: crate::battleground::BgTeam,
+    pub phase: crate::battleground::BgPhase,
+    pub accepted: bool,
+    pub invitation_time_left_secs: Option<u32>,
+    pub score_a: u32,
+    pub score_b: u32,
+    pub flags: crate::battleground::FlagObjective,
+    pub outcome: Option<crate::battleground::BgOutcome>,
+    pub players: Vec<BattlegroundPlayerScoreSnapshot>,
+    pub honor_reward: Option<u32>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct PvpTalentSnapshot {
+    pub id: u32,
+    pub spell_id: u32,
+    pub name: String,
+    pub icon: u32,
+    pub required_level: u8,
+    pub slot_mask: u8,
+    pub unavailable_reason: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct PvpTalentSlotSnapshot {
+    pub index: u8,
+    pub required_level: u8,
+    pub selected: Option<u32>,
+    pub can_change: bool,
+    pub unlocked: bool,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct PvpTalentsSnapshot {
+    pub spec_id: u32,
+    pub slots: Vec<PvpTalentSlotSnapshot>,
+    pub choices: Vec<PvpTalentSnapshot>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct WarModeSnapshot {
+    pub desired: bool,
+    pub active: bool,
+    pub can_enable: bool,
+    pub can_disable: bool,
+    pub enlisted_spell: Option<u32>,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct PvpSnapshot {
     pub honor: u32,
     pub honor_max: u32,
     pub conquest: u32,
-    pub conquest_max: u32,
+    /// Dynamic season policy unavailable is None, not an invented cap.
+    pub conquest_max: Option<u32>,
     pub brackets: Vec<PvpBracketStatsSnapshot>,
     pub queue: Option<PvpQueueSnapshot>,
+    pub battleground: Option<BattlegroundSnapshot>,
+    pub war_mode: Option<WarModeSnapshot>,
+    pub talents: Option<PvpTalentsSnapshot>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
