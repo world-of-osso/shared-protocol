@@ -130,6 +130,7 @@ fn roster_portrait_round_trips_on_the_wire() {
             },
         }],
         loot_method: LootMode::RoundRobin,
+        loot_threshold: 2,
     };
     let config = bincode::config::standard();
     let mut roster = roster;

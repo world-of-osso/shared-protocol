@@ -117,12 +117,53 @@ pub struct LootFailed {
     pub error: LootError,
 }
 
+/// Need/Greed/Transmog/Pass intent; roll values are generated only by the server.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct GroupLootChoice {
+    pub roll_id: u64,
+    pub choice: crate::loot::LootRollChoice,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct GroupLootHistoryRequest;
+
+/// Eligibility and result for one participant, captured at drop time.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct GroupLootPlayer {
+    pub character_id: u64,
+    pub name: String,
+    pub can_need: bool,
+    pub need_reason: Option<String>,
+    pub can_transmog: bool,
+    pub response: Option<crate::loot::LootRollEntry>,
+}
+
+/// Authoritative roll/history entry. Sent to eligible members on start, vote and
+/// resolution, and replayed after a history request. Complete entries never roll again.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct GroupLootRoll {
+    pub roll_id: u64,
+    pub corpse: u64,
+    pub item: LootContent,
+    pub seconds_remaining: f32,
+    pub players: Vec<GroupLootPlayer>,
+    pub winner: Option<u64>,
+    pub complete: bool,
+    pub delivered: bool,
+}
+
 pub(super) fn register_loot_protocol(app: &mut App) {
     app.add_channel::<LootChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
         ..default()
     })
     .add_direction(NetworkDirection::Bidirectional);
+    app.register_protocol_message::<GroupLootChoice>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<GroupLootHistoryRequest>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<GroupLootRoll>()
+        .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<LootUnit>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<LootSlotRequest>()

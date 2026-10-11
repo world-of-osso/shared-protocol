@@ -68,6 +68,12 @@ pub struct SetGroupLootMethod {
     pub method: LootMode,
 }
 
+/// Leader sets the minimum quality (Uncommon/Rare/Epic) that starts group rolls.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct SetGroupLootThreshold {
+    pub quality: u8,
+}
+
 /// Leader starts a ready check (`DoReadyCheck`).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct StartReadyCheck;
@@ -236,6 +242,8 @@ pub enum GroupMessageCode {
     SetLootRoundRobin,
     SetLootNeedBeforeGreed,
     SetLootPersonal,
+    SetLootGroup,
+    LootMethodUnavailable,
     ReadyCheckInProgress,
     ReadyCheckStarted,
     ReadyCheckAllReady,
@@ -274,6 +282,8 @@ impl GroupMessageCode {
             Self::SetLootRoundRobin => "ERR_SET_LOOT_ROUNDROBIN",
             Self::SetLootNeedBeforeGreed => "ERR_SET_LOOT_NBG",
             Self::SetLootPersonal => "ERR_SET_LOOT_PERSONAL",
+            Self::SetLootGroup => "ERR_SET_LOOT_GROUP",
+            Self::LootMethodUnavailable => "ERR_INVALID_LOOT_METHOD",
             Self::ReadyCheckInProgress => "ERR_READY_CHECK_IN_PROGRESS",
             Self::ReadyCheckStarted => "READY_CHECK_MESSAGE",
             Self::ReadyCheckAllReady => "READY_CHECK_ALL_READY",
@@ -314,6 +324,8 @@ impl GroupMessageCode {
             Self::SetLootRoundRobin => "Looting set to Round Robin.".into(),
             Self::SetLootNeedBeforeGreed => "Looting set to Need Before Greed.".into(),
             Self::SetLootPersonal => "Looting set to Personal.".into(),
+            Self::SetLootGroup => "Looting set to Group Loot.".into(),
+            Self::LootMethodUnavailable => "That loot method is unavailable.".into(),
             Self::ReadyCheckInProgress => "You are already running a ready check".into(),
             Self::ReadyCheckStarted => format!("{name} has initiated a ready check."),
             Self::ReadyCheckAllReady => "Everyone is Ready".into(),
@@ -331,6 +343,7 @@ pub(super) fn register_group_messages(app: &mut App) {
     for_client::<SetRaidSubgroup>(app);
     for_client::<SetGroupRole>(app);
     for_client::<SetGroupLootMethod>(app);
+    for_client::<SetGroupLootThreshold>(app);
     for_client::<StartReadyCheck>(app);
     for_client::<RespondReadyCheck>(app);
     for_client::<SetRaidTarget>(app);
