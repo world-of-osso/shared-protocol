@@ -419,7 +419,7 @@ mod tests {
         assert_eq!(def.name, "Timewarped Badge");
         assert!(def.account_wide);
         // All others should not be account-wide.
-        for id in 1..=6 {
+        for id in [HONOR_CURRENCY_ID, CONQUEST_CURRENCY_ID, 3, 4, 5, 6] {
             assert!(
                 !currency_by_id(id).unwrap().account_wide,
                 "id {id} should not be account_wide"
