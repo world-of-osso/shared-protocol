@@ -25,7 +25,7 @@ Group-loot messages and roll lifecycle in `src/loot.rs` and `src/protocol/loot_m
 
 ## Integration proof — 2026-10-11
 
-Server and native engine branches use protocol revision `b5e5861bc0ab31d5c5856e628e53dbd779619b55`. Ordered real UDP snapshot/choice test passes; two private54300 accounts prove actual inventory deltas, numeric results and history in Modern and Forever. Server deterministic Transmog1 > Greed99 test also replays completed history on a replaced authenticated connection. [Consumer proof ledger](../../../game-engine/docs/wiki/systems/group-loot.md).
+Server and native engine branches pin protocol revision `c6e063c37d647c08661af16770ded3589eec23f4`. Its six deterministic tests pass; server-only Transmog class preference adds no wire fields. Ordered real UDP snapshot/choice test passes; two private54300 accounts prove actual inventory deltas, numeric results and history in Modern and Forever. Server deterministic Transmog1 > Greed99 test also replays completed history on a replaced authenticated connection. [Consumer proof ledger](../../../game-engine/docs/wiki/systems/group-loot.md).
 
 ## Known gaps (current cycle)
 - [ ] Independent final integration verification; verifier backend authentication expired.
