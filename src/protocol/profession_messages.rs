@@ -178,7 +178,18 @@ pub struct CraftingOrderSnapshot {
     pub status: CraftingOrderStatus,
     pub can_claim: bool,
     pub can_fulfill: bool,
+    pub can_release: bool,
     pub can_cancel: bool,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct CraftingOrderRecipeSnapshot {
+    pub spell_id: u32,
+    pub skill_line: u32,
+    pub item_id: u32,
+    pub count: u32,
+    pub name: String,
+    pub reagents: Vec<CraftingOrderReagent>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -186,6 +197,7 @@ pub struct CraftingOrdersSnapshot {
     pub skill_line: u32,
     pub kind: CraftingOrderKind,
     pub mine: bool,
+    pub recipes: Vec<CraftingOrderRecipeSnapshot>,
     pub orders: Vec<CraftingOrderSnapshot>,
 }
 

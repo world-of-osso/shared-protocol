@@ -164,6 +164,14 @@ fn fixed_output_order_and_specialization_requests_round_trip() {
             skill_line: 2532,
             kind: CraftingOrderKind::Personal,
             mine: false,
+            recipes: vec![CraftingOrderRecipeSnapshot {
+                spell_id: 413496,
+                skill_line: 2532,
+                item_id: 206434,
+                count: 1,
+                name: "Crafting Order Recipe".into(),
+                reagents: vec![],
+            }],
             orders: vec![CraftingOrderSnapshot {
                 id: 4_294_967_301,
                 spell_id: 413496,
@@ -180,6 +188,7 @@ fn fixed_output_order_and_specialization_requests_round_trip() {
                 status: CraftingOrderStatus::Claimed,
                 can_claim: false,
                 can_fulfill: true,
+                can_release: true,
                 can_cancel: false,
             }],
         }),
