@@ -586,6 +586,17 @@ pub struct QueueForRatedPvp {
 pub struct DequeueFromPvp;
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SetWarModeDesired {
+    pub enabled: bool,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SelectPvpTalent {
+    pub slot: u8,
+    pub talent_id: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct PvpStateUpdate {
     pub snapshot: Option<PvpSnapshot>,
     pub message: Option<String>,
