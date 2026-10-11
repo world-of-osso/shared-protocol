@@ -57,9 +57,26 @@ pub struct ProfessionSpecNodeSnapshot {
     /// Raw TraitNode.Type, not a class/spec/hero interpretation.
     pub kind: u8,
     pub available: bool,
+    pub unavailable_reason: Option<String>,
     pub costs: Vec<ProfessionSpecCost>,
     pub path: Option<ProfessionSpecPath>,
     pub perk: Option<ProfessionSpecPerk>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ProfessionSpecEdgeSnapshot {
+    pub left_node_id: u32,
+    pub right_node_id: u32,
+    pub kind: u8,
+    pub visual_style: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ProfessionSpecCurrencySnapshot {
+    pub trait_currency_id: u32,
+    /// CurrencyTypes ID for wallet-backed knowledge, zero for derived unlock tokens.
+    pub currency_id: u32,
+    pub available: u32,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -69,13 +86,16 @@ pub struct ProfessionSpecTreeSnapshot {
     pub root_node_id: u32,
     pub unlocked: bool,
     pub nodes: Vec<ProfessionSpecNodeSnapshot>,
+    pub edges: Vec<ProfessionSpecEdgeSnapshot>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ProfessionSpecializationsSnapshot {
     pub skill_line: u32,
+    /// CurrencyTypes ID, not TraitCurrency ID.
     pub knowledge_currency_id: u32,
     pub knowledge_available: u32,
+    pub currencies: Vec<ProfessionSpecCurrencySnapshot>,
     pub trees: Vec<ProfessionSpecTreeSnapshot>,
 }
 

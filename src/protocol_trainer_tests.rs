@@ -191,6 +191,11 @@ fn fixed_output_order_and_specialization_requests_round_trip() {
             skill_line: 2830,
             knowledge_currency_id: 2025,
             knowledge_available: 25,
+            currencies: vec![ProfessionSpecCurrencySnapshot {
+                trait_currency_id: 9,
+                currency_id: 2025,
+                available: 25,
+            }],
             trees: vec![ProfessionSpecTreeSnapshot {
                 tree_id: 350,
                 name: "Leather Armor Crafting".into(),
@@ -210,6 +215,7 @@ fn fixed_output_order_and_specialization_requests_round_trip() {
                     pos_y: 200,
                     kind: 1,
                     available: true,
+                    unavailable_reason: None,
                     costs: vec![ProfessionSpecCost {
                         trait_currency_id: 9,
                         amount: 1,
@@ -223,6 +229,12 @@ fn fixed_output_order_and_specialization_requests_round_trip() {
                         required_points: 5,
                         unlocks_subpath: true,
                     }),
+                }],
+                edges: vec![ProfessionSpecEdgeSnapshot {
+                    left_node_id: 28532,
+                    right_node_id: 28536,
+                    kind: 0,
+                    visual_style: 1,
                 }],
             }],
         }),
