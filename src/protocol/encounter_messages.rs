@@ -45,12 +45,52 @@ pub struct EncounterDisengageUnit {
     pub unit: u64,
 }
 
+/// Retail EncounterEventSeverity. No severity is inferred from spell damage.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub enum EncounterSeverity {
+    Low,
+    Medium,
+    High,
+}
+
+/// An actual selected scheduler timer, not an estimated ability cooldown.
+/// Conditional timers may skip on a chance roll, target or phase condition.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct EncounterTimer {
+    pub event_id: u32,
+    pub spell_id: u32,
+    pub remaining_ms: u32,
+    pub duration_ms: u32,
+    pub conditional: bool,
+}
+
+/// Ordered with encounter lifecycle. Snapshot replaces this caster's timers;
+/// empty snapshots cancel them. Casts are sent only after server acceptance.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub enum EncounterTimelineEvent {
+    Timers {
+        caster: u64,
+        timers: Vec<EncounterTimer>,
+    },
+    Cast {
+        caster: u64,
+        spell_id: u32,
+        severity: EncounterSeverity,
+    },
+    Phase {
+        caster: u64,
+        phase: u32,
+    },
+}
+
 pub(super) fn register_encounter_protocol(app: &mut App) {
     app.add_channel::<EncounterChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
         ..default()
     })
     .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<EncounterTimelineEvent>()
+        .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<EncounterStart>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<EncounterEnd>()

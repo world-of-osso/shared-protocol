@@ -60,6 +60,26 @@ fn protocol_plugin_registers_encounter_messages() {
         .init_resource::<ReplicationRegistry>();
     app.add_plugins(ProtocolPlugin);
 
+    assert!(app.is_message_registered::<EncounterTimelineEvent>());
+    assert_wire_round_trip(&EncounterTimelineEvent::Timers {
+        caster: 3669,
+        timers: vec![EncounterTimer {
+            event_id: 2,
+            spell_id: 20805,
+            remaining_ms: 7312,
+            duration_ms: 7312,
+            conditional: true,
+        }],
+    });
+    assert_wire_round_trip(&EncounterTimelineEvent::Cast {
+        caster: 3669,
+        spell_id: 20805,
+        severity: EncounterSeverity::Low,
+    });
+    assert_wire_round_trip(&EncounterTimelineEvent::Phase {
+        caster: 3669,
+        phase: 2,
+    });
     assert!(app.is_message_registered::<EncounterStart>());
     assert!(app.is_message_registered::<EncounterEnd>());
     assert!(app.is_message_registered::<EncounterEngageUnit>());
