@@ -1,11 +1,12 @@
 //! BG objective types: flag capture (WSG), node control (AB), reinforcements (AV).
 
 use super::{BgInstance, BgTeam, BgTemplate};
+use serde::{Deserialize, Serialize};
 
 // -- Objective: Flag Capture (WSG) --
 
 /// State of a single flag in capture-the-flag.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum FlagState {
     /// Flag is at its home base.
     AtBase,
@@ -16,7 +17,7 @@ pub enum FlagState {
 }
 
 /// Flag capture state for both teams.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct FlagObjective {
     /// Team A's flag (defended by A, captured by B).
     pub flag_a: FlagState,
@@ -64,10 +65,20 @@ impl FlagObjective {
 
     /// Carrier reaches their own base with enemy flag. Awards a capture if
     /// the carrier's own flag is at base. Returns true if captured.
-    pub fn capture(&mut self, team: BgTeam, instance: &mut BgInstance, tmpl: &BgTemplate) -> bool {
+    pub fn capture(
+        &mut self,
+        team: BgTeam,
+        carrier: u64,
+        instance: &mut BgInstance,
+        tmpl: &BgTemplate,
+    ) -> bool {
+        if instance.phase != super::BgPhase::InProgress {
+            return false;
+        }
         let own_flag_at_base = *self.own_flag(team) == FlagState::AtBase;
         let enemy_flag = self.enemy_flag_mut(team);
-        let is_carried = matches!(enemy_flag, FlagState::Carried { .. });
+        let is_carried =
+            matches!(enemy_flag, FlagState::Carried { carrier: actual } if *actual == carrier);
         if !is_carried || !own_flag_at_base {
             return false;
         }

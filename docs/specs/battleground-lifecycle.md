@@ -18,4 +18,6 @@ Server retains matched rosters and validates acceptance/decline against membersh
 
 `LeaveBattleground` echoes the current match identity. Server returns only the owning, arrived participant to its retained origin through NewWorld/WorldPortAck; clears membership and closes an unoccupied/unreserved match copy after the last participant. It does not invent early-leave penalty or automatic-exit timers.
 
-Required but missing: native popup/response UI, durable origin handling across disconnect/restart, live objective interactions, scoreboard, sourced honor award and both-skin live proof. Server multi-player queue/score regression is unit-level proof only, not a live or transport lifecycle test.
+Shared FlagObjective.capture now requires the actual carrier and InProgress phase; an invalid/ended attempt cannot consume a flag or mutate score. Typed BG snapshots expose flags, scores, outcome, roster and objective counters using existing objective models. Type36 WSG227740/227741 are usable through the existing world-object contract. Unknown honor reward/level/kill-policy values are absent, not synthetic numbers.
+
+Required but missing: native popup/response/scoreboard UI, durable origin handling across disconnect/restart, real combat counters, sourced honor award and both-skin live proof. Preparation/match/flag-reset/drop/exit/expiry timing and dropped-flag visual fidelity remain explicit gaps. Server multi-player queue/score regression is unit-level proof only, not a live or transport lifecycle test.

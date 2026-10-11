@@ -384,6 +384,25 @@ pub struct PvpQueueSnapshot {
     pub kind: PvpQueueKindSnapshot,
 }
 
+/// Retail PVPMatchTable columns plus WSG objective counters, scoped to one match.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct BattlegroundPlayerScoreSnapshot {
+    pub character_id: u64,
+    pub name: String,
+    pub class: u8,
+    pub level: u8,
+    pub team: crate::battleground::BgTeam,
+    pub killing_blows: u32,
+    pub deaths: u32,
+    pub damage_done: u64,
+    pub healing_done: u64,
+    pub flag_captures: u32,
+    pub flag_returns: u32,
+    /// Unknown honor policies are absent, not synthetic zero rewards/badges.
+    pub honorable_kills: Option<u32>,
+    pub honor_level: Option<u32>,
+}
+
 /// Retained match invitation; absent expiry means the source timer is unknown,
 /// not an invented countdown. Waiting+accepted is entry pending, not a live match.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -396,6 +415,12 @@ pub struct BattlegroundSnapshot {
     pub phase: crate::battleground::BgPhase,
     pub accepted: bool,
     pub invitation_time_left_secs: Option<u32>,
+    pub score_a: u32,
+    pub score_b: u32,
+    pub flags: crate::battleground::FlagObjective,
+    pub outcome: Option<crate::battleground::BgOutcome>,
+    pub players: Vec<BattlegroundPlayerScoreSnapshot>,
+    pub honor_reward: Option<u32>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]

@@ -368,7 +368,7 @@ pub enum BgPhase {
 }
 
 /// Outcome of a finished battleground.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum BgOutcome {
     /// One team won by reaching win_score or depleting enemy reinforcements.
     Winner(BgTeam),

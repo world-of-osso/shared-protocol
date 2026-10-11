@@ -17,7 +17,7 @@ fn wsg_full_pipeline_queue_to_rewards() {
     let mut flags = FlagObjective::default();
     for _ in 0..3 {
         flags.pickup(BgTeam::A, bg_match.team_a[0]);
-        flags.capture(BgTeam::A, &mut inst, &tmpl);
+        flags.capture(BgTeam::A, bg_match.team_a[0], &mut inst, &tmpl);
     }
 
     assert_eq!(inst.phase, BgPhase::Ended);
