@@ -64,6 +64,7 @@ fn countdown_start_and_cancel_round_trip_on_the_wire() {
     }
     for remaining in [10.0, 6.5, 0.0] {
         let update = GroupCountdownUpdate {
+            deadline_unix_ms: 10000,
             initiator_name: "Alice".into(),
             duration_secs: 10,
             time_remaining_secs: remaining,

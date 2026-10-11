@@ -5,7 +5,7 @@ Retail Mainline player countdown (`C_PartyInfo.DoCountdown`) over the reliable g
 ## What it must do
 
 - [ ] Requests carry the selected integer duration; zero requests cancellation.
-- [ ] Server updates carry initiator name, original duration and remaining seconds.
+- [ ] Server updates carry initiator name, original duration, remaining seconds and UTC deadline; delayed delivery must not restart an expired countdown.
 - [ ] Zero original duration means cancellation; positive original duration with zero remaining means normal expiry.
 - [ ] Start, replacement, cancellation and expiry reach every online group member.
 
@@ -23,7 +23,7 @@ Retail Mainline player countdown (`C_PartyInfo.DoCountdown`) over the reliable g
 
 ## Known gaps (current cycle)
 
-- [ ] Server and native client integration; assistant permissions; native countdown/audio and manager control.
+- [ ] Final server/native integration and live countdown/audio/manager proof. Assistant assignment and authoritative assistant snapshots are part of the group wire contract.
 - [ ] Local Lua sources name `Constants.PartyCountdownConstants.MaxCountdownSeconds` without exposing its numeric value. Do not infer a duration limit.
 
 ## Out of scope

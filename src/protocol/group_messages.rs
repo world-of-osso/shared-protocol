@@ -96,6 +96,8 @@ pub struct GroupCountdownRequest {
 /// A zero duration is cancellation; a positive duration with zero remaining is expiry.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct GroupCountdownUpdate {
+    /// Server UTC deadline, preventing delayed reliable messages from restarting a stale timer.
+    pub deadline_unix_ms: u64,
     pub initiator_name: String,
     pub duration_secs: u32,
     pub time_remaining_secs: f32,
