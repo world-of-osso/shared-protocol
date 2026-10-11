@@ -44,13 +44,15 @@ pub struct LootRollEntry {
     pub roll_value: u8,
 }
 
-pub fn resolve_need_greed(entries: &[LootRollEntry]) -> Option<u64> {
+pub fn resolve_need_greed(entries: &[LootRollEntry], preferred_transmog: &[u64]) -> Option<u64> {
     entries
         .iter()
         .filter(|entry| entry.choice != LootRollChoice::Pass)
         .max_by_key(|entry| {
             (
                 entry.choice.priority(),
+                entry.choice == LootRollChoice::Transmog
+                    && preferred_transmog.contains(&entry.player_id),
                 entry.roll_value,
                 std::cmp::Reverse(entry.player_id),
             )
@@ -84,17 +86,26 @@ pub struct RollWindow {
     pub responses: Vec<LootRollEntry>,
     pub can_need: Vec<u64>,
     pub can_transmog: Vec<u64>,
+    /// Warbands: appropriate classes outrank other Transmog collectors.
+    /// This server-owned preference is independent of item-specific Need refusal.
+    pub preferred_transmog: Vec<u64>,
     pub time_remaining: f32,
 }
 
 impl RollWindow {
-    pub fn new(item: LootDrop, group_players: &[u64], can_equip: &[u64]) -> Self {
+    pub fn new(
+        item: LootDrop,
+        group_players: &[u64],
+        can_need: &[u64],
+        preferred_transmog: &[u64],
+    ) -> Self {
         Self {
             item,
             pending_players: group_players.to_vec(),
             responses: Vec::new(),
-            can_need: can_equip.to_vec(),
+            can_need: can_need.to_vec(),
             can_transmog: Vec::new(),
+            preferred_transmog: preferred_transmog.to_vec(),
             time_remaining: ROLL_WINDOW_TIMEOUT,
         }
     }
@@ -149,7 +160,7 @@ impl RollWindow {
 
     pub fn resolve(&self) -> Option<u64> {
         if self.is_complete() {
-            resolve_need_greed(&self.responses)
+            resolve_need_greed(&self.responses, &self.preferred_transmog)
         } else {
             None
         }
