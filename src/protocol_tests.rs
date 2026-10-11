@@ -449,11 +449,11 @@ fn pvp_state_update_round_trip() {
             honor: 750,
             honor_max: 15_000,
             conquest: 120,
-            conquest_max: 1_800,
+            conquest_max: None,
             brackets: vec![
                 PvpBracketStatsSnapshot {
                     bracket: PvpBracketSnapshot::Arena2v2,
-                    rating: 1516,
+                    rating: Some(1516),
                     season_wins: 1,
                     season_losses: 0,
                     weekly_wins: 1,
@@ -461,7 +461,7 @@ fn pvp_state_update_round_trip() {
                 },
                 PvpBracketStatsSnapshot {
                     bracket: PvpBracketSnapshot::RatedBattleground,
-                    rating: 1500,
+                    rating: None,
                     season_wins: 0,
                     season_losses: 0,
                     weekly_wins: 0,
@@ -469,6 +469,14 @@ fn pvp_state_update_round_trip() {
                 },
             ],
             queue: None,
+            talents: None,
+            war_mode: Some(WarModeSnapshot {
+                desired: true,
+                active: false,
+                can_enable: true,
+                can_disable: true,
+                enlisted_spell: Some(282559),
+            }),
             battleground: Some(BattlegroundSnapshot {
                 match_id: 9,
                 battleground_id: 1014,

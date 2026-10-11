@@ -24,6 +24,20 @@ pub struct SetDungeonDifficulty {
     pub difficulty_id: u32,
 }
 
+/// Retail raid difficulty request. Legacy difficulties use a separate selection.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct SetRaidDifficulty {
+    pub difficulty_id: u32,
+    pub legacy: bool,
+}
+
+/// Current raid selections, sent on login and group/leader changes.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub struct RaidDifficultySet {
+    pub difficulty_id: u32,
+    pub legacy_difficulty_id: u32,
+}
+
 /// `SMSG_SET_DUNGEON_DIFFICULTY`: the player's dungeon difficulty, at login and on every
 /// change ("Dungeon Difficulty set to %s.").
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
@@ -128,6 +142,10 @@ pub(super) fn register_instance_protocol(app: &mut App) {
     .add_direction(NetworkDirection::Bidirectional);
     app.register_protocol_message::<SetDungeonDifficulty>()
         .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<SetRaidDifficulty>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<RaidDifficultySet>()
+        .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<RequestRaidInfo>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<ResetInstances>()

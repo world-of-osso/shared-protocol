@@ -120,6 +120,8 @@ pub const GAMEOBJECT_TYPE_GUILD_BANK: u8 = 34;
 pub const GAMEOBJECT_TYPE_MAILBOX: u8 = 19;
 /// TrinityCore `GAMEOBJECT_TYPE_RITUAL` (summoning portal).
 pub const GAMEOBJECT_TYPE_RITUAL: u8 = 18;
+/// TrinityCore GameObjectTypes; Retail Font of Power.
+pub const GAMEOBJECT_TYPE_KEYSTONE_RECEPTACLE: u8 = 49;
 /// TrinityCore `GAMEOBJECT_TYPE_MEETINGSTONE`.
 pub const GAMEOBJECT_TYPE_MEETINGSTONE: u8 = 23;
 /// TrinityCore `GAMEOBJECT_TYPE_GENERIC`: decoration (fires, lamps).
@@ -128,6 +130,27 @@ pub const GAMEOBJECT_TYPE_GENERIC: u8 = 5;
 pub const GAMEOBJECT_TYPE_SPELL_FOCUS: u8 = 8;
 /// TrinityCore `GAMEOBJECT_TYPE_CHAIR`: using it seats the player.
 pub const GAMEOBJECT_TYPE_CHAIR: u8 = 7;
+/// Retail resource nodes, not legacy chests.
+pub const GAMEOBJECT_TYPE_GATHERING_NODE: u8 = 50;
+
+/// Authored gathering category on a node or a fully looted skinnable corpse.
+/// The server selects and validates the cast from the character's learned skills.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+)]
+pub struct GatherableResource {
+    pub parent_skill: u32,
+}
 
 /// TDB1210 Mainline WSG227740/227741 use type36 (new flags).
 pub const GAMEOBJECT_TYPE_BATTLEGROUND_FLAG: u8 = 36;
@@ -178,6 +201,7 @@ impl GameObjectInfo {
                     | GAMEOBJECT_TYPE_MEETINGSTONE
                     | GAMEOBJECT_TYPE_RITUAL
                     | GAMEOBJECT_TYPE_CHAIR
+                    | GAMEOBJECT_TYPE_GATHERING_NODE
             )
     }
 }
@@ -312,6 +336,7 @@ mod transmog_tests {
 pub(super) fn register_interaction_protocol(app: &mut App) {
     app.protocol_component::<NpcFlags>().replicate();
     app.protocol_component::<GameObjectInfo>().replicate();
+    app.protocol_component::<GatherableResource>().replicate();
     app.add_channel::<InteractionChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
         ..default()
