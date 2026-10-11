@@ -22,6 +22,8 @@ fn kobold_camp_cleanup(current: u32) -> QuestEntrySnapshot {
         title: "Kobold Camp Cleanup".into(),
         zone: String::new(),
         completed: false,
+        expires_at: Some(2800),
+        failed: false,
         repeatability: QuestRepeatability::Normal,
         objectives: vec![QuestObjectiveSnapshot {
             text: "Kobold Vermin slain".into(),
@@ -49,6 +51,26 @@ fn kobold_camp_cleanup(current: u32) -> QuestEntrySnapshot {
             ],
         }],
     }
+}
+
+#[test]
+fn quest_share_messages_round_trip() {
+    assert_wire_round_trip(&PushQuestToParty { quest_id: 62 });
+    assert_wire_round_trip(&QuestShareOffer {
+        offer_id: 1,
+        sender_name: "Sharer".into(),
+        quest_id: 62,
+        title: "The Fargodeep Mine".into(),
+    });
+    assert_wire_round_trip(&QuestPushResponse {
+        offer_id: 1,
+        accepted: true,
+    });
+    assert_wire_round_trip(&QuestPushResult {
+        quest_id: 62,
+        player_name: "Recipient".into(),
+        reason: QuestPushReason::Accepted,
+    });
 }
 
 #[test]
