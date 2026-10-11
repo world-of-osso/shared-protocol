@@ -3,7 +3,11 @@
 //! Static definitions live in `ALL_CURRENCIES` / `currency_by_id`.
 //! Per-character state is tracked in `CurrencyWallet`.
 //!
-//! Ref: WoW currency system (Cataclysm/MoP era), AzerothCore `CharacterCurrency`.
+//! PvP identities/caps: local Retail 12.1.0.69933 CurrencyTypes1095531.
+//! Conquest's seasonal cap uses WorldState31270; no static weekly cap is authored.
+
+pub const HONOR_CURRENCY_ID: u32 = 1792;
+pub const CONQUEST_CURRENCY_ID: u32 = 1602;
 
 use serde::{Deserialize, Serialize};
 
@@ -24,17 +28,17 @@ pub struct CurrencyDef {
 /// All known currency definitions.
 pub const ALL_CURRENCIES: &[CurrencyDef] = &[
     CurrencyDef {
-        id: 1,
+        id: HONOR_CURRENCY_ID,
         name: "Honor",
         cap: 15_000,
         weekly_cap: 0,
         account_wide: false,
     },
     CurrencyDef {
-        id: 2,
+        id: CONQUEST_CURRENCY_ID,
         name: "Conquest",
         cap: 0,
-        weekly_cap: 550,
+        weekly_cap: 0,
         account_wide: false,
     },
     CurrencyDef {
@@ -199,10 +203,10 @@ mod tests {
     use super::*;
 
     fn honor() -> &'static CurrencyDef {
-        currency_by_id(1).unwrap()
+        currency_by_id(HONOR_CURRENCY_ID).unwrap()
     }
     fn conquest() -> &'static CurrencyDef {
-        currency_by_id(2).unwrap()
+        currency_by_id(CONQUEST_CURRENCY_ID).unwrap()
     }
     fn justice() -> &'static CurrencyDef {
         currency_by_id(3).unwrap()
@@ -215,6 +219,16 @@ mod tests {
     }
 
     #[test]
+    fn retail_pvp_currency_ids_and_source_caps() {
+        let honor = currency_by_id(1792).expect("local CurrencyTypes Honor1792");
+        let conquest = currency_by_id(1602).expect("local CurrencyTypes Conquest1602");
+        assert_eq!(honor.cap, 15_000);
+        assert_eq!(conquest.weekly_cap, 0);
+        assert!(currency_by_id(1).is_none());
+        assert!(currency_by_id(2).is_none());
+    }
+
+    #[test]
     fn get_unknown_returns_zero() {
         let wallet = CurrencyWallet::default();
         assert_eq!(wallet.get(999), 0);
@@ -223,29 +237,29 @@ mod tests {
     #[test]
     fn add_basic() {
         let mut wallet = CurrencyWallet::default();
-        let added = wallet.add(1, 500, honor()).unwrap();
+        let added = wallet.add(HONOR_CURRENCY_ID, 500, honor()).unwrap();
         assert_eq!(added, 500);
-        assert_eq!(wallet.get(1), 500);
+        assert_eq!(wallet.get(HONOR_CURRENCY_ID), 500);
     }
 
     #[test]
     fn add_respects_cap() {
         let mut wallet = CurrencyWallet::default();
         // Add 14_000, then try to add 2_000 more (cap is 15_000).
-        wallet.add(1, 14_000, honor()).unwrap();
-        let added = wallet.add(1, 2_000, honor()).unwrap();
+        wallet.add(HONOR_CURRENCY_ID, 14_000, honor()).unwrap();
+        let added = wallet.add(HONOR_CURRENCY_ID, 2_000, honor()).unwrap();
         assert_eq!(added, 1_000);
-        assert_eq!(wallet.get(1), 15_000);
+        assert_eq!(wallet.get(HONOR_CURRENCY_ID), 15_000);
     }
 
     #[test]
     fn add_respects_weekly_cap() {
         let mut wallet = CurrencyWallet::default();
-        // Conquest has weekly_cap = 550, no total cap.
-        let added = wallet.add(2, 700, conquest()).unwrap();
-        assert_eq!(added, 550);
-        assert_eq!(wallet.get(2), 550);
-        assert_eq!(wallet.week_earned(2), 550);
+        // Valor has weekly_cap = 1000.
+        let added = wallet.add(4, 1700, valor()).unwrap();
+        assert_eq!(added, 1000);
+        assert_eq!(wallet.get(4), 1000);
+        assert_eq!(wallet.week_earned(4), 1000);
     }
 
     #[test]
@@ -262,11 +276,11 @@ mod tests {
     #[test]
     fn add_weekly_cap_partially_spent() {
         let mut wallet = CurrencyWallet::default();
-        wallet.add(2, 300, conquest()).unwrap();
-        let added = wallet.add(2, 400, conquest()).unwrap();
-        assert_eq!(added, 250); // 550 - 300 = 250 remaining weekly
-        assert_eq!(wallet.get(2), 550);
-        assert_eq!(wallet.week_earned(2), 550);
+        wallet.add(4, 750, valor()).unwrap();
+        let added = wallet.add(4, 400, valor()).unwrap();
+        assert_eq!(added, 250); // 1000 - 750 = 250 remaining weekly
+        assert_eq!(wallet.get(4), 1000);
+        assert_eq!(wallet.week_earned(4), 1000);
     }
 
     #[test]
@@ -288,50 +302,50 @@ mod tests {
     #[test]
     fn remove_basic() {
         let mut wallet = CurrencyWallet::default();
-        wallet.add(1, 1_000, honor()).unwrap();
-        wallet.remove(1, 400).unwrap();
-        assert_eq!(wallet.get(1), 600);
+        wallet.add(HONOR_CURRENCY_ID, 1_000, honor()).unwrap();
+        wallet.remove(HONOR_CURRENCY_ID, 400).unwrap();
+        assert_eq!(wallet.get(HONOR_CURRENCY_ID), 600);
     }
 
     #[test]
     fn remove_insufficient() {
         let mut wallet = CurrencyWallet::default();
-        wallet.add(1, 100, honor()).unwrap();
-        let err = wallet.remove(1, 200);
+        wallet.add(HONOR_CURRENCY_ID, 100, honor()).unwrap();
+        let err = wallet.remove(HONOR_CURRENCY_ID, 200);
         assert_eq!(err, Err(CurrencyError::Insufficient));
     }
 
     #[test]
     fn remove_zero_ok() {
         let mut wallet = CurrencyWallet::default();
-        assert!(wallet.remove(1, 0).is_ok());
+        assert!(wallet.remove(HONOR_CURRENCY_ID, 0).is_ok());
         assert!(wallet.remove(999, 0).is_ok());
     }
 
     #[test]
     fn has_check() {
         let mut wallet = CurrencyWallet::default();
-        wallet.add(1, 500, honor()).unwrap();
-        assert!(wallet.has(1, 500));
-        assert!(wallet.has(1, 499));
-        assert!(!wallet.has(1, 501));
+        wallet.add(HONOR_CURRENCY_ID, 500, honor()).unwrap();
+        assert!(wallet.has(HONOR_CURRENCY_ID, 500));
+        assert!(wallet.has(HONOR_CURRENCY_ID, 499));
+        assert!(!wallet.has(HONOR_CURRENCY_ID, 501));
     }
 
     #[test]
     fn has_zero_always_true() {
         let wallet = CurrencyWallet::default();
         assert!(wallet.has(999, 0));
-        assert!(wallet.has(1, 0));
+        assert!(wallet.has(HONOR_CURRENCY_ID, 0));
     }
 
     #[test]
     fn reset_weekly() {
         let mut wallet = CurrencyWallet::default();
-        wallet.add(2, 400, conquest()).unwrap();
-        assert_eq!(wallet.week_earned(2), 400);
+        wallet.add(CONQUEST_CURRENCY_ID, 400, conquest()).unwrap();
+        assert_eq!(wallet.week_earned(CONQUEST_CURRENCY_ID), 400);
         wallet.reset_weekly();
-        assert_eq!(wallet.week_earned(2), 0);
-        assert_eq!(wallet.get(2), 400); // amount preserved
+        assert_eq!(wallet.week_earned(CONQUEST_CURRENCY_ID), 0);
+        assert_eq!(wallet.get(CONQUEST_CURRENCY_ID), 400); // amount preserved
     }
 
     #[test]
@@ -343,8 +357,8 @@ mod tests {
 
     #[test]
     fn currency_by_id_found() {
-        let def = currency_by_id(1).unwrap();
-        assert_eq!(def.id, 1);
+        let def = currency_by_id(HONOR_CURRENCY_ID).unwrap();
+        assert_eq!(def.id, HONOR_CURRENCY_ID);
         assert_eq!(def.name, "Honor");
         assert_eq!(def.cap, 15_000);
     }
@@ -372,29 +386,28 @@ mod tests {
     #[test]
     fn add_to_cap_then_add_more_returns_zero() {
         let mut wallet = CurrencyWallet::default();
-        wallet.add(1, 15_000, honor()).unwrap();
-        let added = wallet.add(1, 1, honor()).unwrap();
+        wallet.add(HONOR_CURRENCY_ID, 15_000, honor()).unwrap();
+        let added = wallet.add(HONOR_CURRENCY_ID, 1, honor()).unwrap();
         assert_eq!(added, 0);
-        assert_eq!(wallet.get(1), 15_000);
+        assert_eq!(wallet.get(HONOR_CURRENCY_ID), 15_000);
     }
 
     #[test]
     fn weekly_cap_independent_of_total_cap() {
-        // Conquest has no total cap, only weekly cap of 550.
+        // Valor's total cap4000 is separate from its weekly cap1000.
         let mut wallet = CurrencyWallet::default();
-        wallet.add(2, 550, conquest()).unwrap();
-        // Reset weekly, then earn again — total grows but weekly is fresh.
+        wallet.add(4, 1000, valor()).unwrap();
         wallet.reset_weekly();
-        let added = wallet.add(2, 550, conquest()).unwrap();
-        assert_eq!(added, 550);
-        assert_eq!(wallet.get(2), 1_100);
+        let added = wallet.add(4, 1000, valor()).unwrap();
+        assert_eq!(added, 1000);
+        assert_eq!(wallet.get(4), 2000);
     }
 
     #[test]
     fn serde_round_trip() {
         let mut wallet = CurrencyWallet::default();
-        wallet.add(1, 1_000, honor()).unwrap();
-        wallet.add(2, 300, conquest()).unwrap();
+        wallet.add(HONOR_CURRENCY_ID, 1_000, honor()).unwrap();
+        wallet.add(4, 750, valor()).unwrap();
         let json = serde_json::to_string(&wallet).unwrap();
         let decoded: CurrencyWallet = serde_json::from_str(&json).unwrap();
         assert_eq!(wallet, decoded);
@@ -406,7 +419,7 @@ mod tests {
         assert_eq!(def.name, "Timewarped Badge");
         assert!(def.account_wide);
         // All others should not be account-wide.
-        for id in 1..=6 {
+        for id in [HONOR_CURRENCY_ID, CONQUEST_CURRENCY_ID, 3, 4, 5, 6] {
             assert!(
                 !currency_by_id(id).unwrap().account_wide,
                 "id {id} should not be account_wide"
@@ -417,12 +430,12 @@ mod tests {
     #[test]
     fn multiple_currencies_independent() {
         let mut wallet = CurrencyWallet::default();
-        wallet.add(1, 1_000, honor()).unwrap();
-        wallet.add(2, 200, conquest()).unwrap();
-        assert_eq!(wallet.get(1), 1_000);
-        assert_eq!(wallet.get(2), 200);
+        wallet.add(HONOR_CURRENCY_ID, 1_000, honor()).unwrap();
+        wallet.add(CONQUEST_CURRENCY_ID, 200, conquest()).unwrap();
+        assert_eq!(wallet.get(HONOR_CURRENCY_ID), 1_000);
+        assert_eq!(wallet.get(CONQUEST_CURRENCY_ID), 200);
         // Adding honor doesn't touch conquest.
-        wallet.add(1, 500, honor()).unwrap();
-        assert_eq!(wallet.get(2), 200);
+        wallet.add(HONOR_CURRENCY_ID, 500, honor()).unwrap();
+        assert_eq!(wallet.get(CONQUEST_CURRENCY_ID), 200);
     }
 }

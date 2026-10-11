@@ -376,7 +376,8 @@ pub enum PvpBracketSnapshot {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct PvpBracketStatsSnapshot {
     pub bracket: PvpBracketSnapshot,
-    pub rating: u32,
+    /// No rating is claimed without an authoritative played-match result.
+    pub rating: Option<u32>,
     pub season_wins: u32,
     pub season_losses: u32,
     pub weekly_wins: u32,
@@ -434,14 +435,53 @@ pub struct BattlegroundSnapshot {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct PvpTalentSnapshot {
+    pub id: u32,
+    pub spell_id: u32,
+    pub name: String,
+    pub icon: u32,
+    pub required_level: u8,
+    pub slot_mask: u8,
+    pub unavailable_reason: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct PvpTalentSlotSnapshot {
+    pub index: u8,
+    pub required_level: u8,
+    pub selected: Option<u32>,
+    pub can_change: bool,
+    pub unlocked: bool,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct PvpTalentsSnapshot {
+    pub spec_id: u32,
+    pub slots: Vec<PvpTalentSlotSnapshot>,
+    pub choices: Vec<PvpTalentSnapshot>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct WarModeSnapshot {
+    pub desired: bool,
+    pub active: bool,
+    pub can_enable: bool,
+    pub can_disable: bool,
+    pub enlisted_spell: Option<u32>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct PvpSnapshot {
     pub honor: u32,
     pub honor_max: u32,
     pub conquest: u32,
-    pub conquest_max: u32,
+    /// Dynamic season policy unavailable is None, not an invented cap.
+    pub conquest_max: Option<u32>,
     pub brackets: Vec<PvpBracketStatsSnapshot>,
     pub queue: Option<PvpQueueSnapshot>,
     pub battleground: Option<BattlegroundSnapshot>,
+    pub war_mode: Option<WarModeSnapshot>,
+    pub talents: Option<PvpTalentsSnapshot>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
