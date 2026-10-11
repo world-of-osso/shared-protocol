@@ -95,6 +95,7 @@ fn guild_invite_messages_round_trip() {
         guild: Some(GuildSnapshot {
             guild_id: 3,
             guild_name: "Raid Team".into(),
+            created_at: Some(1728600000),
             motd: "Bring flasks".into(),
             info_text: "Wed/Sun raids".into(),
             members: vec![GuildMemberSnapshot {

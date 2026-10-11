@@ -136,6 +136,10 @@ fn register_guild_and_chat_messages(app: &mut App) {
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<GuildInviteResponse>()
         .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<GuildInvitation>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<GuildDeclineInviteRequest>()
+        .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<GuildAcceptInviteRequest>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<GuildAcceptInviteResponse>()

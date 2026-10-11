@@ -221,6 +221,8 @@ pub struct AchievementToastSnapshot {
     pub achievement_id: u32,
     pub name: String,
     pub points: u32,
+    /// Authored Achievement.IconFileID for the earned alert.
+    pub icon_fdid: u32,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -272,6 +274,8 @@ pub struct GuildMemberSnapshot {
 pub struct GuildSnapshot {
     pub guild_id: u32,
     pub guild_name: String,
+    /// Actual creation time, Unix seconds; legacy guilds with no recorded date stay None.
+    pub created_at: Option<u64>,
     pub motd: String,
     pub info_text: String,
     pub members: Vec<GuildMemberSnapshot>,
