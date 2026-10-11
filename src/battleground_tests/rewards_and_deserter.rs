@@ -168,9 +168,12 @@ fn deserter_blocks_queue_join() {
     tracker.apply(1, 10000);
 
     assert_eq!(
-        q.join_solo_checked(1, 30, 1, 10000, &tracker),
+        q.join_solo_checked(1, 30, warsong_gulch().id, 10000, &tracker),
         Err(BgQueueError::Deserter)
     );
 
-    assert!(q.join_solo_checked(1, 30, 1, 10900, &tracker).is_ok());
+    assert!(
+        q.join_solo_checked(1, 30, warsong_gulch().id, 10900, &tracker)
+            .is_ok()
+    );
 }
