@@ -32,9 +32,38 @@ pub struct DungeonEncounterProgress {
 /// AchievementChannel, client to server. Each request produces one bounded page.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum QueryAchievementCatalog {
+    Summary { scope: AchievementScope },
     Categories { after_id: u32 },
     Category { category_id: u32, after_id: u32 },
     Criteria { achievement_id: u32, after_id: u32 },
+}
+
+/// Account and character filters refer to the authored 0x20000 flag, not other characters' state.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum AchievementScope {
+    #[default]
+    All,
+    Account,
+    Character,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct AchievementCategoryTotals {
+    pub category_id: u32,
+    pub total: u32,
+    pub completed: u32,
+}
+
+/// Full eligible catalog totals, independent of pages opened by the client.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct AchievementSummary {
+    pub scope: AchievementScope,
+    pub points: u32,
+    pub total: u32,
+    pub completed: u32,
+    pub categories: Vec<AchievementCategoryTotals>,
+    /// At most three earned rows, newest known date first; unknown dates remain absent.
+    pub recent: Vec<AchievementCatalogEntry>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -66,6 +95,8 @@ pub struct AchievementCatalogEntry {
     pub description: String,
     pub points: u32,
     pub icon_fdid: u32,
+    /// Authentic Achievement.Flags (account 0x20000; statistic 0x1).
+    pub flags: u32,
     pub earned: bool,
     /// Unix seconds UTC. Historical earned IDs may have no known date.
     pub earned_at: Option<i64>,
@@ -77,6 +108,7 @@ pub struct AchievementCatalogEntry {
 /// AchievementChannel, server to client. Unknown IDs return empty terminal pages.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum AchievementCatalogPage {
+    Summary(AchievementSummary),
     Categories {
         categories: Vec<AchievementCategoryEntry>,
         next_id: Option<u32>,
