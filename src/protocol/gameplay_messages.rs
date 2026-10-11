@@ -571,6 +571,12 @@ pub struct RespondToBattlegroundInvite {
     pub accepted: bool,
 }
 
+/// Leave only the current match; stale scoreboard buttons cannot leave a new one.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct LeaveBattleground {
+    pub match_id: u64,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct QueueForRatedPvp {
     pub bracket: PvpBracketSnapshot,

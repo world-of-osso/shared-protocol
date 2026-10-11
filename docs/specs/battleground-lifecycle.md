@@ -16,4 +16,6 @@ Source-backed template correction also maps WSG to Mainline BattlemasterList1014
 
 Server retains matched rosters and validates acceptance/decline against membership and match identity; duplicate, outsider and stale responses fail without changing another participant. Invitation delivery and response systems are connected to existing PvP snapshots. Acceptance remains Waiting/map-entry-pending, never falsely InProgress.
 
-Required but missing: native popup/response UI, transfer/origin persistence, live objective interactions, scoreboard, sourced honor award and both-skin live proof. Server multi-player queue/score regression is unit-level proof only, not a live or transport lifecycle test.
+`LeaveBattleground` echoes the current match identity. Server returns only the owning, arrived participant to its retained origin through NewWorld/WorldPortAck; clears membership and closes an unoccupied/unreserved match copy after the last participant. It does not invent early-leave penalty or automatic-exit timers.
+
+Required but missing: native popup/response UI, durable origin handling across disconnect/restart, live objective interactions, scoreboard, sourced honor award and both-skin live proof. Server multi-player queue/score regression is unit-level proof only, not a live or transport lifecycle test.
