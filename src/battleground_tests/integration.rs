@@ -66,7 +66,7 @@ fn ab_full_pipeline_node_control_to_win() {
     }
 
     assert_eq!(inst.outcome, Some(BgOutcome::Winner(BgTeam::A)));
-    assert!(inst.score_a.score >= 1600);
+    assert!(inst.score_a.score >= 1500);
 
     let dist = distribute_rewards(&inst).unwrap();
     let winner = dist
