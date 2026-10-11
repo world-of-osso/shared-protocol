@@ -32,6 +32,31 @@ fn protocol_plugin_registers_group_messages() {
 }
 
 #[test]
+fn countdown_start_and_cancel_round_trip_on_the_wire() {
+    let config = bincode::config::standard();
+    for seconds in [10, 0] {
+        let request = GroupCountdownRequest { seconds };
+        let bytes = bincode::serde::encode_to_vec(&request, config).unwrap();
+        let (decoded, consumed): (GroupCountdownRequest, usize) =
+            bincode::serde::decode_from_slice(&bytes, config).unwrap();
+        assert_eq!(decoded, request);
+        assert_eq!(consumed, bytes.len());
+    }
+    for remaining in [10.0, 6.5, 0.0] {
+        let update = GroupCountdownUpdate {
+            initiator_name: "Alice".into(),
+            duration_secs: 10,
+            time_remaining_secs: remaining,
+        };
+        let bytes = bincode::serde::encode_to_vec(&update, config).unwrap();
+        let (decoded, consumed): (GroupCountdownUpdate, usize) =
+            bincode::serde::decode_from_slice(&bytes, config).unwrap();
+        assert_eq!(decoded, update);
+        assert_eq!(consumed, bytes.len());
+    }
+}
+
+#[test]
 fn group_member_states_round_trip_on_the_wire() {
     use crate::components::{AuraView, Position, PowerEntry, PowerType};
     let states = GroupMemberStates {
