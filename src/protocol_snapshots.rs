@@ -429,6 +429,31 @@ pub struct BattlegroundSnapshot {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct PvpTalentSnapshot {
+    pub id: u32,
+    pub spell_id: u32,
+    pub name: String,
+    pub icon: u32,
+    pub required_level: u8,
+    pub slot_mask: u8,
+    pub unavailable_reason: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct PvpTalentSlotSnapshot {
+    pub index: u8,
+    pub required_level: u8,
+    pub selected: Option<u32>,
+    pub can_change: bool,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct PvpTalentsSnapshot {
+    pub slots: Vec<PvpTalentSlotSnapshot>,
+    pub choices: Vec<PvpTalentSnapshot>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct WarModeSnapshot {
     pub desired: bool,
     pub active: bool,
@@ -447,6 +472,7 @@ pub struct PvpSnapshot {
     pub queue: Option<PvpQueueSnapshot>,
     pub battleground: Option<BattlegroundSnapshot>,
     pub war_mode: Option<WarModeSnapshot>,
+    pub talents: Option<PvpTalentsSnapshot>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]

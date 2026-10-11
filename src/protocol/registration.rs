@@ -346,6 +346,8 @@ fn register_pvp_messages(app: &mut App) {
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<QueueForRatedPvp>()
         .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<SelectPvpTalent>()
+        .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<SetWarModeDesired>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<DequeueFromPvp>()

@@ -468,6 +468,7 @@ fn pvp_state_update_round_trip() {
                 },
             ],
             queue: None,
+            talents: None,
             war_mode: Some(WarModeSnapshot {
                 desired: true,
                 active: false,
