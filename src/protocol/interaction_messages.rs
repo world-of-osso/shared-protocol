@@ -120,6 +120,8 @@ pub const GAMEOBJECT_TYPE_GUILD_BANK: u8 = 34;
 pub const GAMEOBJECT_TYPE_MAILBOX: u8 = 19;
 /// TrinityCore `GAMEOBJECT_TYPE_RITUAL` (summoning portal).
 pub const GAMEOBJECT_TYPE_RITUAL: u8 = 18;
+/// TrinityCore GameObjectTypes; Retail Font of Power.
+pub const GAMEOBJECT_TYPE_KEYSTONE_RECEPTACLE: u8 = 49;
 /// TrinityCore `GAMEOBJECT_TYPE_MEETINGSTONE`.
 pub const GAMEOBJECT_TYPE_MEETINGSTONE: u8 = 23;
 /// TrinityCore `GAMEOBJECT_TYPE_GENERIC`: decoration (fires, lamps).
