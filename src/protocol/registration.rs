@@ -33,6 +33,8 @@ pub(super) fn register_messages(app: &mut App) {
     register_spell_messages(app);
     super::group_messages::register_group_messages(app);
     crate::protocol_snapshots::register_snapshot_messages(app);
+    app.register_protocol_message::<RespondToBattlegroundInvite>()
+        .add_direction(NetworkDirection::ClientToServer);
 }
 
 fn register_pet_battle_messages(app: &mut App) {

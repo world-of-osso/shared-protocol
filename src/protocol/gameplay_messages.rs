@@ -564,6 +564,13 @@ pub struct QueueForBattleground {
     pub battleground_id: u32,
 }
 
+/// Echo the match identity so a stale popup cannot accept another invitation.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct RespondToBattlegroundInvite {
+    pub match_id: u64,
+    pub accepted: bool,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct QueueForRatedPvp {
     pub bracket: PvpBracketSnapshot,

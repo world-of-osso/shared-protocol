@@ -467,11 +467,16 @@ fn pvp_state_update_round_trip() {
                     weekly_losses: 0,
                 },
             ],
-            queue: Some(PvpQueueSnapshot {
-                kind: PvpQueueKindSnapshot::Battleground {
-                    battleground_id: 1,
-                    name: "Warsong Gulch".into(),
-                },
+            queue: None,
+            battleground: Some(BattlegroundSnapshot {
+                match_id: 9,
+                battleground_id: 1014,
+                name: "Warsong Gulch".into(),
+                map_id: 2106,
+                team: crate::battleground::BgTeam::A,
+                phase: crate::battleground::BgPhase::Waiting,
+                accepted: false,
+                invitation_time_left_secs: None,
             }),
         }),
         message: Some("queued for Warsong Gulch".into()),

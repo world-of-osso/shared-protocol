@@ -384,6 +384,20 @@ pub struct PvpQueueSnapshot {
     pub kind: PvpQueueKindSnapshot,
 }
 
+/// Retained match invitation; absent expiry means the source timer is unknown,
+/// not an invented countdown. Waiting+accepted is entry pending, not a live match.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct BattlegroundSnapshot {
+    pub match_id: u64,
+    pub battleground_id: u32,
+    pub name: String,
+    pub map_id: u32,
+    pub team: crate::battleground::BgTeam,
+    pub phase: crate::battleground::BgPhase,
+    pub accepted: bool,
+    pub invitation_time_left_secs: Option<u32>,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct PvpSnapshot {
     pub honor: u32,
@@ -392,6 +406,7 @@ pub struct PvpSnapshot {
     pub conquest_max: u32,
     pub brackets: Vec<PvpBracketStatsSnapshot>,
     pub queue: Option<PvpQueueSnapshot>,
+    pub battleground: Option<BattlegroundSnapshot>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]

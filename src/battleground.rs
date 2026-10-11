@@ -357,7 +357,7 @@ pub enum BgTeam {
 }
 
 /// Phase of a battleground instance.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum BgPhase {
     /// Players are entering; waiting for min_players_per_team on each side.
     Waiting,
