@@ -71,6 +71,7 @@ pub struct GroupRosterSnapshot {
     pub total_count: u16,
     pub members: Vec<GroupMemberSnapshot>,
     pub loot_method: crate::loot::LootMode,
+    pub loot_threshold: u8,
 }
 
 /// Canonical head customization and only the equipped head visual, independent of
