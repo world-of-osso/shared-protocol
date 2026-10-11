@@ -91,13 +91,13 @@ fn purchase_name_taken_by_existing_guild() {
 }
 
 #[test]
-fn purchase_name_taken_by_pending_petition() {
+fn pending_charters_share_a_title_until_an_actual_guild_reserves_it() {
     let mut mgr = PetitionManager::new();
     mgr.purchase_charter(100, "Cool Guild", 5000, false, 1000)
         .unwrap();
-    assert_eq!(
-        mgr.purchase_charter(200, "cool guild", 5000, false, 1001),
-        Err(PetitionError::NameTaken)
+    assert!(
+        mgr.purchase_charter(200, "cool guild", 5000, false, 1001)
+            .is_ok()
     );
 }
 
@@ -442,5 +442,29 @@ fn buy_charter_npc_at_exact_range() {
             &npc_ctx(NPC_FLAG_GUILD_CHARTER, exact, 5000, "Guild")
         )
         .is_ok()
+    );
+}
+
+#[test]
+fn retail_petitioner_flag_sells_charters_not_food_vendor_flag() {
+    let mut manager = PetitionManager::new();
+    let context = CharterNpcContext {
+        npc_flags: 262144,
+        distance_squared: 4.0,
+        player: 7,
+        guild_name: "Retail Charter Guild",
+        player_gold: 1000,
+        is_guilded: false,
+        now: 1728600000,
+    };
+    assert!(buy_charter_from_npc(&mut manager, &context).is_ok());
+    let food_vendor = CharterNpcContext {
+        npc_flags: 0x0200,
+        player: 8,
+        ..context
+    };
+    assert_eq!(
+        buy_charter_from_npc(&mut manager, &food_vendor),
+        Err(CharterNpcError::NotCharterVendor)
     );
 }

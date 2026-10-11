@@ -68,7 +68,7 @@ impl Petition {
 }
 
 /// Manages guild petitions.
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct PetitionManager {
     petitions: Vec<Petition>,
     /// Taken guild names (lowercase for case-insensitive check).
@@ -95,7 +95,7 @@ impl PetitionManager {
         &mut self,
         player: u64,
         guild_name: &str,
-        player_gold: u32,
+        player_gold: u64,
         is_guilded: bool,
         now: u64,
     ) -> Result<u64, PetitionError> {
@@ -116,13 +116,13 @@ impl PetitionManager {
         &self,
         player: u64,
         name: &str,
-        gold: u32,
+        gold: u64,
         is_guilded: bool,
     ) -> Result<(), PetitionError> {
         if is_guilded {
             return Err(PetitionError::AlreadyInGuild);
         }
-        if gold < CHARTER_COST {
+        if gold < u64::from(CHARTER_COST) {
             return Err(PetitionError::InsufficientFunds);
         }
         if name.is_empty() || name.len() > MAX_GUILD_NAME_LEN {
@@ -140,10 +140,6 @@ impl PetitionManager {
     fn is_name_taken(&self, name: &str) -> bool {
         let lower = name.to_lowercase();
         self.taken_names.contains(&lower)
-            || self
-                .petitions
-                .iter()
-                .any(|p| p.guild_name.to_lowercase() == lower)
     }
 
     /// Look up a petition by ID.
@@ -228,6 +224,9 @@ impl PetitionManager {
         if petition.owner != submitter {
             return Err(PetitionError::NotOwner);
         }
+        if self.is_name_taken(&petition.guild_name) {
+            return Err(PetitionError::NameTaken);
+        }
         if !petition.has_enough_signatures() {
             return Err(PetitionError::NotEnoughSignatures);
         }
@@ -242,6 +241,38 @@ impl PetitionManager {
         Ok(result)
     }
 
+    /// Rename only the owner's pending charter; other pending titles are not reserved.
+    pub fn rename(&mut self, id: u64, owner: u64, name: &str) -> Result<(), PetitionError> {
+        if name.is_empty() || name.chars().count() > MAX_GUILD_NAME_LEN {
+            return Err(PetitionError::InvalidName);
+        }
+        if self.is_name_taken(name) {
+            return Err(PetitionError::NameTaken);
+        }
+        let petition = self
+            .petitions
+            .iter_mut()
+            .find(|petition| petition.id == id)
+            .ok_or(PetitionError::NotFound)?;
+        if petition.owner != owner {
+            return Err(PetitionError::NotOwner);
+        }
+        petition.guild_name = name.into();
+        Ok(())
+    }
+
+    /// Guild membership invalidates owned petitions and the player's signatures.
+    pub fn remove_guilded_player(&mut self, player: u64) {
+        self.petitions.retain(|petition| petition.owner != player);
+        for petition in &mut self.petitions {
+            petition.signatures.retain(|&signer| signer != player);
+        }
+    }
+
+    pub fn petitions(&self) -> &[Petition] {
+        &self.petitions
+    }
+
     /// Number of pending petitions.
     pub fn len(&self) -> usize {
         self.petitions.len()
@@ -250,6 +281,12 @@ impl PetitionManager {
     /// Whether there are no petitions.
     pub fn is_empty(&self) -> bool {
         self.petitions.is_empty()
+    }
+}
+
+impl Default for PetitionManager {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -317,7 +354,7 @@ pub fn register_tabard(
 // --- Guild charter NPC ---
 
 /// NPC flags indicating this vendor sells guild charters.
-pub const NPC_FLAG_GUILD_CHARTER: u32 = 0x0200;
+pub const NPC_FLAG_GUILD_CHARTER: u32 = crate::protocol::NpcFlags::PETITIONER as u32;
 
 /// Maximum interaction distance with a charter NPC (yards).
 pub const CHARTER_NPC_RANGE: f32 = 10.0;
@@ -339,7 +376,7 @@ pub struct CharterNpcContext<'a> {
     pub distance_squared: f32,
     pub player: u64,
     pub guild_name: &'a str,
-    pub player_gold: u32,
+    pub player_gold: u64,
     pub is_guilded: bool,
     pub now: u64,
 }
