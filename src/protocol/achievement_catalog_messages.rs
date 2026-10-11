@@ -44,6 +44,8 @@ pub struct ScenarioStage {
     pub name: String,
     /// Retail Scenario.Type, including 3 (dungeon display).
     pub kind: u32,
+    /// Retail Scenario.Flags (bit 0x2 suppresses the numbered stage text).
+    pub flags: u32,
     pub step_id: u32,
     /// One-based. num_stages + 1 denotes completion.
     pub stage: u32,
