@@ -95,6 +95,7 @@ fn dungeon2_catalog_pages_wire_round_trip() {
             progress_supported: true,
             criteria: vec![criterion.clone()],
             next_criteria_id: None,
+            statistic_value: None,
         }],
         next_id: None,
     });
@@ -129,6 +130,7 @@ fn dungeon2_maximum_category_payload_is_below_64_kib() {
         progress_supported: false,
         criteria: vec![criterion; ACHIEVEMENT_CRITERIA_PAGE_SIZE],
         next_criteria_id: Some(u32::MAX),
+        statistic_value: Some(u64::MAX),
     };
     let page = AchievementCatalogPage::Category {
         category_id: u32::MAX,
