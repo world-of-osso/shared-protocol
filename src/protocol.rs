@@ -43,6 +43,7 @@ mod threat_messages;
 mod tooltip_messages;
 mod trainer_messages;
 mod transfer_messages;
+mod transmog_messages;
 mod world_time_messages;
 
 pub use achievement_catalog_messages::*;
@@ -78,6 +79,7 @@ pub use threat_messages::*;
 pub use tooltip_messages::*;
 pub use trainer_messages::*;
 pub use transfer_messages::*;
+pub use transmog_messages::*;
 pub use world_time_messages::*;
 
 use registration::{register_channels, register_messages};
@@ -103,6 +105,7 @@ impl Plugin for ProtocolPlugin {
         guild_bank_messages::register_guild_bank_protocol(app);
         guild_rank_messages::register_guild_rank_protocol(app);
         trainer_messages::register_trainer_protocol(app);
+        transmog_messages::register_transmog_protocol(app);
         loot_messages::register_loot_protocol(app);
         mail_messages::register_mail_protocol(app);
         taxi_messages::register_taxi_protocol(app);
