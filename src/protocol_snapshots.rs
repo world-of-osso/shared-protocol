@@ -20,6 +20,11 @@ pub struct QuestEntrySnapshot {
     pub zone: String,
     /// Objectives done; the quest can be turned in.
     pub completed: bool,
+    /// Absolute server Unix seconds; timer continues while disconnected.
+    pub expires_at: Option<i64>,
+    /// Server clock when this timer was sampled; clients calibrate countdowns on receipt.
+    pub timer_sampled_at: Option<i64>,
+    pub failed: bool,
     pub repeatability: QuestRepeatability,
     pub objectives: Vec<QuestObjectiveSnapshot>,
     /// Quest level; -1 scales to the player's level.
