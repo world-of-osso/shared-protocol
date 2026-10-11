@@ -445,10 +445,12 @@ pub struct PvpTalentSlotSnapshot {
     pub required_level: u8,
     pub selected: Option<u32>,
     pub can_change: bool,
+    pub unlocked: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct PvpTalentsSnapshot {
+    pub spec_id: u32,
     pub slots: Vec<PvpTalentSlotSnapshot>,
     pub choices: Vec<PvpTalentSnapshot>,
 }
