@@ -65,10 +65,34 @@ pub struct ChallengeSnapshot {
     pub error: Option<String>,
 }
 
+/// A complete recipient-specific replacement, including the player when solo.
+/// Raids have no rows. Bag item GUIDs are deliberately not shared with peers.
+#[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq, Eq)]
+pub struct PartyKeystoneSnapshot {
+    pub members: Vec<PartyKeystoneMember>,
+}
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct PartyKeystoneMember {
+    pub character_id: u64,
+    pub name: String,
+    pub class: u8,
+    pub is_leader: bool,
+    pub key: Option<PartyKeystone>,
+}
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct PartyKeystone {
+    pub challenge_id: u32,
+    pub level: u32,
+    pub dungeon_name: String,
+    pub time_limit_ms: u64,
+}
+
 pub(super) fn register(app: &mut App) {
     app.register_protocol_message::<ChallengeRequest>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<ChallengeSnapshot>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<PartyKeystoneSnapshot>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 // Messages use the existing reliable, ordered InstanceChannel.
