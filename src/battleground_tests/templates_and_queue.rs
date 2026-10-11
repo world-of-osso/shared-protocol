@@ -3,8 +3,8 @@ use super::*;
 #[test]
 fn wsg_template() {
     let wsg = warsong_gulch();
-    assert_eq!(wsg.id, 1);
-    assert_eq!(wsg.map_id, 489);
+    assert_eq!(wsg.id, 1014);
+    assert_eq!(wsg.map_id, 2106);
     assert_eq!(wsg.team_size, 10);
     assert_eq!(wsg.objective, BgObjective::FlagCapture);
     assert_eq!(wsg.win_score, 3);
@@ -17,7 +17,7 @@ fn ab_template() {
     assert_eq!(ab.id, 2);
     assert_eq!(ab.team_size, 15);
     assert_eq!(ab.objective, BgObjective::NodeControl);
-    assert_eq!(ab.win_score, 1600);
+    assert_eq!(ab.win_score, 1500);
 }
 
 #[test]
@@ -55,7 +55,7 @@ fn template_map_ids_unique() {
 
 #[test]
 fn lookup_by_id() {
-    assert_eq!(template_by_id(1).unwrap().name, "Warsong Gulch");
+    assert_eq!(template_by_id(1014).unwrap().name, "Warsong Gulch");
     assert_eq!(template_by_id(2).unwrap().name, "Arathi Basin");
     assert_eq!(template_by_id(3).unwrap().name, "Alterac Valley");
     assert!(template_by_id(999).is_none());
@@ -107,7 +107,7 @@ fn serialization_round_trip() {
 #[test]
 fn join_solo_and_is_queued() {
     let mut q = BgQueue::default();
-    assert!(q.join_solo(1, 30, 1, 100).is_ok());
+    assert!(q.join_solo(1, 30, warsong_gulch().id, 100).is_ok());
     assert!(q.is_queued(1));
     assert_eq!(q.len(), 1);
 }
@@ -115,8 +115,11 @@ fn join_solo_and_is_queued() {
 #[test]
 fn join_solo_already_queued() {
     let mut q = BgQueue::default();
-    q.join_solo(1, 30, 1, 100).unwrap();
-    assert_eq!(q.join_solo(1, 30, 1, 101), Err(BgQueueError::AlreadyQueued));
+    q.join_solo(1, 30, warsong_gulch().id, 100).unwrap();
+    assert_eq!(
+        q.join_solo(1, 30, warsong_gulch().id, 101),
+        Err(BgQueueError::AlreadyQueued)
+    );
 }
 
 #[test]
@@ -128,14 +131,20 @@ fn join_unknown_bg() {
 #[test]
 fn join_out_of_bracket() {
     let mut q = BgQueue::default();
-    assert_eq!(q.join_solo(1, 5, 1, 100), Err(BgQueueError::OutOfBracket));
-    assert_eq!(q.join_solo(1, 61, 1, 100), Err(BgQueueError::OutOfBracket));
+    assert_eq!(
+        q.join_solo(1, 5, warsong_gulch().id, 100),
+        Err(BgQueueError::OutOfBracket)
+    );
+    assert_eq!(
+        q.join_solo(1, 91, warsong_gulch().id, 100),
+        Err(BgQueueError::OutOfBracket)
+    );
 }
 
 #[test]
 fn join_group() {
     let mut q = BgQueue::default();
-    q.join_group(1, vec![1, 2, 3], vec![30, 30, 30], 1, 100)
+    q.join_group(1, vec![1, 2, 3], vec![30, 30, 30], warsong_gulch().id, 100)
         .unwrap();
     assert!(q.is_queued(1));
     assert!(q.is_queued(2));
@@ -147,7 +156,7 @@ fn join_group() {
 fn join_empty_group() {
     let mut q = BgQueue::default();
     assert_eq!(
-        q.join_group(1, vec![], vec![], 1, 100),
+        q.join_group(1, vec![], vec![], warsong_gulch().id, 100),
         Err(BgQueueError::EmptyGroup)
     );
 }
@@ -156,7 +165,7 @@ fn join_empty_group() {
 fn join_group_rejects_level_count_mismatch() {
     let mut q = BgQueue::default();
     assert_eq!(
-        q.join_group(1, vec![1, 2, 3], vec![30, 30], 1, 100),
+        q.join_group(1, vec![1, 2, 3], vec![30, 30], warsong_gulch().id, 100),
         Err(BgQueueError::LevelCountMismatch)
     );
 }
@@ -165,7 +174,7 @@ fn join_group_rejects_level_count_mismatch() {
 fn join_group_rejects_duplicate_members() {
     let mut q = BgQueue::default();
     assert_eq!(
-        q.join_group(1, vec![1, 2, 2], vec![30, 30, 30], 1, 100),
+        q.join_group(1, vec![1, 2, 2], vec![30, 30, 30], warsong_gulch().id, 100),
         Err(BgQueueError::DuplicatePlayer)
     );
 }
@@ -173,10 +182,10 @@ fn join_group_rejects_duplicate_members() {
 #[test]
 fn join_group_rejects_member_already_queued_elsewhere() {
     let mut q = BgQueue::default();
-    q.join_group(1, vec![1, 2, 3], vec![30, 30, 30], 1, 100)
+    q.join_group(1, vec![1, 2, 3], vec![30, 30, 30], warsong_gulch().id, 100)
         .unwrap();
     assert_eq!(
-        q.join_group(4, vec![3, 4, 5], vec![30, 30, 30], 1, 101),
+        q.join_group(4, vec![3, 4, 5], vec![30, 30, 30], warsong_gulch().id, 101),
         Err(BgQueueError::AlreadyQueued)
     );
 }
@@ -184,7 +193,7 @@ fn join_group_rejects_member_already_queued_elsewhere() {
 #[test]
 fn leave_queue() {
     let mut q = BgQueue::default();
-    q.join_solo(1, 30, 1, 100).unwrap();
+    q.join_solo(1, 30, warsong_gulch().id, 100).unwrap();
     assert!(q.leave(1));
     assert!(!q.is_queued(1));
     assert!(q.is_empty());
@@ -200,9 +209,9 @@ fn leave_not_queued() {
 fn match_not_enough_players() {
     let mut q = BgQueue::default();
     for i in 1..=8 {
-        q.join_solo(i, 30, 1, 100).unwrap();
+        q.join_solo(i, 30, warsong_gulch().id, 100).unwrap();
     }
-    assert!(q.try_match(1).is_none());
+    assert!(q.try_match(warsong_gulch().id).is_none());
     assert_eq!(q.len(), 8);
 }
 
@@ -210,10 +219,10 @@ fn match_not_enough_players() {
 fn match_forms_two_teams() {
     let mut q = BgQueue::default();
     for i in 1..=10 {
-        q.join_solo(i, 30, 1, 100).unwrap();
+        q.join_solo(i, 30, warsong_gulch().id, 100).unwrap();
     }
-    let m = q.try_match(1).unwrap();
-    assert_eq!(m.bg_id, 1);
+    let m = q.try_match(warsong_gulch().id).unwrap();
+    assert_eq!(m.bg_id, 1014);
     assert_eq!(m.team_a.len(), 5);
     assert_eq!(m.team_b.len(), 5);
 
@@ -226,14 +235,14 @@ fn match_forms_two_teams() {
 #[test]
 fn match_with_groups() {
     let mut q = BgQueue::default();
-    q.join_group(1, vec![1, 2, 3], vec![30, 30, 30], 1, 100)
+    q.join_group(1, vec![1, 2, 3], vec![30, 30, 30], warsong_gulch().id, 100)
         .unwrap();
-    q.join_group(4, vec![4, 5, 6], vec![30, 30, 30], 1, 100)
+    q.join_group(4, vec![4, 5, 6], vec![30, 30, 30], warsong_gulch().id, 100)
         .unwrap();
     for i in 7..=10 {
-        q.join_solo(i, 30, 1, 100).unwrap();
+        q.join_solo(i, 30, warsong_gulch().id, 100).unwrap();
     }
-    let m = q.try_match(1).unwrap();
+    let m = q.try_match(warsong_gulch().id).unwrap();
     let total = m.team_a.len() + m.team_b.len();
     assert_eq!(total, 10);
 }
@@ -242,12 +251,12 @@ fn match_with_groups() {
 fn match_different_bg_types_independent() {
     let mut q = BgQueue::default();
     for i in 1..=10 {
-        q.join_solo(i, 30, 1, 100).unwrap();
+        q.join_solo(i, 30, warsong_gulch().id, 100).unwrap();
     }
     for i in 11..=18 {
         q.join_solo(i, 30, 2, 100).unwrap();
     }
-    assert!(q.try_match(1).is_some());
+    assert!(q.try_match(warsong_gulch().id).is_some());
     assert!(q.try_match(2).is_none());
 }
 

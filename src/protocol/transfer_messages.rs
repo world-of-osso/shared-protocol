@@ -36,6 +36,8 @@ pub struct WorldPortAck;
 pub enum TransferAbortReason {
     /// `TRANSFER_ABORT_MAX_PLAYERS`: "Transfer Aborted: instance is full".
     MaxPlayers,
+    /// Current-expansion raids require a raid group (legacy raids permit solo entry).
+    NeedGroup,
     /// `TRANSFER_ABORT_NOT_FOUND`: "Transfer Aborted: instance not found".
     NotFound,
     /// `TRANSFER_ABORT_MAP_NOT_ALLOWED`: "Map cannot be entered at this time.".
@@ -57,6 +59,7 @@ impl TransferAbortReason {
     /// Retail GlobalStrings text the client shows in UIErrorsFrame, `map_name` for `%s`.
     pub fn text(&self, map_name: &str) -> String {
         match self {
+            Self::NeedGroup => "You must be in a raid group to enter this instance.".into(),
             Self::MaxPlayers => "Transfer Aborted: instance is full".into(),
             Self::NotFound => "Transfer Aborted: instance not found".into(),
             Self::MapNotAllowed => "Map cannot be entered at this time.".into(),

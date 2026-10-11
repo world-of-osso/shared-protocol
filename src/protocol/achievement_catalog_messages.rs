@@ -7,6 +7,7 @@ pub const ACHIEVEMENT_CATEGORY_PAGE_SIZE: usize = 32;
 pub const ACHIEVEMENT_PAGE_SIZE: usize = 8;
 pub const ACHIEVEMENT_CRITERIA_PAGE_SIZE: usize = 16;
 pub const ACHIEVEMENT_NAME_MAX_BYTES: usize = 256;
+pub const ACHIEVEMENT_SEARCH_MAX_CHARS: usize = 256;
 pub const ACHIEVEMENT_DESCRIPTION_MAX_BYTES: usize = 2048;
 pub const DUNGEON_ENCOUNTER_MAX_ROWS: usize = 32;
 
@@ -29,12 +30,90 @@ pub struct DungeonEncounterProgress {
     pub flags: u32,
 }
 
+/// Copy-scoped replacement snapshot on InstanceChannel. None clears the scenario tracker.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ScenarioProgress {
+    pub map_id: u32,
+    pub instance_id: u32,
+    pub difficulty_id: u32,
+    pub scenario: Option<ScenarioStage>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ScenarioStage {
+    pub scenario_id: u32,
+    pub name: String,
+    /// Retail Scenario.Type, including 3 (dungeon display).
+    pub kind: u32,
+    /// Retail Scenario.Flags (bit 0x2 suppresses the numbered stage text).
+    pub flags: u32,
+    pub step_id: u32,
+    /// One-based. num_stages + 1 denotes completion.
+    pub stage: u32,
+    pub num_stages: u32,
+    pub title: String,
+    pub description: String,
+    pub completed: bool,
+    pub criteria: Vec<AchievementCriterionLine>,
+}
+
 /// AchievementChannel, client to server. Each request produces one bounded page.
-#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum QueryAchievementCatalog {
-    Categories { after_id: u32 },
-    Category { category_id: u32, after_id: u32 },
-    Criteria { achievement_id: u32, after_id: u32 },
+    Summary {
+        scope: AchievementScope,
+    },
+    Categories {
+        after_id: u32,
+    },
+    Category {
+        category_id: u32,
+        after_id: u32,
+    },
+    Criteria {
+        achievement_id: u32,
+        after_id: u32,
+    },
+    Achievement {
+        achievement_id: u32,
+    },
+    Statistics {
+        category_id: u32,
+        after_id: u32,
+    },
+    Search {
+        text: String,
+        scope: AchievementScope,
+        after_id: u32,
+    },
+}
+
+/// Account and character filters refer to the authored 0x20000 flag, not other characters' state.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum AchievementScope {
+    #[default]
+    All,
+    Account,
+    Character,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct AchievementCategoryTotals {
+    pub category_id: u32,
+    pub total: u32,
+    pub completed: u32,
+}
+
+/// Full eligible catalog totals, independent of pages opened by the client.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct AchievementSummary {
+    pub scope: AchievementScope,
+    pub points: u32,
+    pub total: u32,
+    pub completed: u32,
+    pub categories: Vec<AchievementCategoryTotals>,
+    /// At most three earned rows, newest known date first; unknown dates remain absent.
+    pub recent: Vec<AchievementCatalogEntry>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -66,17 +145,37 @@ pub struct AchievementCatalogEntry {
     pub description: String,
     pub points: u32,
     pub icon_fdid: u32,
+    /// Authentic Achievement.Flags (account 0x20000; statistic 0x1).
+    pub flags: u32,
     pub earned: bool,
     /// Unix seconds UTC. Historical earned IDs may have no known date.
     pub earned_at: Option<i64>,
     pub progress_supported: bool,
     pub criteria: Vec<AchievementCriterionLine>,
     pub next_criteria_id: Option<u32>,
+    /// Unclamped authoritative counter for supported statistics; None means unevaluated.
+    pub statistic_value: Option<u64>,
 }
 
 /// AchievementChannel, server to client. Unknown IDs return empty terminal pages.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum AchievementCatalogPage {
+    Summary(AchievementSummary),
+    Statistics {
+        category_id: u32,
+        achievements: Vec<AchievementCatalogEntry>,
+        next_id: Option<u32>,
+    },
+    Search {
+        text: String,
+        scope: AchievementScope,
+        achievements: Vec<AchievementCatalogEntry>,
+        next_id: Option<u32>,
+    },
+    Achievement {
+        achievement_id: u32,
+        entry: Option<AchievementCatalogEntry>,
+    },
     Categories {
         categories: Vec<AchievementCategoryEntry>,
         next_id: Option<u32>,

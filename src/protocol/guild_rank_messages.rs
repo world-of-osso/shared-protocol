@@ -60,6 +60,12 @@ pub struct GuildRanksState {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum GuildRankRequest {
     Query,
+    /// Leave one's guild; Guild Master must transfer leadership first.
+    Leave,
+    /// Remove a lower-ranked member, subject to GUILD_RIGHT_REMOVE.
+    RemoveMember {
+        character_name: String,
+    },
     Add {
         name: String,
     },
@@ -107,12 +113,16 @@ pub enum GuildRankError {
     InvalidName,
     MemberNotFound,
     WrongTab,
+    LeaderCannotLeave,
 }
 
 impl GuildRankError {
     /// Retail GlobalStrings. The client displays the same refusal as the server.
     pub fn message(self) -> &'static str {
         match self {
+            Self::LeaderCannotLeave => {
+                "You must promote a new Guild Master using /gleader before leaving the guild."
+            } // ERR_GUILD_LEADER_LEAVE
             Self::NotInGuild => "You are not in a guild.", // ERR_GUILD_PLAYER_NOT_IN_GUILD
             Self::Permissions => "You don't have permission to do that.", // ERR_GUILD_PERMISSIONS
             Self::RankTooHigh => "That player's rank is too high", // ERR_GUILD_RANK_TOO_HIGH_S (%s = That player)
@@ -136,6 +146,33 @@ pub(super) fn register_guild_rank_protocol(app: &mut App) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn guild_lifecycle_wire_preserves_member_and_invitation() {
+        for request in [
+            GuildRankRequest::Leave,
+            GuildRankRequest::RemoveMember {
+                character_name: "Cara".into(),
+            },
+        ] {
+            let bytes =
+                bincode::serde::encode_to_vec(&request, bincode::config::standard()).unwrap();
+            let (decoded, used): (GuildRankRequest, _) =
+                bincode::serde::decode_from_slice(&bytes, bincode::config::standard()).unwrap();
+            assert_eq!(decoded, request);
+            assert_eq!(used, bytes.len());
+        }
+        let invite = crate::protocol::GuildInvitation {
+            guild_id: 7,
+            guild_name: "Bank Testers".into(),
+            inviter_name: "Alice".into(),
+        };
+        let bytes = bincode::serde::encode_to_vec(&invite, bincode::config::standard()).unwrap();
+        let (decoded, used): (crate::protocol::GuildInvitation, _) =
+            bincode::serde::decode_from_slice(&bytes, bincode::config::standard()).unwrap();
+        assert_eq!(decoded, invite);
+        assert_eq!(used, bytes.len());
+    }
+
     #[test]
     fn guild_ranks_wire_preserves_zero_limits_and_member_order() {
         let state = GuildRanksState {

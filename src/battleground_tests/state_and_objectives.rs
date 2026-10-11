@@ -166,7 +166,7 @@ fn flag_capture_scores_point() {
     let mut flags = FlagObjective::default();
 
     flags.pickup(BgTeam::A, 1);
-    assert!(flags.capture(BgTeam::A, &mut inst, &tmpl));
+    assert!(flags.capture(BgTeam::A, 1, &mut inst, &tmpl));
     assert_eq!(inst.score_a.score, 1);
     assert_eq!(flags.flag_b, FlagState::AtBase);
 }
@@ -180,7 +180,7 @@ fn flag_capture_requires_own_flag_at_base() {
     flags.pickup(BgTeam::A, 1);
     flags.pickup(BgTeam::B, 2);
 
-    assert!(!flags.capture(BgTeam::A, &mut inst, &tmpl));
+    assert!(!flags.capture(BgTeam::A, 1, &mut inst, &tmpl));
     assert_eq!(inst.score_a.score, 0);
 }
 
@@ -192,7 +192,7 @@ fn flag_three_captures_wins_wsg() {
 
     for _ in 0..3 {
         flags.pickup(BgTeam::A, 1);
-        flags.capture(BgTeam::A, &mut inst, &tmpl);
+        flags.capture(BgTeam::A, 1, &mut inst, &tmpl);
     }
     assert_eq!(inst.phase, BgPhase::Ended);
     assert_eq!(inst.outcome, Some(BgOutcome::Winner(BgTeam::A)));
