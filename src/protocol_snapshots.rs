@@ -272,6 +272,8 @@ pub struct GuildMemberSnapshot {
 pub struct GuildSnapshot {
     pub guild_id: u32,
     pub guild_name: String,
+    /// Actual creation time, Unix seconds; legacy guilds with no recorded date stay None.
+    pub created_at: Option<u64>,
     pub motd: String,
     pub info_text: String,
     pub members: Vec<GuildMemberSnapshot>,
