@@ -125,6 +125,9 @@ pub struct HouseLayout {
 pub struct HousingState {
     pub build_key: String,
     pub neighborhood_id: Option<u32>,
+    /// Present only in the reply to an authenticated, in-range UseGameObject.
+    /// Plot identity, not a private owner/account ID or an ownership grant.
+    pub opened_cornerstone: Option<u32>,
     pub plots: Vec<HousingPlot>,
     pub owned_houses: Vec<HousingHouse>,
     pub stored: Vec<StoredDecor>,
