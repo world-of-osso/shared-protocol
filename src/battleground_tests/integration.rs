@@ -46,10 +46,10 @@ fn wsg_full_pipeline_queue_to_rewards() {
 fn ab_full_pipeline_node_control_to_win() {
     let mut q = BgQueue::default();
     for i in 1..=16 {
-        q.join_solo(i, 30, 2, 100).unwrap();
+        q.join_solo(i, 30, arathi_basin().id, 100).unwrap();
     }
 
-    let bg_match = q.try_match(2).unwrap();
+    let bg_match = q.try_match(arathi_basin().id).unwrap();
 
     let tmpl = arathi_basin();
     let mut inst = BgInstance::from_match(&bg_match, &tmpl);

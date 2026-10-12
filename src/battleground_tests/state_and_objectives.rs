@@ -276,12 +276,12 @@ fn node_tick_resources_adds_score() {
     nodes.finish_capture(1);
 
     nodes.tick_resources(&mut inst, &tmpl);
-    assert_eq!(inst.score_a.score, 10);
+    assert_eq!(inst.score_a.score, 3);
     assert_eq!(inst.score_b.score, 0);
 }
 
 #[test]
-fn node_five_nodes_gives_thirty_per_tick() {
+fn node_five_nodes_gives_sixty_per_two_second_tick() {
     let tmpl = arathi_basin();
     let bg_match = BgMatch {
         bg_id: 2,
@@ -297,7 +297,7 @@ fn node_five_nodes_gives_thirty_per_tick() {
         nodes.finish_capture(i);
     }
     nodes.tick_resources(&mut inst, &tmpl);
-    assert_eq!(inst.score_a.score, 30);
+    assert_eq!(inst.score_a.score, 60);
 }
 
 #[test]
