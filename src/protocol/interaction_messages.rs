@@ -159,6 +159,8 @@ pub struct GatherableResource {
 
 /// TDB1210 Mainline WSG/Twin Peaks 227740/227741 use type 36 (new flags).
 pub const GAMEOBJECT_TYPE_BATTLEGROUND_FLAG: u8 = 36;
+/// TrinityCore GAMEOBJECT_TYPE_FLAGSTAND: Kotmogu Orb of Power templates use this type.
+pub const GAMEOBJECT_TYPE_FLAGSTAND: u8 = 24;
 /// TDB1210 Arathi/Gilneas capturePoint templates; TC GameObjectTypes.
 pub const GAMEOBJECT_TYPE_CAPTURE_POINT: u8 = 42;
 /// Shared by Warsong Gulch 2106 and Twin Peaks 726 (TC script GameObjects).
@@ -197,6 +199,13 @@ impl GameObjectInfo {
             && crate::battleground::is_objective_entry(self.entry)
     }
 
+    pub fn is_battleground_orb(&self) -> bool {
+        self.go_type == GAMEOBJECT_TYPE_FLAGSTAND
+            && crate::battleground::KOTMOGU_ORBS
+                .iter()
+                .any(|orb| orb.entry == self.entry)
+    }
+
     pub fn is_battleground_capture_point(&self) -> bool {
         self.go_type == GAMEOBJECT_TYPE_CAPTURE_POINT
             && crate::battleground::is_objective_entry(self.entry)
@@ -204,6 +213,7 @@ impl GameObjectInfo {
 
     pub fn is_usable(&self) -> bool {
         self.is_battleground_capture_point()
+            || self.is_battleground_orb()
             || self.is_battleground_flag()
             || matches!(
                 self.go_type,

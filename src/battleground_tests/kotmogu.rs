@@ -1,6 +1,20 @@
 use super::*;
 use crate::battleground::{BgMatch, BgOutcome, temple_of_kotmogu};
 
+#[test]
+fn kotmogu_authored_flagstand_orbs_are_usable_but_other_flagstands_are_not() {
+    let mut object = crate::protocol::GameObjectInfo {
+        entry: 212094,
+        go_type: 24,
+        display_id: 11533,
+        name: "Orb of Power".into(),
+        scale: 1.0,
+    };
+    assert!(object.is_usable());
+    object.entry = 999999;
+    assert!(!object.is_usable());
+}
+
 const CENTER: [f32; 3] = [1783.41, 1333.56, 6.0];
 const MEDIUM: [f32; 3] = [1823.41, 1333.56, 11.0];
 const OUTSIDE: [f32; 3] = [1850.1666, 1250.118, 13.2056];
