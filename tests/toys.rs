@@ -11,7 +11,24 @@ fn roundtrip<T: Serialize + DeserializeOwned + PartialEq + std::fmt::Debug>(valu
 
 #[test]
 fn toys_wire_roundtrips_real_item_and_account_flags() {
-    roundtrip(UseToy { item_id: 1973 });
+    roundtrip(UseToy {
+        item_id: 1973,
+        destination: None,
+        witness: None,
+    });
+    roundtrip(UseToy {
+        item_id: 89869,
+        destination: Some([-8914.57, 80.81, 131.61]),
+        witness: None,
+    });
+    roundtrip(UseToy {
+        item_id: 122120,
+        destination: None,
+        witness: Some(WitnessRay {
+            start: [-8908.2, 83.7, 146.6],
+            end: [-8896.5, 82.1, 173.8],
+        }),
+    });
     roundtrip(SetToyFavourite {
         item_id: 1973,
         favourite: true,
@@ -26,6 +43,7 @@ fn toys_wire_roundtrips_real_item_and_account_flags() {
             source_type: 0,
             source_text: "World Drop".into(),
             spell_id: Some(16739),
+            requires_target_witness: false,
             learned: true,
             favourite: true,
             unavailable_reason: Some("unsupported aura 4".into()),

@@ -16,6 +16,26 @@ fn assert_wire_round_trip<T: Serialize + DeserializeOwned + PartialEq + Debug>(v
 }
 
 #[test]
+fn mount_vendor_authored_turnin_and_requirement_errors_round_trip() {
+    assert_wire_round_trip(&VendorCost {
+        currency: false,
+        id: 137642,
+        amount: 15,
+        name: "Mark of Honor".into(),
+        icon_file_data_id: 1322720,
+    });
+    for error in [
+        MerchantError::MissingTurnins,
+        MerchantError::ReputationRequired,
+    ] {
+        assert_wire_round_trip(&MerchantFailed {
+            npc: 4294967301,
+            error,
+        });
+    }
+}
+
+#[test]
 fn merchant_messages_round_trip() {
     // Brother Danil (152) sells Refreshing Spring Water (159): 5 copper for 5.
     assert_wire_round_trip(&VendorInventory {
@@ -23,6 +43,7 @@ fn merchant_messages_round_trip() {
         can_repair: false,
         guild_repair_money: None,
         items: vec![VendorItem {
+            extra_costs: Vec::new(),
             slot: 0,
             item_id: 159,
             name: "Refreshing Spring Water".into(),
@@ -42,6 +63,7 @@ fn merchant_messages_round_trip() {
         can_repair: true,
         guild_repair_money: Some(250_000),
         items: vec![VendorItem {
+            extra_costs: Vec::new(),
             slot: 0,
             item_id: 2488,
             name: "Gladius".into(),

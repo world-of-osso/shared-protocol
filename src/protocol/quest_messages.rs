@@ -324,6 +324,13 @@ pub enum QuestObjectiveKind {
     GameObject,
     /// Items held in bags (`object_id` = item id).
     Item,
+    /// Authored weighted aggregate, expressed as percentage out of100.
+    ProgressBar,
+    TalkTo,
+    PlayerKills,
+    CriteriaTree,
+    AreaTriggerEnter,
+    KillWithLabel,
 }
 
 /// One quest POI blob: an objective area on a map.
@@ -345,6 +352,34 @@ pub struct QuestPoiSnapshot {
 pub struct QuestPoiPoint {
     pub x: i32,
     pub y: i32,
+}
+
+/// Realm-authoritative active task list, not static client POI availability.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Default)]
+pub struct WorldQuestAvailability {
+    pub server_time: i64,
+    pub quests: Vec<AvailableWorldQuest>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct WorldQuestNumericReward {
+    pub id: u32,
+    pub amount: i32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct AvailableWorldQuest {
+    pub quest_id: u32,
+    pub title: String,
+    pub map_id: u32,
+    pub zone_id: u32,
+    pub ui_map_id: u32,
+    pub position: QuestPoiPoint,
+    pub expires_at: i64,
+    pub rewards: QuestRewards,
+    pub xp: u32,
+    pub currencies: Vec<WorldQuestNumericReward>,
+    pub reputation: Vec<WorldQuestNumericReward>,
 }
 
 pub(super) fn register_quest_protocol(app: &mut App) {
@@ -381,6 +416,8 @@ fn register_client_messages(app: &mut App) {
 }
 
 fn register_server_messages(app: &mut App) {
+    app.register_protocol_message::<WorldQuestAvailability>()
+        .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<QuestShareOffer>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<QuestPushResult>()
