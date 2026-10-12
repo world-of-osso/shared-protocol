@@ -33,6 +33,7 @@ fn kobold_camp_cleanup(current: u32) -> QuestEntrySnapshot {
             completed: false,
             kind: QuestObjectiveKind::Monster,
             object_id: 6,
+            optional: false,
         }],
         level: 2,
         sort_id: 9,
@@ -106,6 +107,25 @@ fn quest_share_messages_round_trip() {
         quest_title: "The Fargodeep Mine".into(),
         recipient: false,
         reason: QuestPushReason::Accepted,
+    });
+}
+
+#[test]
+fn quest_weighted_bar_and_optional_objectives_round_trip() {
+    let mut entry = kobold_camp_cleanup(3);
+    entry.objectives[0].optional = true;
+    entry.objectives.push(QuestObjectiveSnapshot {
+        text: "Close Time Rifts".into(),
+        current: 90,
+        required: 100,
+        completed: false,
+        optional: false,
+        kind: QuestObjectiveKind::ProgressBar,
+        object_id: 0,
+    });
+    assert_wire_round_trip(&QuestLogSnapshot {
+        entries: vec![entry],
+        watched_quest_ids: vec![7],
     });
 }
 

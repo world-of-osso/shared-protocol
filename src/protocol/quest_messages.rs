@@ -324,6 +324,8 @@ pub enum QuestObjectiveKind {
     GameObject,
     /// Items held in bags (`object_id` = item id).
     Item,
+    /// Authored weighted aggregate, expressed as percentage out of100.
+    ProgressBar,
 }
 
 /// One quest POI blob: an objective area on a map.
