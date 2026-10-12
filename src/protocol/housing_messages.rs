@@ -45,6 +45,18 @@ pub enum HousingCommand {
         house_id: u64,
         access: HouseAccess,
     },
+    /// Validate/stage dye selections only; no owned dye or decor is consumed.
+    PreviewDecorDyes {
+        house_id: u64,
+        instance_id: u64,
+        changes: Vec<DecorDye>,
+    },
+    /// Commit this connection's preview against current owned inventory.
+    CommitDecorDyes {
+        house_id: u64,
+        instance_id: u64,
+    },
+    CancelDecorDyes,
     /// Consumes one owned Retail vendor/collect-effect item into account storage.
     RedeemDecor {
         item_guid: u64,
@@ -52,6 +64,8 @@ pub enum HousingCommand {
     PlaceDecor {
         house_id: u64,
         decor_id: u32,
+        /// None selects the undyed stack; a dyed variant must be explicitly identified.
+        variant_id: Option<u64>,
         transform: DecorTransform,
     },
     MoveDecor {
@@ -141,11 +155,36 @@ pub struct StoredDecor {
     pub quantity: u32,
 }
 
+/// Literal DecorDyeSlot record identity; None returns this slot to default color.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct DecorDye {
+    pub slot_id: u32,
+    pub color_id: Option<u32>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct DecorDyePreview {
+    pub house_id: u64,
+    pub instance_id: u64,
+    pub changes: Vec<DecorDye>,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct PlacedDecor {
     pub instance_id: u64,
     pub decor_id: u32,
     pub transform: DecorTransform,
+    /// Committed dyes only. Native recoloring is not yet available.
+    pub dyes: Vec<DecorDye>,
+}
+
+/// An actual owned dyed stack, not a catalog unlock or a new decor grant.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct StoredDecorVariant {
+    pub variant_id: u64,
+    pub decor_id: u32,
+    pub quantity: u32,
+    pub dyes: Vec<DecorDye>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
@@ -184,10 +223,14 @@ pub struct HousingState {
     pub plots: Vec<HousingPlot>,
     pub owned_houses: Vec<HousingHouse>,
     pub stored: Vec<StoredDecor>,
+    /// Owned dyed variants are included in stored totals, never counted twice.
+    pub stored_variants: Vec<StoredDecorVariant>,
     /// The account's placed instances per decor across all its houses; Retail
     /// HousingCatalogEntryInfo.totalNumPlaced. Owned = stored + placed.
     pub placed: Vec<StoredDecor>,
     pub layout: Option<HouseLayout>,
+    /// Actor-local transient preview, never saved ownership or an observer update.
+    pub dye_preview: Option<DecorDyePreview>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
