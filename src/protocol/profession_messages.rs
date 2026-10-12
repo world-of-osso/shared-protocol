@@ -37,6 +37,8 @@ pub struct ProfessionSpecPath {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ProfessionSpecPerk {
+    /// Unique ProfTrait path referenced by source Granted conditions; zero if unresolved.
+    pub path_node_id: u32,
     pub required_points: u32,
     pub unlocks_subpath: bool,
 }

@@ -235,6 +235,7 @@ fn fixed_output_order_and_specialization_requests_round_trip() {
                         trait_currency_id: 1451,
                     }),
                     perk: Some(ProfessionSpecPerk {
+                        path_node_id: 28546,
                         required_points: 5,
                         unlocks_subpath: true,
                     }),
