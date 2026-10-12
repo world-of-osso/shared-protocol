@@ -12,7 +12,7 @@ Classic Arathi Basin (map529) ends at1500 resources, not1600. Source: local `gam
 
 ## Coverage continuation — 2026-10-12
 
-Kotmogu uses Mainline queue 699/map 998, source minimum 2 and maximum 10 per team, levels 40–90 and 1500 victory points (TDB WorldState 17388). Authored dynamically summoned orb templates 212094/212091/212093/212092 are required, rather than fabricated static TDB placements. PvpStat 418 Orb Possessions then 419 Victory Points follow local PvpScoreboardLayout order 0/1. Queue metadata is not proof of implemented orb scoring or live lifecycle; those gates remain open.
+Kotmogu uses Mainline queue 699/map 998, source minimum 2 and maximum 10 per team, levels 40–90 and 1500 victory points (TDB WorldState 17388). Authored dynamically summoned orb templates 212094/212091/212093/212092 are required, rather than fabricated static TDB placements. PvpStat 418 Orb Possessions then 419 Victory Points follow local PvpScoreboardLayout order 0/1. Orb authority permits one carried orb per player; death/departure returns it directly home. Five-second source ticks award 6/4/2 points using the authored small box/medium trigger/outside regions, clamp team points at 1500 and measure PvpStat 419. Both teams reaching the limit on the same tick draws, matching the script's post-tick CheckWinner. Real-channel server/native/live gates and orb combat aura/kill-credit integration remain open; protocol tests do not certify those boundaries.
 
 ## Acceptance status — 2026-10-11
 

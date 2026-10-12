@@ -205,7 +205,7 @@ pub fn template_by_id(id: u32) -> Option<BgTemplate> {
 pub fn objective_object_entries(map_id: u32) -> Vec<u32> {
     if map_id == 998 {
         // TC OnInit dynamically spawns orange, blue, green, purple from TDB templates.
-        return vec![212094, 212091, 212093, 212092];
+        return KOTMOGU_ORBS.iter().map(|orb| orb.entry).collect();
     }
     if let Some(rules) = node_rules(map_id) {
         return rules.nodes.iter().map(|node| node.entry).collect();
@@ -600,6 +600,9 @@ pub use columns::*;
 #[path = "battleground_eye.rs"]
 mod eye;
 pub use eye::*;
+#[path = "battleground_kotmogu.rs"]
+mod kotmogu;
+pub use kotmogu::*;
 
 // -- Scoring & Rewards --
 
