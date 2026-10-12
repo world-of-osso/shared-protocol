@@ -439,6 +439,7 @@ pub struct BattlegroundSnapshot {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ArenaUnitSnapshot {
     pub character_id: u64,
+    pub entity: u64,
     pub name: String,
     pub class: u8,
     pub team: crate::battleground::BgTeam,
