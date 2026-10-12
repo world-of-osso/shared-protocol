@@ -20,6 +20,8 @@ pub enum TransmogChoice {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct TransmogSource {
     pub source_id: u32,
+    /// Retail Enum.TransmogSource, authored ItemModifiedAppearance.TransmogSourceTypeEnum.
+    pub source_type: u8,
     pub appearance_id: u32,
     pub item_id: u32,
     pub display_id: u32,
@@ -132,6 +134,7 @@ mod tests {
                 can_hide: true,
                 sources: vec![TransmogSource {
                     source_id: 821,
+                    source_type: 3,
                     appearance_id: 154,
                     item_id: 2488,
                     display_id: 1542,
@@ -142,6 +145,9 @@ mod tests {
             }],
             ..Default::default()
         };
+        // Enum.TransmogSource.Vendor = 3 for authentic Gladius source821.
+        let json = serde_json::to_value(&state).unwrap();
+        assert_eq!(json["slots"][0]["sources"][0]["source_type"], 3);
         let bytes = bincode::serde::encode_to_vec(&state, bincode::config::standard()).unwrap();
         let (decoded, consumed): (TransmogState, usize) =
             bincode::serde::decode_from_slice(&bytes, bincode::config::standard()).unwrap();
