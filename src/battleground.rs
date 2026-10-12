@@ -623,6 +623,9 @@ pub use eye::*;
 #[path = "battleground_kotmogu.rs"]
 mod kotmogu;
 pub use kotmogu::*;
+#[path = "battleground_silvershard.rs"]
+mod silvershard;
+pub use silvershard::*;
 
 // -- Scoring & Rewards --
 
