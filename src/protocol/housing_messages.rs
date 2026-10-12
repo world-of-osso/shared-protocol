@@ -40,10 +40,10 @@ pub enum HousingCommand {
         house_id: u64,
     },
     LeaveHouse,
-    /// HouseSettingFlags.HouseAccessAnyone; unset is not an inferred Retail default.
-    SetHouseAccessAnyone {
+    /// Owner saves the HouseAccess flags only; plot/blueprint/owner policy is unchanged.
+    SaveHouseAccess {
         house_id: u64,
-        allowed: bool,
+        access: HouseAccess,
     },
     /// Consumes one owned Retail vendor/collect-effect item into account storage.
     RedeemDecor {
@@ -111,6 +111,17 @@ pub struct HousingPlot {
     pub owner_type: HousingPlotOwnerType,
 }
 
+/// Literal Retail HouseSettingFlags.HouseAccess* selections. None on a house
+/// means not configured, never an inferred default. Relationships are server-owned.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct HouseAccess {
+    pub anyone: bool,
+    pub neighbors: bool,
+    pub guild: bool,
+    pub friends: bool,
+    pub party: bool,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct HousingHouse {
     pub house_id: u64,
@@ -118,7 +129,7 @@ pub struct HousingHouse {
     pub plot_id: u32,
     pub owner_character_id: u64,
     pub can_edit: bool,
-    pub house_access_anyone: Option<bool>,
+    pub house_access: Option<HouseAccess>,
     /// No verified first-house component/room grant: do not synthesize geometry.
     pub exterior_grant_available: bool,
     pub interior_grant_available: bool,
