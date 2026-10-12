@@ -326,6 +326,11 @@ pub enum QuestObjectiveKind {
     Item,
     /// Authored weighted aggregate, expressed as percentage out of100.
     ProgressBar,
+    TalkTo,
+    PlayerKills,
+    CriteriaTree,
+    AreaTriggerEnter,
+    KillWithLabel,
 }
 
 /// One quest POI blob: an objective area on a map.
