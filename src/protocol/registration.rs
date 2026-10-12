@@ -408,6 +408,12 @@ fn register_durability_messages(app: &mut App) {
 }
 
 fn register_collection_messages(app: &mut App) {
+    app.register_protocol_message::<MountJournalUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<SetMountFavourite>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<SummonRandomFavouriteMount>()
+        .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<UseToy>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<SetToyFavourite>()

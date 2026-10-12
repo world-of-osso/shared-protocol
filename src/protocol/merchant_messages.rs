@@ -23,6 +23,17 @@ pub struct MerchantChannel;
 /// Buyback slots per player (AzerothCore `BUYBACK_SLOT_START..BUYBACK_SLOT_END`).
 pub const BUYBACK_SLOTS: usize = 12;
 
+/// One authored item/currency turn-in of an ExtendedCost mount offer.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct VendorCost {
+    /// True for CurrencyTypes; false for an Item ID.
+    pub currency: bool,
+    pub id: u32,
+    pub amount: u32,
+    pub name: String,
+    pub icon_file_data_id: u32,
+}
+
 /// One vendor slot (Retail `MerchantItemInfo`).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct VendorItem {
@@ -33,6 +44,7 @@ pub struct VendorItem {
     pub quality: u8,
     /// Copper per purchase of `stack_count` items.
     pub price: u32,
+    pub extra_costs: Vec<VendorCost>,
     /// Items one purchase yields (`VendorStackCount`).
     pub stack_count: u32,
     /// Largest stack the item forms (`Stackable`).
@@ -131,6 +143,8 @@ pub enum MerchantError {
     ItemNotFound,
     SoldOut,
     NotEnoughMoney,
+    MissingTurnins,
+    ReputationRequired,
     InventoryFull,
     CantCarryMore,
     NotInterested,
@@ -150,7 +164,9 @@ impl MerchantError {
             Self::ItemNotFound => "The item was not found.", // ERR_ITEM_NOT_FOUND
             Self::SoldOut => "That item is currently sold out.", // ERR_VENDOR_SOLD_OUT
             Self::NotEnoughMoney => "You don't have enough money.", // ERR_NOT_ENOUGH_MONEY
-            Self::InventoryFull => "Inventory is full.",     // ERR_INV_FULL
+            Self::MissingTurnins => "You don't have the required items or currency.",
+            Self::ReputationRequired => "You don't have the required reputation.",
+            Self::InventoryFull => "Inventory is full.", // ERR_INV_FULL
             Self::CantCarryMore => "You can't carry any more of those items.", // ERR_ITEM_MAX_COUNT
             Self::NotInterested => "The merchant doesn't want that item.", // ERR_VENDOR_NOT_INTERESTED
             Self::TooMuchGold => "At gold limit",                          // ERR_TOO_MUCH_GOLD
