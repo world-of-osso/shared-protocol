@@ -14,7 +14,9 @@ fn wsg_template() {
 #[test]
 fn ab_template() {
     let ab = arathi_basin();
-    assert_eq!(ab.id, 2);
+    assert_eq!(ab.id, 1018);
+    assert_eq!(ab.map_id, 2107);
+    assert_eq!(ab.bracket, LevelBracket::new(10, 90));
     assert_eq!(ab.team_size, 15);
     assert_eq!(ab.objective, BgObjective::NodeControl);
     assert_eq!(ab.win_score, 1500);
@@ -56,7 +58,7 @@ fn template_map_ids_unique() {
 #[test]
 fn lookup_by_id() {
     assert_eq!(template_by_id(1014).unwrap().name, "Warsong Gulch");
-    assert_eq!(template_by_id(2).unwrap().name, "Arathi Basin");
+    assert_eq!(template_by_id(1018).unwrap().name, "Arathi Basin");
     assert_eq!(template_by_id(3).unwrap().name, "Alterac Valley");
     assert!(template_by_id(999).is_none());
 }
@@ -254,10 +256,10 @@ fn match_different_bg_types_independent() {
         q.join_solo(i, 30, warsong_gulch().id, 100).unwrap();
     }
     for i in 11..=18 {
-        q.join_solo(i, 30, 2, 100).unwrap();
+        q.join_solo(i, 30, arathi_basin().id, 100).unwrap();
     }
     assert!(q.try_match(warsong_gulch().id).is_some());
-    assert!(q.try_match(2).is_none());
+    assert!(q.try_match(arathi_basin().id).is_none());
 }
 
 #[test]
