@@ -41,6 +41,8 @@ pub struct ProfessionSpecPerk {
     pub path_node_id: u32,
     pub required_points: u32,
     pub unlocks_subpath: bool,
+    /// ProfTraitPerkNodeFlags.IsMajorBonus (2), independent of UnlocksSubpath (1).
+    pub is_major_bonus: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]

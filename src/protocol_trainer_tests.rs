@@ -238,6 +238,7 @@ fn fixed_output_order_and_specialization_requests_round_trip() {
                         path_node_id: 28546,
                         required_points: 5,
                         unlocks_subpath: true,
+                        is_major_bonus: false,
                     }),
                 }],
                 edges: vec![ProfessionSpecEdgeSnapshot {
