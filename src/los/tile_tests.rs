@@ -26,7 +26,10 @@ fn m2_floor_query_keeps_reachable_floor_and_skips_steep_faces_and_roof() {
     assert_eq!(tile.floor_height(Vec3::new(0.0, 62.0, 0.0)), Some(20.0));
     let a = Vec3::new(0.0, 15.0, 0.0);
     let b = Vec3::new(0.0, 11.0, 0.0);
-    assert_eq!(tile.first_hit(a, b), Some(0.25));
+    let camera_hit = tile
+        .first_hit(a, b)
+        .expect("steep face still blocks the camera");
+    assert!((camera_hit - 0.25).abs() < 1e-6, "{camera_hit}");
 }
 
 /// A deterministic scatter of `count` triangles up to 4 yd across in a 200 yd cube.
