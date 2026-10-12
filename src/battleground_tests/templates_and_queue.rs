@@ -1,6 +1,63 @@
 use super::*;
 
 #[test]
+fn deephaul_source_dropped_crystal_is_usable() {
+    let crystal = crate::protocol::GameObjectInfo {
+        entry: 422412,
+        go_type: 37,
+        display_id: 91024,
+        name: "Deephaul Crystal".into(),
+        scale: 1.0,
+    };
+    assert!(crystal.is_battleground_flag());
+    assert!(crystal.is_usable());
+}
+
+#[test]
+fn deephaul_source_queue_flag_and_scoreboard_columns() {
+    let template = template_by_id(1110).expect("Mainline Deephaul queue1110");
+    assert_eq!(
+        (
+            template.map_id,
+            template.min_players_per_team,
+            template.team_size
+        ),
+        (2656, 5, 10)
+    );
+    assert_eq!(template.bracket, LevelBracket::new(19, 90));
+    assert_eq!((template.win_score, template.max_duration_secs), (1500, 0));
+    assert_eq!(objective_object_entries(2656), [422413]);
+    let columns: Vec<_> = pvp_stat_columns(2656)
+        .iter()
+        .map(|column| (column.stat, column.title))
+        .collect();
+    assert_eq!(
+        columns,
+        [(1020, "Flag Captures"), (1021, "Carts Controlled")]
+    );
+}
+
+#[test]
+fn seething_source_queue_and_scoreboard_column() {
+    let template = template_by_id(894).expect("Mainline Seething Shore queue 894");
+    assert_eq!(
+        (
+            template.map_id,
+            template.min_players_per_team,
+            template.team_size
+        ),
+        (1803, 5, 10)
+    );
+    assert_eq!(template.bracket, LevelBracket::new(40, 90));
+    assert_eq!((template.win_score, template.max_duration_secs), (1500, 0));
+    let columns: Vec<_> = pvp_stat_columns(1803)
+        .iter()
+        .map(|column| (column.stat, column.title))
+        .collect();
+    assert_eq!(columns, [(744, "Azerite Collected")]);
+}
+
+#[test]
 fn silvershard_source_queue_and_scoreboard_column() {
     let template = template_by_id(708).expect("Mainline Silvershard queue 708");
     assert_eq!(
@@ -88,6 +145,8 @@ fn all_templates_lists_source_queue_maps() {
             (7, 566),
             (699, 998),
             (708, 727),
+            (894, 1803),
+            (1110, 2656),
             (3, 30)
         ]
     );
