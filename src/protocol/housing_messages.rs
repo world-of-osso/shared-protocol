@@ -9,12 +9,15 @@ use super::ProtocolRegistrationExt;
 
 pub struct HousingChannel;
 
-/// House-local position in client/server Bevy axes, yaw in radians.
-/// Basic mode keeps the authored scale and other authored rotation components.
+/// House-local Y-up position and Euler rotation in radians, uniform model scale.
+/// Basic mode changes position/yaw while preserving pitch/roll/scale.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq)]
 pub struct DecorTransform {
     pub position: [f32; 3],
     pub yaw: f32,
+    pub pitch: f32,
+    pub roll: f32,
+    pub scale: f32,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
@@ -56,6 +59,12 @@ pub enum HousingCommand {
         house_id: u64,
         instance_id: u64,
         yaw: f32,
+    },
+    /// Expert mode commits one complete staged transform, not per-frame input.
+    TransformDecor {
+        house_id: u64,
+        instance_id: u64,
+        transform: DecorTransform,
     },
     RemoveDecor {
         house_id: u64,

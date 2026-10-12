@@ -13,6 +13,9 @@ fn housing_wire_preserves_real_decor_identity_quantities_and_requested_transform
             transform: DecorTransform {
                 position: [1.25, 2.0, -3.0],
                 yaw: std::f32::consts::FRAC_PI_2,
+                pitch: 0.25,
+                roll: -0.5,
+                scale: 1.25,
             },
         },
     };
