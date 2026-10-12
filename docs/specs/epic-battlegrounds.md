@@ -9,8 +9,8 @@ Retail epic queue metadata and reinforcement rules in `src/battleground.rs`, sou
 - [x] Refuse an under-minimum roster and levels outside the source bracket.
 - [x] A player death deducts one reinforcement; depletion ends the match once.
 
-- [ ] Alterac's15 authored nodes preserve initial ownership, four-minute contest/defense, neutral Snowfall counter-assault and permanent75-reinforcement tower destruction.
-- [ ] Alterac source captains cost100 once, generals end the match, and mine leaders change ownership with one reinforcement per45seconds per owned mine.
+- [x] Alterac's15 authored nodes preserve initial ownership, four-minute contest/defense, neutral Snowfall counter-assault and permanent75-reinforcement tower destruction.
+- [x] Alterac source captains cost100 once, generals end the match, and mine leaders change ownership with one reinforcement per45seconds per owned mine.
 
 ## How it works
 
@@ -32,7 +32,8 @@ Retail epic queue metadata and reinforcement rules in `src/battleground.rs`, sou
 
 ## Known gaps (current cycle)
 
-- [ ] Authored nodes, towers, mines, captains, generals, gates, transports and vehicles require map-specific rules and runtime integration.
+- [ ] Alterac node/tower/mine/captain/general pure rules need normal eight-second Opening casts, source prefab transitions and authoritative combat-death integration. Initial entry is ground-based, not transport-relative.
+- [ ] Isle nodes, gates, transports and vehicles still require map-specific rules and runtime integration.
 - [ ] Native HUD/source scoreboard columns and both-skin private real-server lifecycle proof remain pending.
 - [ ] Metadata registration alone does not admit either map through server/native objective eligibility.
 
