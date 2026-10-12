@@ -203,6 +203,22 @@ pub struct GameObjectAnimation {
     pub looping: bool,
 }
 
+/// Hidden respawning objects retain their authoritative entity and aura ownership.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
+pub struct GameObjectVisible(pub bool);
+
 impl GameObjectInfo {
     /// Whether a player can use the object: the types whose TrinityCore `GameObject::Use`
     /// (GameObject.cpp:2620-3530) gives the player an action the server implements. Others,
@@ -361,6 +377,7 @@ pub(super) fn register_interaction_protocol(app: &mut App) {
     app.protocol_component::<NpcFlags>().replicate();
     app.protocol_component::<GameObjectInfo>().replicate();
     app.protocol_component::<GameObjectAnimation>().replicate();
+    app.protocol_component::<GameObjectVisible>().replicate();
     app.protocol_component::<GatherableResource>().replicate();
     app.add_channel::<InteractionChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
