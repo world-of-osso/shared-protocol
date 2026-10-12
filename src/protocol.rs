@@ -35,6 +35,7 @@ mod mirror_timer_messages;
 mod pet_battle_messages;
 mod pet_messages;
 mod pet_stable_messages;
+mod profession_messages;
 mod protocol_check;
 mod protocol_layout;
 mod quest_messages;
@@ -71,6 +72,7 @@ pub use mirror_timer_messages::*;
 pub use pet_battle_messages::*;
 pub use pet_messages::*;
 pub use pet_stable_messages::*;
+pub use profession_messages::*;
 pub use protocol_check::{
     ProtocolCheckChannel, ProtocolCheckTimeout, ProtocolFingerprint, ProtocolRejected,
     ProtocolVerified, defer_lightyear_protocol_check,
