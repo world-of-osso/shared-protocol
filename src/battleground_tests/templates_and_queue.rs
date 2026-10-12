@@ -124,12 +124,41 @@ fn ab_template() {
 }
 
 #[test]
-fn av_template() {
-    let av = alterac_valley();
-    assert_eq!(av.id, 3);
-    assert_eq!(av.team_size, 40);
-    assert_eq!(av.objective, BgObjective::Reinforcements);
-    assert_eq!(av.starting_reinforcements, 600);
+fn epic_source_templates() {
+    let av = template_by_id(1).expect("Mainline Alterac queue1");
+    let isle = template_by_id(30).expect("Mainline Isle queue30");
+    for (template, map, reinforcements) in [(av, 30, 700), (isle, 628, 400)] {
+        assert_eq!(template.map_id, map);
+        assert_eq!(template.team_size, 40);
+        assert_eq!(template.min_players_per_team, 10);
+        assert_eq!(template.bracket, LevelBracket::new(20, 90));
+        assert_eq!(template.objective, BgObjective::Reinforcements);
+        assert_eq!(template.starting_reinforcements, reinforcements);
+        assert_eq!(template.max_duration_secs, 0);
+        assert_eq!(template.win_score, 0);
+    }
+    assert!(template_by_id(3).is_none(), "queue3 is not Retail AV");
+}
+
+#[test]
+fn epic_source_minimum_rosters_and_level_bracket() {
+    for id in [1, 30] {
+        let mut queue = BgQueue::default();
+        assert_eq!(
+            queue.join_solo(1, 19, id, 0),
+            Err(BgQueueError::OutOfBracket)
+        );
+        for player in 1..20 {
+            queue.join_solo(player, 20, id, 0).unwrap();
+        }
+        assert!(queue.try_match(id).is_none());
+        queue.join_solo(20, 90, id, 0).unwrap();
+        let matched = queue
+            .try_match(id)
+            .expect("ten per team admits source minimum");
+        assert_eq!(matched.team_a.len(), 10);
+        assert_eq!(matched.team_b.len(), 10);
+    }
 }
 
 #[test]
@@ -147,7 +176,8 @@ fn all_templates_lists_source_queue_maps() {
             (708, 727),
             (894, 1803),
             (1110, 2656),
-            (3, 30)
+            (1, 30),
+            (30, 628)
         ]
     );
 }
@@ -174,7 +204,8 @@ fn template_map_ids_unique() {
 fn lookup_by_id() {
     assert_eq!(template_by_id(1014).unwrap().name, "Warsong Gulch");
     assert_eq!(template_by_id(1018).unwrap().name, "Arathi Basin");
-    assert_eq!(template_by_id(3).unwrap().name, "Alterac Valley");
+    assert_eq!(template_by_id(1).unwrap().name, "Alterac Valley");
+    assert_eq!(template_by_id(30).unwrap().name, "Isle of Conquest");
     assert_eq!(template_by_id(120).unwrap().name, "The Battle for Gilneas");
     assert!(template_by_id(999).is_none());
 }
