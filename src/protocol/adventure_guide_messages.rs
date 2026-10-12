@@ -43,7 +43,7 @@ pub struct PerksActivitySnapshot {
     pub description: String,
     pub points: u32,
     pub supersedes: u32,
-    pub priority: u32,
+    pub priority: i32,
     pub tags: Vec<u32>,
     pub tracked: bool,
     pub progress: PerksActivityProgress,
