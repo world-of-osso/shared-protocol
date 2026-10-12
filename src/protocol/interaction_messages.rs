@@ -119,6 +119,8 @@ pub enum NpcRole {
     CraftingOrders,
 }
 
+/// Retail/TrinityCore `GAMEOBJECT_TYPE_BUTTON`, including source AV banners.
+pub const GAMEOBJECT_TYPE_BUTTON: u8 = 1;
 /// AzerothCore `GAMEOBJECT_TYPE_GUILD_BANK`.
 pub const GAMEOBJECT_TYPE_GUILD_BANK: u8 = 34;
 /// AzerothCore `GAMEOBJECT_TYPE_MAILBOX`.
@@ -213,7 +215,8 @@ impl GameObjectInfo {
     }
 
     pub fn is_battleground_banner(&self) -> bool {
-        matches!(self.go_type, 1 | 10) && crate::battleground::is_alterac_banner_entry(self.entry)
+        matches!(self.go_type, GAMEOBJECT_TYPE_BUTTON | 10)
+            && crate::battleground::is_alterac_banner_entry(self.entry)
     }
 
     pub fn is_battleground_capture_point(&self) -> bool {
