@@ -651,6 +651,14 @@ pub use kotmogu::*;
 mod silvershard;
 pub use silvershard::*;
 
+#[path = "battleground_seething.rs"]
+mod seething;
+pub use seething::*;
+
+#[cfg(test)]
+#[path = "battleground_seething_tests.rs"]
+mod seething_tests;
+
 // -- Scoring & Rewards --
 
 /// Honor currency ID (matches `currency.rs` ALL_CURRENCIES).
