@@ -4,10 +4,10 @@ Retail epic queue metadata and reinforcement rules in `src/battleground.rs`, sou
 
 ## What it must do
 
-- [ ] Alterac Valley queue1/map30 and Isle of Conquest queue30/map628 admit10–40 players per team, levels20–90. Queue3 is not Retail Alterac Valley.
-- [ ] Start Alterac at700 and Isle at400 reinforcements; no invented elapsed-time victory limit.
-- [ ] Refuse an under-minimum roster and levels outside the source bracket.
-- [ ] A player death deducts one reinforcement; depletion ends the match once.
+- [x] Alterac Valley queue1/map30 and Isle of Conquest queue30/map628 admit10–40 players per team, levels20–90. Queue3 is not Retail Alterac Valley.
+- [x] Start Alterac at700 and Isle at400 reinforcements; no invented elapsed-time victory limit.
+- [x] Refuse an under-minimum roster and levels outside the source bracket.
+- [x] A player death deducts one reinforcement; depletion ends the match once.
 
 ## How it works
 
