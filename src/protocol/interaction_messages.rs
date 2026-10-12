@@ -184,6 +184,25 @@ pub struct GameObjectInfo {
     pub scale: f32,
 }
 
+/// Server-selected authored M2 sequence for a world object's state transition.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
+pub struct GameObjectAnimation {
+    pub animation_id: u16,
+    pub looping: bool,
+}
+
 impl GameObjectInfo {
     /// Whether a player can use the object: the types whose TrinityCore `GameObject::Use`
     /// (GameObject.cpp:2620-3530) gives the player an action the server implements. Others,
@@ -341,6 +360,7 @@ mod transmog_tests {
 pub(super) fn register_interaction_protocol(app: &mut App) {
     app.protocol_component::<NpcFlags>().replicate();
     app.protocol_component::<GameObjectInfo>().replicate();
+    app.protocol_component::<GameObjectAnimation>().replicate();
     app.protocol_component::<GatherableResource>().replicate();
     app.add_channel::<InteractionChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
