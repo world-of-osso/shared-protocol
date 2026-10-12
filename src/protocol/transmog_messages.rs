@@ -47,7 +47,7 @@ pub struct TransmogState {
     pub npc: u64,
     /// Paid Apply still validates only these collected eligible choices.
     pub slots: Vec<TransmogSlot>,
-    pub catalogue: Vec<super::TransmogCatalogueSource>,
+    /// Started sets; their primary appearances carry the collection states.
     pub sets: Vec<super::TransmogSet>,
     pub outfit_entries: Vec<super::TransmogOutfitEntry>,
     pub outfits: Vec<super::TransmogOutfit>,
