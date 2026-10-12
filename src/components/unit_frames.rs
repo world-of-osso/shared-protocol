@@ -242,6 +242,10 @@ pub struct UnitFactionTemplate(pub u32);
 pub struct UnitFlags(pub u32);
 
 impl UnitFlags {
+    /// TC UNIT_FLAG_NON_ATTACKABLE: no attacks, regardless of the attacker's owner.
+    pub const NON_ATTACKABLE: u32 = 0x0000_0002;
+    /// TC UNIT_FLAG_IMMUNE_TO_PC: players and player-controlled units cannot attack.
+    pub const IMMUNE_TO_PC: u32 = 0x0000_0100;
     /// `UNIT_FLAG_NOT_SELECTABLE`: no nameplate, and the unit cannot be targeted or clicked.
     pub const NOT_SELECTABLE: u32 = 0x0200_0000;
     /// `UNIT_FLAG_NON_ATTACKABLE_2` (`SPELL_AURA_MOD_UNATTACKABLE`): the unit cannot be
@@ -256,7 +260,34 @@ impl UnitFlags {
     }
 
     pub fn is_attackable(self) -> bool {
-        self.0 & Self::NON_ATTACKABLE_2 == 0
+        self.0 & (Self::NON_ATTACKABLE | Self::NON_ATTACKABLE_2) == 0
+    }
+
+    pub fn can_be_attacked_by(self, player_controlled: bool) -> bool {
+        self.is_selectable()
+            && self.is_attackable()
+            && (!player_controlled || self.0 & Self::IMMUNE_TO_PC == 0)
+    }
+}
+
+#[cfg(test)]
+mod unit_flag_attack_tests {
+    use super::UnitFlags;
+
+    #[test]
+    fn authored_attackability_flags_distinguish_pc_immunity_from_general_immunity() {
+        for flag in [
+            UnitFlags::NON_ATTACKABLE,
+            UnitFlags::NON_ATTACKABLE_2,
+            UnitFlags::NOT_SELECTABLE,
+        ] {
+            assert!(!UnitFlags(flag).can_be_attacked_by(true));
+            assert!(!UnitFlags(flag).can_be_attacked_by(false));
+        }
+        assert!(!UnitFlags(UnitFlags::IMMUNE_TO_PC).can_be_attacked_by(true));
+        assert!(UnitFlags(UnitFlags::IMMUNE_TO_PC).can_be_attacked_by(false));
+        assert!(UnitFlags(0).can_be_attacked_by(true));
+        assert!(UnitFlags(0).can_be_attacked_by(false));
     }
 }
 
