@@ -395,7 +395,7 @@ pub struct PvpQueueSnapshot {
     pub kind: PvpQueueKindSnapshot,
 }
 
-/// Retail PVPMatchTable columns plus WSG objective counters, scoped to one match.
+/// Retail PVPMatchTable columns plus per-map PvpStat counters, scoped to one match.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct BattlegroundPlayerScoreSnapshot {
     pub character_id: u64,
@@ -407,9 +407,7 @@ pub struct BattlegroundPlayerScoreSnapshot {
     pub deaths: u32,
     pub damage_done: u64,
     pub healing_done: u64,
-    pub flag_captures: u32,
-    pub flag_returns: u32,
-    /// Source PvPStatID/value pairs measured by objective interactions.
+    /// Source PvPStatID/value pairs (`pvp_stat_columns`) measured by objective interactions.
     pub objective_scores: Vec<(u32, u32)>,
     /// Unknown honor policies are absent, not synthetic zero rewards/badges.
     pub honorable_kills: Option<u32>,

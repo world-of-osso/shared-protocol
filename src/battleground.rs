@@ -130,12 +130,30 @@ pub fn battle_for_gilneas() -> BgTemplate {
     }
 }
 
+/// BattlemasterList108 (12.1.0.69933): Capture the Flag, 5–10 players, levels30–90;
+/// BattlemasterListXMap623 → map726; TDB starts1726/1727. Three captures win.
+pub fn twin_peaks() -> BgTemplate {
+    BgTemplate {
+        id: 108,
+        name: "Twin Peaks".into(),
+        map_id: 726,
+        team_size: 10,
+        min_players_per_team: 5,
+        objective: BgObjective::FlagCapture,
+        max_duration_secs: 0,
+        win_score: 3,
+        starting_reinforcements: 0,
+        bracket: LevelBracket::new(30, 90),
+    }
+}
+
 /// All built-in battleground templates.
 pub fn all_templates() -> Vec<BgTemplate> {
     vec![
         warsong_gulch(),
         arathi_basin(),
         battle_for_gilneas(),
+        twin_peaks(),
         alterac_valley(),
     ]
 }
@@ -143,6 +161,27 @@ pub fn all_templates() -> Vec<BgTemplate> {
 /// Find a template by ID.
 pub fn template_by_id(id: u32) -> Option<BgTemplate> {
     all_templates().into_iter().find(|t| t.id == id)
+}
+
+/// Authored TDB objective objects a match on `map_id` needs loaded and usable.
+pub fn objective_object_entries(map_id: u32) -> Vec<u32> {
+    if let Some(rules) = node_rules(map_id) {
+        return rules.nodes.iter().map(|node| node.entry).collect();
+    }
+    if flag_rules(map_id).is_some() {
+        return vec![
+            crate::protocol::WARSONG_ALLIANCE_FLAG_ENTRY,
+            crate::protocol::WARSONG_HORDE_FLAG_ENTRY,
+        ];
+    }
+    Vec::new()
+}
+
+/// Whether `entry` is an objective object of any queueable battleground map.
+pub fn is_objective_entry(entry: u32) -> bool {
+    all_templates()
+        .iter()
+        .any(|template| objective_object_entries(template.map_id).contains(&entry))
 }
 
 // -- BG Queue --
@@ -507,6 +546,12 @@ pub use objectives::*;
 #[path = "battleground_nodes.rs"]
 mod nodes;
 pub use nodes::*;
+#[path = "battleground_flags.rs"]
+mod flags;
+pub use flags::*;
+#[path = "battleground_columns.rs"]
+mod columns;
+pub use columns::*;
 
 // -- Scoring & Rewards --
 
