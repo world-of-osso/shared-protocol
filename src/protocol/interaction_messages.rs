@@ -76,6 +76,9 @@ impl NpcFlags {
     pub const VAULTKEEPER: u64 = 0x2000_0000;
     pub const WILD_BATTLE_PET: u64 = 0x4000_0000;
     pub const BLACK_MARKET: u64 = 0x8000_0000;
+    /// TDB1210 Clerks215258/219043/219048/235626: NPCFlags2 bit20;
+    /// each joins menu30243 OptionNpc50 ("create a crafting order").
+    pub const CRAFTING_ORDERS: u64 = 0x0010_0000_0000_0000;
 
     /// Bits of AzerothCore (3.3.5) `NPCFlags` that exist in Retail. AzerothCore
     /// bits 0x1 (GOSSIP) … 0x0400_0000 (MAILBOX) have the same value and meaning in
@@ -112,6 +115,8 @@ pub enum NpcRole {
     Mailbox,
     /// Retail `PlayerInteractionType::Transmogrifier`.
     Transmogrifier,
+    /// Retail `PlayerInteractionType::ProfessionsCustomerOrders`.
+    CraftingOrders,
 }
 
 /// AzerothCore `GAMEOBJECT_TYPE_GUILD_BANK`.
