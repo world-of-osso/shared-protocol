@@ -57,6 +57,29 @@ fn housing_wire_preserves_real_decor_identity_quantities_and_requested_transform
 }
 
 #[test]
+fn housing_access_settings_roundtrip_keeps_each_limited_permission() {
+    let access = super::HouseAccess {
+        anyone: false,
+        neighbors: false,
+        guild: true,
+        friends: true,
+        party: false,
+    };
+    let request = HousingRequest {
+        request_id: 10,
+        command: HousingCommand::SaveHouseAccess {
+            house_id: 42,
+            access,
+        },
+    };
+    let bytes = bincode::serde::encode_to_vec(&request, bincode::config::standard()).unwrap();
+    let (decoded, consumed): (HousingRequest, usize) =
+        bincode::serde::decode_from_slice(&bytes, bincode::config::standard()).unwrap();
+    assert_eq!(decoded, request);
+    assert_eq!(consumed, bytes.len());
+}
+
+#[test]
 fn housing_plot_owner_relationship_and_source_plot_visit_roundtrip() {
     use super::{HousingPlot, HousingPlotOwnerType};
     let plot = HousingPlot {
