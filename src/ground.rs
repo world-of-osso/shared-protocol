@@ -28,6 +28,7 @@ pub const FLOOR_SEARCH_DEPTH: f32 = 50.0;
 pub enum Surface {
     Terrain,
     Wmo,
+    M2,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]

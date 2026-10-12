@@ -54,6 +54,28 @@ pub struct SpellChargesUpdate {
     pub remaining_ms: u32,
 }
 
+/// Server-computed effective costs use the same raw power units as cast admission.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct EffectivePowerCost {
+    /// DB2 PowerType, or -2 for health.
+    pub power_type: i32,
+    pub amount: f32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct SpellCostReading {
+    pub spell_id: u32,
+    /// Unsupported/missing caster facts are explicit, never zero-cost substitutes.
+    pub costs: Result<Vec<EffectivePowerCost>, String>,
+    pub affordable: bool,
+}
+
+/// Owner-only full replacement, published whenever effective costs or admission change.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct SpellCostSnapshot {
+    pub spells: Vec<SpellCostReading>,
+}
+
 /// Server rejected a cast requested by the owning client.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct CastFailed {

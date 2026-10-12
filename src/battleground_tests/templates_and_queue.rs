@@ -1,6 +1,50 @@
 use super::*;
 
 #[test]
+fn silvershard_source_queue_and_scoreboard_column() {
+    let template = template_by_id(708).expect("Mainline Silvershard queue 708");
+    assert_eq!(
+        (
+            template.map_id,
+            template.min_players_per_team,
+            template.team_size
+        ),
+        (727, 3, 10)
+    );
+    assert_eq!(template.bracket, LevelBracket::new(30, 90));
+    assert_eq!((template.win_score, template.max_duration_secs), (1500, 0));
+    let columns: Vec<_> = pvp_stat_columns(727)
+        .iter()
+        .map(|column| (column.stat, column.title))
+        .collect();
+    assert_eq!(columns, [(428, "Carts Controlled")]);
+}
+
+#[test]
+fn kotmogu_source_queue_and_objective_columns() {
+    let template = template_by_id(699).expect("Mainline Kotmogu queue 699");
+    assert_eq!(
+        (
+            template.map_id,
+            template.min_players_per_team,
+            template.team_size
+        ),
+        (998, 2, 10)
+    );
+    assert_eq!(template.bracket, LevelBracket::new(40, 90));
+    assert_eq!((template.win_score, template.max_duration_secs), (1500, 0));
+    assert_eq!(
+        objective_object_entries(998),
+        [212094, 212091, 212093, 212092]
+    );
+    let columns: Vec<_> = pvp_stat_columns(998)
+        .iter()
+        .map(|column| (column.stat, column.title))
+        .collect();
+    assert_eq!(columns, [(418, "Orb Possessions"), (419, "Victory Points")]);
+}
+
+#[test]
 fn wsg_template() {
     let wsg = warsong_gulch();
     assert_eq!(wsg.id, 1014);
@@ -14,7 +58,9 @@ fn wsg_template() {
 #[test]
 fn ab_template() {
     let ab = arathi_basin();
-    assert_eq!(ab.id, 2);
+    assert_eq!(ab.id, 1018);
+    assert_eq!(ab.map_id, 2107);
+    assert_eq!(ab.bracket, LevelBracket::new(10, 90));
     assert_eq!(ab.team_size, 15);
     assert_eq!(ab.objective, BgObjective::NodeControl);
     assert_eq!(ab.win_score, 1500);
@@ -30,9 +76,21 @@ fn av_template() {
 }
 
 #[test]
-fn all_templates_returns_three() {
-    let templates = all_templates();
-    assert_eq!(templates.len(), 3);
+fn all_templates_lists_source_queue_maps() {
+    let pairs: Vec<_> = all_templates().iter().map(|t| (t.id, t.map_id)).collect();
+    assert_eq!(
+        pairs,
+        [
+            (1014, 2106),
+            (1018, 2107),
+            (120, 761),
+            (108, 726),
+            (7, 566),
+            (699, 998),
+            (708, 727),
+            (3, 30)
+        ]
+    );
 }
 
 #[test]
@@ -56,8 +114,9 @@ fn template_map_ids_unique() {
 #[test]
 fn lookup_by_id() {
     assert_eq!(template_by_id(1014).unwrap().name, "Warsong Gulch");
-    assert_eq!(template_by_id(2).unwrap().name, "Arathi Basin");
+    assert_eq!(template_by_id(1018).unwrap().name, "Arathi Basin");
     assert_eq!(template_by_id(3).unwrap().name, "Alterac Valley");
+    assert_eq!(template_by_id(120).unwrap().name, "The Battle for Gilneas");
     assert!(template_by_id(999).is_none());
 }
 
@@ -254,10 +313,10 @@ fn match_different_bg_types_independent() {
         q.join_solo(i, 30, warsong_gulch().id, 100).unwrap();
     }
     for i in 11..=18 {
-        q.join_solo(i, 30, 2, 100).unwrap();
+        q.join_solo(i, 30, arathi_basin().id, 100).unwrap();
     }
     assert!(q.try_match(warsong_gulch().id).is_some());
-    assert!(q.try_match(2).is_none());
+    assert!(q.try_match(arathi_basin().id).is_none());
 }
 
 #[test]
