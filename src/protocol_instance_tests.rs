@@ -108,7 +108,12 @@ fn achievement_comparison_has_finite_registered_layout_and_rejects_nested_wire_r
     );
     let nested = serde_json::json!({"Comparison": {"target_entity":42,"query":{"Comparison":{"target_entity":43,"query":{"Summary":{"scope":"All"}}}}}});
     assert!(serde_json::from_value::<QueryAchievementCatalog>(nested).is_err());
-    let mut app = bevy::prelude::App::new();
-    app.add_plugins(crate::protocol::ProtocolPlugin);
-    app.update();
+    assert_wire_round_trip(&query);
+    let mut app = App::new();
+    app.init_resource::<ProtocolHasher>()
+        .init_resource::<ReplicationRules>()
+        .init_resource::<ReplicationRegistry>();
+    app.add_plugins(ProtocolPlugin);
+    assert!(app.is_message_registered::<QueryAchievementCatalog>());
+    assert!(app.is_message_registered::<AchievementCatalogPage>());
 }
