@@ -23,7 +23,7 @@ pub struct MountJournalEntry {
     pub name: String,
     pub description: String,
     pub source_text: String,
-    pub source_type: u32,
+    pub source_type: i32,
     pub icon_file_data_id: u32,
     pub display_id: u32,
     /// Capability flags aggregated from MountTypeXCapability (ground/flying/water).
