@@ -16,7 +16,8 @@ fn transmog_state_roundtrips_authored_catalogue_outfit_and_illusion_data() {
         "outfits":[{"id":2,"name":"Gladius","choices":[{"slot":"MainHand","choice":{"Source":821}}],"illusions":[]}],
         "illusions":[{"id":3,"enchantment_id":1898,"cost":10000,"unlock_condition_id":0,"flags":0,"collected":false}],
         "outfit_slots":[{"id":13,"slot":"MainHand","flags":3,"collection_type":0}],
-        "outfit_options":[{"id":1,"slot_info_id":13,"name":"One Handed Weapon","option":1,"flags":0}]
+        "outfit_options":[{"id":1,"slot_info_id":13,"name":"One Handed Weapon","option":1,"flags":0}],
+        "custom_sets":[{"id":1,"name":"Gladius","choices":[{"slot":"MainHand","choice":{"Source":821}}]}]
     });
     let decoded: TransmogState = serde_json::from_value(value.clone()).unwrap();
     assert_eq!(serde_json::to_value(&decoded).unwrap(), value);
@@ -54,7 +55,7 @@ fn transmog_catalogue_distinguishes_all_three_collection_states() {
         let value = serde_json::json!({"npc":54442,"slots":[],"catalogue":[{
             "source":{"source_id":821,"appearance_id":154,"item_id":2488,"display_id":1542,
             "icon_fdid":135274,"name":"Gladius","inventory_type":13},"collection":state,"slots":["MainHand"]}],
-            "sets":[],"outfit_entries":[],"outfits":[],"illusions":[],"outfit_slots":[],"outfit_options":[]});
+            "sets":[],"outfit_entries":[],"outfits":[],"illusions":[],"outfit_slots":[],"outfit_options":[],"custom_sets":[]});
         let decoded: TransmogState = serde_json::from_value(value.clone()).unwrap();
         assert_eq!(serde_json::to_value(decoded).unwrap(), value);
     }

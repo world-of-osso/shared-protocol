@@ -51,6 +51,7 @@ pub struct TransmogState {
     pub sets: Vec<super::TransmogSet>,
     pub outfit_entries: Vec<super::TransmogOutfitEntry>,
     pub outfits: Vec<super::TransmogOutfit>,
+    pub custom_sets: Vec<super::TransmogCustomSet>,
     pub illusions: Vec<super::TransmogIllusion>,
     pub outfit_slots: Vec<super::TransmogOutfitSlot>,
     pub outfit_options: Vec<super::TransmogOutfitOption>,
@@ -104,6 +105,8 @@ pub(super) fn register_transmog_protocol(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<TransmogFailed>()
         .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<super::SaveTransmogCustomSet>()
+        .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<super::SaveTransmogOutfit>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<super::TransmogOutfitFailed>()

@@ -85,6 +85,23 @@ pub struct TransmogOutfitOption {
     pub flags: u32,
 }
 
+/// Player-created presets are separate from DB2-authored outfit entries.
+/// IDs are allocated and persisted by the server, never fabricated DB2 IDs.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct TransmogCustomSet {
+    pub id: u64,
+    pub name: String,
+    pub choices: Vec<TransmogOutfitChoice>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SaveTransmogCustomSet {
+    pub npc: u64,
+    pub id: Option<u64>,
+    pub name: String,
+    pub choices: Vec<TransmogOutfitChoice>,
+}
+
 /// Saving never applies equipment, binds items, or charges the paid Apply quote.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct SaveTransmogOutfit {
