@@ -121,6 +121,8 @@ pub const GAMEOBJECT_TYPE_MAILBOX: u8 = 19;
 /// TrinityCore `GAMEOBJECT_TYPE_RITUAL` (summoning portal).
 pub const GAMEOBJECT_TYPE_RITUAL: u8 = 18;
 /// TrinityCore GameObjectTypes; Retail Font of Power.
+/// Retail GameObjects.TypeID / GAMEOBJECT_TYPE_HOUSING_PLOT cornerstone.
+pub const GAMEOBJECT_TYPE_HOUSING_PLOT: u8 = 48;
 pub const GAMEOBJECT_TYPE_KEYSTONE_RECEPTACLE: u8 = 49;
 /// TrinityCore `GAMEOBJECT_TYPE_MEETINGSTONE`.
 pub const GAMEOBJECT_TYPE_MEETINGSTONE: u8 = 23;
