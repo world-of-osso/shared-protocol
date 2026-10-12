@@ -83,16 +83,16 @@ fn ab_full_pipeline_node_control_to_win() {
 fn av_full_pipeline_reinforcements_to_win() {
     let tmpl = alterac_valley();
     let bg_match = BgMatch {
-        bg_id: 3,
+        bg_id: tmpl.id,
         team_a: vec![1, 2],
         team_b: vec![3, 4],
     };
     let mut inst = BgInstance::from_match(&bg_match, &tmpl);
     inst.start();
 
-    assert_eq!(inst.score_b.reinforcements, 600);
+    assert_eq!(inst.score_b.reinforcements, 700);
 
-    for _ in 0..600 {
+    for _ in 0..700 {
         on_kill_reinforcement(&mut inst, BgTeam::B);
     }
 
