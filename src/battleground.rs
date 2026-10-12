@@ -13,6 +13,8 @@ pub enum BgObjective {
     PowerOrbs,
     /// Control moving mine carts and escort them to authored depots.
     Payload,
+    /// Collect spawned resources before the opposing team.
+    ResourceRace,
 }
 
 /// Level bracket for battleground matchmaking.
@@ -202,6 +204,22 @@ pub fn silvershard_mines() -> BgTemplate {
     }
 }
 
+/// BattlemasterList894/map1803, build12.1.0.69933; TDB WorldState13846.
+pub fn seething_shore() -> BgTemplate {
+    BgTemplate {
+        id: 894,
+        name: "Seething Shore".into(),
+        map_id: 1803,
+        team_size: 10,
+        min_players_per_team: 5,
+        objective: BgObjective::ResourceRace,
+        max_duration_secs: 0,
+        win_score: 1500,
+        starting_reinforcements: 0,
+        bracket: LevelBracket::new(40, 90),
+    }
+}
+
 /// All built-in battleground templates.
 pub fn all_templates() -> Vec<BgTemplate> {
     vec![
@@ -212,6 +230,7 @@ pub fn all_templates() -> Vec<BgTemplate> {
         eye_of_the_storm(),
         temple_of_kotmogu(),
         silvershard_mines(),
+        seething_shore(),
         alterac_valley(),
     ]
 }
