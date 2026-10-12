@@ -260,6 +260,14 @@ fn register_duel_messages(app: &mut App) {
 fn register_profession_messages(app: &mut App) {
     app.register_protocol_message::<CraftRecipe>()
         .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<ProfessionSpecializationRequest>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<ProfessionSpecializationStateUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<CraftingOrderRequest>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<CraftingOrderStateUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_reputation_messages(app: &mut App) {
