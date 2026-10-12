@@ -291,6 +291,9 @@ pub fn has_implemented_objectives(map_id: u32) -> bool {
 
 /// Whether `entry` is an objective object of any queueable battleground map.
 pub fn is_objective_entry(entry: u32) -> bool {
+    if entry == DEEPHAUL_DROP_ENTRY {
+        return true;
+    }
     all_templates()
         .iter()
         .any(|template| objective_object_entries(template.map_id).contains(&entry))

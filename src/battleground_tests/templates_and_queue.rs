@@ -1,6 +1,19 @@
 use super::*;
 
 #[test]
+fn deephaul_source_dropped_crystal_is_usable() {
+    let crystal = crate::protocol::GameObjectInfo {
+        entry: 422412,
+        go_type: 37,
+        display_id: 91024,
+        name: "Deephaul Crystal".into(),
+        scale: 1.0,
+    };
+    assert!(crystal.is_battleground_flag());
+    assert!(crystal.is_usable());
+}
+
+#[test]
 fn deephaul_source_queue_flag_and_scoreboard_columns() {
     let template = template_by_id(1110).expect("Mainline Deephaul queue1110");
     assert_eq!(
