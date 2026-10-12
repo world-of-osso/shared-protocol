@@ -242,6 +242,9 @@ pub fn template_by_id(id: u32) -> Option<BgTemplate> {
 
 /// Authored TDB objective objects a match on `map_id` needs loaded and usable.
 pub fn objective_object_entries(map_id: u32) -> Vec<u32> {
+    if map_id == 1803 {
+        return SEETHING_OBJECTS.to_vec();
+    }
     if map_id == 998 {
         // TC OnInit dynamically spawns orange, blue, green, purple from TDB templates.
         return KOTMOGU_ORBS.iter().map(|orb| orb.entry).collect();
