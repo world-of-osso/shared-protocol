@@ -276,7 +276,11 @@ mod unit_flag_attack_tests {
 
     #[test]
     fn authored_attackability_flags_distinguish_pc_immunity_from_general_immunity() {
-        for flag in [UnitFlags::NON_ATTACKABLE, UnitFlags::NON_ATTACKABLE_2, UnitFlags::NOT_SELECTABLE] {
+        for flag in [
+            UnitFlags::NON_ATTACKABLE,
+            UnitFlags::NON_ATTACKABLE_2,
+            UnitFlags::NOT_SELECTABLE,
+        ] {
             assert!(!UnitFlags(flag).can_be_attacked_by(true));
             assert!(!UnitFlags(flag).can_be_attacked_by(false));
         }
