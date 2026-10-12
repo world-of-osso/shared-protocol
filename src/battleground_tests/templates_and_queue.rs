@@ -1,6 +1,30 @@
 use super::*;
 
 #[test]
+fn kotmogu_source_queue_and_objective_columns() {
+    let template = template_by_id(699).expect("Mainline Kotmogu queue 699");
+    assert_eq!(
+        (
+            template.map_id,
+            template.min_players_per_team,
+            template.team_size
+        ),
+        (998, 2, 10)
+    );
+    assert_eq!(template.bracket, LevelBracket::new(40, 90));
+    assert_eq!((template.win_score, template.max_duration_secs), (1500, 0));
+    assert_eq!(
+        objective_object_entries(998),
+        [212094, 212091, 212093, 212092]
+    );
+    let columns: Vec<_> = pvp_stat_columns(998)
+        .iter()
+        .map(|column| (column.stat, column.title))
+        .collect();
+    assert_eq!(columns, [(418, "Orb Possessions"), (419, "Victory Points")]);
+}
+
+#[test]
 fn wsg_template() {
     let wsg = warsong_gulch();
     assert_eq!(wsg.id, 1014);

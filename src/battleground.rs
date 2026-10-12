@@ -9,6 +9,8 @@ pub enum BgObjective {
     NodeControl,
     /// Deplete the enemy team's reinforcement count (e.g. Alterac Valley).
     Reinforcements,
+    /// Carry Orbs of Power for location-dependent victory points.
+    PowerOrbs,
 }
 
 /// Level bracket for battleground matchmaking.
@@ -164,6 +166,23 @@ pub fn eye_of_the_storm() -> BgTemplate {
     }
 }
 
+/// BattlemasterList 699, local 12.1.0.69933: Power Orbs, 2–10 per team, levels 40–90.
+/// TDB1210 starts 4059/4060 map 998; WorldState 17388 caps victory points at 1500.
+pub fn temple_of_kotmogu() -> BgTemplate {
+    BgTemplate {
+        id: 699,
+        name: "Temple of Kotmogu".into(),
+        map_id: 998,
+        team_size: 10,
+        min_players_per_team: 2,
+        objective: BgObjective::PowerOrbs,
+        max_duration_secs: 0,
+        win_score: 1500,
+        starting_reinforcements: 0,
+        bracket: LevelBracket::new(40, 90),
+    }
+}
+
 /// All built-in battleground templates.
 pub fn all_templates() -> Vec<BgTemplate> {
     vec![
@@ -172,6 +191,7 @@ pub fn all_templates() -> Vec<BgTemplate> {
         battle_for_gilneas(),
         twin_peaks(),
         eye_of_the_storm(),
+        temple_of_kotmogu(),
         alterac_valley(),
     ]
 }
@@ -183,6 +203,10 @@ pub fn template_by_id(id: u32) -> Option<BgTemplate> {
 
 /// Authored TDB objective objects a match on `map_id` needs loaded and usable.
 pub fn objective_object_entries(map_id: u32) -> Vec<u32> {
+    if map_id == 998 {
+        // TC OnInit dynamically spawns orange, blue, green, purple from TDB templates.
+        return vec![212094, 212091, 212093, 212092];
+    }
     if let Some(rules) = node_rules(map_id) {
         return rules.nodes.iter().map(|node| node.entry).collect();
     }

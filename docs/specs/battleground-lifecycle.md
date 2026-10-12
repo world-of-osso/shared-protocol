@@ -10,6 +10,10 @@ Numeric policies and identifiers require local source evidence. Never derive rew
 
 Classic Arathi Basin (map529) ends at1500 resources, not1600. Source: local `game-engine/data/db2/12.1.0.69933/Map.csv`, row529 `PvpLongDescription_lang`: “- Capture and hold the objectives\r\n- Earn 1500 resources”. The shared instance must declare the scoring team winner at1500; subsequent score events cannot change that result.
 
+## Coverage continuation — 2026-10-12
+
+Kotmogu uses Mainline queue 699/map 998, source minimum 2 and maximum 10 per team, levels 40–90 and 1500 victory points (TDB WorldState 17388). Authored dynamically summoned orb templates 212094/212091/212093/212092 are required, rather than fabricated static TDB placements. PvpStat 418 Orb Possessions then 419 Victory Points follow local PvpScoreboardLayout order 0/1. Queue metadata is not proof of implemented orb scoring or live lifecycle; those gates remain open.
+
 ## Acceptance status — 2026-10-11
 
 Source-backed template correction also maps WSG to Mainline BattlemasterList1014/map2106, teams5–10 and levels10–90. Values decoded from local CASC FDID1360265, build12.1.0.69933, layout3414CBD7; matching wowdev/WoWDBDefs schema supplies field names only, not gameplay numbers. TDB world_state17303 supplies3 captures. `PvpSnapshot.battleground` now carries the retained match identity, authored map/template, team, Waiting phase and acceptance. `RespondToBattlegroundInvite` echoes that identity and explicit accept/decline over the existing PvP channel. Expiry is absent until sourced; callers must not invent a countdown. Other template IDs and policies, durations, node tick/capture policies, deserter duration and reward amounts remain unverified; their presence is not authentic Retail evidence. Existing static marks rewards are not an implementation of Mainline honor.
