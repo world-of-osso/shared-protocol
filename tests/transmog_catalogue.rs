@@ -10,10 +10,10 @@ fn transmog_state_roundtrips_authored_sets_outfit_and_illusion_data() {
         "npc":54442,"slots":[],
         "sets":[{"set_id":13,"parent_set_id":80,"name":"Wild Combatant's Chain Armor","source_ids":[70594,70595],
             "primary_appearances":[
-                {"source":{"source_id":70594,"appearance_id":25939,"item_id":124923,"display_id":142240,
+                {"source":{"source_id":70594,"source_type":3,"appearance_id":25939,"item_id":124923,"display_id":142240,
                 "icon_fdid":1092121,"name":"Wild Combatant's Chain Armor","inventory_type":5},
                 "collection":"Collected","slots":["Chest"]},
-                {"source":{"source_id":70595,"appearance_id":25940,"item_id":124924,"display_id":142246,
+                {"source":{"source_id":70595,"source_type":3,"appearance_id":25940,"item_id":124924,"display_id":142246,
                 "icon_fdid":1092122,"name":"Wild Combatant's Chain Gauntlets","inventory_type":10},
                 "collection":"Uncollected","slots":["Hands"]}]}],
         "outfit_entries":[{"id":2,"name":"Outfit 1","order_index":2,"cost":0,"source":1,"flags":35,"set_type":1}],
@@ -59,7 +59,7 @@ fn transmog_set_pieces_distinguish_all_three_collection_states() {
     for state in ["Collected", "Uncollected", "NonCollectable"] {
         let value = serde_json::json!({"npc":54442,"slots":[],"sets":[{"set_id":13,
             "parent_set_id":80,"name":"Wild Combatant's Chain Armor","source_ids":[70594],
-            "primary_appearances":[{"source":{"source_id":70594,"appearance_id":25939,
+            "primary_appearances":[{"source":{"source_id":70594,"source_type":3,"appearance_id":25939,
             "item_id":124923,"display_id":142240,"icon_fdid":1092121,
             "name":"Wild Combatant's Chain Armor","inventory_type":5},"collection":state,
             "slots":["Chest"]}]}],"outfit_entries":[],"outfits":[],"illusions":[],"outfit_slots":[],"outfit_options":[],"custom_sets":[]});
