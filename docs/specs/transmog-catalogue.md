@@ -2,6 +2,7 @@
 
 - [x] TransmogState separates paid eligible slot choices from the visual-level collected/uncollected/non-collectable catalogue.
 - [x] State carries authentic TransmogSet/TransmogSetItem membership, TransmogOutfitEntry/SlotInfo/SlotOption records, saved outfit choices and TransmogIllusion identities, conditions and costs, with each illusion's SpellItemEnchantment name and icon.
+- [x] Each TransmogSet carries one primary appearance per transmog slot with its collection state (collected member first), so set progress covers slots the character has not equipped.
 - [x] SaveTransmogOutfit saves configuration into an authored outfit entry; it never applies equipment or charges the existing paid Apply quote.
 - [x] Player-created Custom Sets remain separate from DB2 outfit entries. SaveTransmogCustomSet creates or updates account presets with server-allocated persisted IDs.
 - [x] Illusion IDs and ItemModifiedAppearance source IDs remain separate namespaces. Save failures are explicit and separate from paid Apply failures.

@@ -23,6 +23,9 @@ pub struct TransmogSet {
     pub parent_set_id: u32,
     pub name: String,
     pub source_ids: Vec<u32>,
+    /// One member per transmog slot, collected first (C_TransmogSets.GetSetPrimaryAppearances;
+    /// TrinityCore a352b1fa CollectionMgr::IsSetCompleted slot grouping).
+    pub primary_appearances: Vec<TransmogCatalogueSource>,
 }
 
 /// Authored TransmogOutfitEntry, not an invented player outfit identifier.
