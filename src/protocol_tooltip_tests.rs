@@ -22,6 +22,7 @@ fn tooltip_messages_round_trip() {
     assert_wire_round_trip(&CreatureTooltipQuery { entry: 38 });
     assert_wire_round_trip(&CreatureTooltip {
         entry: 38,
+        name: "Defias Thug".into(),
         subname: String::new(),
         creature_type: 7,
         drops: vec![
