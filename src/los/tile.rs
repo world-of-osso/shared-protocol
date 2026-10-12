@@ -24,6 +24,13 @@ const SAH_DEPTH: usize = 32;
 /// does not block it (a ray from a point resting on a surface).
 const END_EPSILON: f32 = 1e-5;
 
+#[derive(Clone, Copy)]
+enum HitKind {
+    Any,
+    Nearest,
+    Floor,
+}
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 struct Node {
     min: Vec3,
@@ -77,15 +84,24 @@ impl LosTile {
 
     /// Whether any triangle crosses the open segment `a..b`.
     pub fn blocks(&self, a: Vec3, b: Vec3) -> bool {
-        self.hit(a, b, true).is_some()
+        self.hit(a, b, HitKind::Any).is_some()
     }
 
     /// Segment parameter (0 at `a`, 1 at `b`) of the first triangle the segment crosses.
     pub fn first_hit(&self, a: Vec3, b: Vec3) -> Option<f32> {
-        self.hit(a, b, false)
+        self.hit(a, b, HitKind::Nearest)
     }
 
-    fn hit(&self, a: Vec3, b: Vec3, any: bool) -> Option<f32> {
+    /// Highest walkable collision face in the shared step/search interval.
+    /// Unlike LOS, ground includes both segment endpoints.
+    pub fn floor_height(&self, feet: Vec3) -> Option<f32> {
+        let top = feet + Vec3::Y * crate::ground::STEP_UP_HEIGHT;
+        let bottom = feet - Vec3::Y * crate::ground::FLOOR_SEARCH_DEPTH;
+        self.hit(top, bottom, HitKind::Floor)
+            .map(|t| top.lerp(bottom, t).y)
+    }
+
+    fn hit(&self, a: Vec3, b: Vec3, kind: HitKind) -> Option<f32> {
         if self.nodes.is_empty() {
             return None;
         }
@@ -93,7 +109,11 @@ impl LosTile {
         // A zero component gives a huge, finite inverse: no 0 * inf NaN in the slab test.
         let safe = Vec3::select(dir.abs().cmplt(Vec3::splat(1e-30)), Vec3::splat(1e-30), dir);
         let inv = safe.recip();
-        let mut best = 1.0 - END_EPSILON;
+        let mut best = if matches!(kind, HitKind::Floor) {
+            1.0
+        } else {
+            1.0 - END_EPSILON
+        };
         let mut found = None;
         let mut stack = [0u32; MAX_DEPTH];
         let mut depth = 1;
@@ -111,8 +131,11 @@ impl LosTile {
             }
             for tri in &self.triangles[node.start as usize..(node.start + node.count) as usize] {
                 let corners = tri.map(|index| self.vertices[index as usize]);
-                if let Some(t) = segment_triangle(a, dir, corners, best) {
-                    if any {
+                if !accepts_normal(kind, corners) {
+                    continue;
+                }
+                if let Some(t) = segment_triangle(a, dir, corners, best, kind) {
+                    if matches!(kind, HitKind::Any) {
                         return Some(t);
                     }
                     best = t;
@@ -257,9 +280,22 @@ fn slab_hit(min: Vec3, max: Vec3, origin: Vec3, inv: Vec3, t_max: f32) -> bool {
     near <= far
 }
 
-/// Möller–Trumbore, both faces: the segment parameter of the crossing in
-/// `(END_EPSILON, t_max)`.
-fn segment_triangle(origin: Vec3, dir: Vec3, [a, b, c]: [Vec3; 3], t_max: f32) -> Option<f32> {
+fn accepts_normal(kind: HitKind, [a, b, c]: [Vec3; 3]) -> bool {
+    if !matches!(kind, HitKind::Floor) {
+        return true;
+    }
+    let normal = (b - a).cross(c - a).normalize_or_zero();
+    normal.y.abs() >= crate::ground::min_walkable_normal_y()
+}
+
+/// Two-sided Möller–Trumbore. Ground includes endpoints; LOS excludes them.
+fn segment_triangle(
+    origin: Vec3,
+    dir: Vec3,
+    [a, b, c]: [Vec3; 3],
+    t_max: f32,
+    kind: HitKind,
+) -> Option<f32> {
     let edge1 = b - a;
     let edge2 = c - a;
     let p = dir.cross(edge2);
@@ -279,7 +315,12 @@ fn segment_triangle(origin: Vec3, dir: Vec3, [a, b, c]: [Vec3; 3], t_max: f32) -
         return None;
     }
     let t = edge2.dot(q) * inv_det;
-    (t > END_EPSILON && t < t_max).then_some(t)
+    let within_segment = if matches!(kind, HitKind::Floor) {
+        t >= 0.0 && t <= t_max
+    } else {
+        t > END_EPSILON && t < t_max
+    };
+    within_segment.then_some(t)
 }
 
 #[derive(Clone, Copy)]
