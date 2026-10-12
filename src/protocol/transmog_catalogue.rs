@@ -57,6 +57,9 @@ pub struct TransmogOutfitIllusion {
 pub struct TransmogOutfit {
     pub id: u32,
     pub name: String,
+    /// Player-selected IconSelector FileDataID; zero means explicitly no saved icon.
+    /// Required on the wire. Legacy storage is migrated by the server, never defaulted.
+    pub icon_fdid: u32,
     pub choices: Vec<TransmogOutfitChoice>,
     pub illusions: Vec<TransmogOutfitIllusion>,
 }

@@ -17,7 +17,7 @@ fn transmog_state_roundtrips_authored_sets_outfit_and_illusion_data() {
                 "icon_fdid":1092122,"name":"Wild Combatant's Chain Gauntlets","inventory_type":10},
                 "collection":"Uncollected","slots":["Hands"]}]}],
         "outfit_entries":[{"id":2,"name":"Outfit 1","order_index":2,"cost":0,"source":1,"flags":35,"set_type":1}],
-        "outfits":[{"id":2,"name":"Gladius","choices":[{"slot":"MainHand","choice":{"Source":821}}],"illusions":[]}],
+        "outfits":[{"id":2,"name":"Gladius","icon_fdid":135274,"choices":[{"slot":"MainHand","choice":{"Source":821}}],"illusions":[]}],
         "illusions":[{"id":3,"enchantment_id":1898,"name":"Lifestealing","icon_fdid":136130,
             "cost":10000,"unlock_condition_id":0,"flags":0,"collected":false}],
         "outfit_slots":[{"id":13,"slot":"MainHand","flags":3,"collection_type":0}],
@@ -35,7 +35,7 @@ fn transmog_state_roundtrips_authored_sets_outfit_and_illusion_data() {
 
 #[test]
 fn transmog_outfit_save_roundtrips_without_paid_apply_guids() {
-    let value = serde_json::json!({"npc":54442,"outfit":{"id":2,"name":"Gladius",
+    let value = serde_json::json!({"npc":54442,"outfit":{"id":2,"name":"Gladius","icon_fdid":135274,
         "choices":[{"slot":"MainHand","choice":{"Source":821}}],
         "illusions":[{"slot":"MainHand","illusion_id":3}]}});
     let save: SaveTransmogOutfit = serde_json::from_value(value.clone()).unwrap();
