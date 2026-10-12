@@ -1,4 +1,4 @@
-//! Retail type42 capture points. Values: TDB1210 templates and TC a352b1fa.
+//! Retail type 42 capture points. Values: TDB1210 templates and TC a352b1fa.
 use super::{BgInstance, BgTeam, BgTemplate, NodeOwner};
 
 #[derive(Debug, Clone, Copy)]
@@ -21,7 +21,7 @@ pub struct NodeRules {
     pub nodes: &'static [NodeSpec],
 }
 
-// CapturePoint.CaptureTime (Data0) is60000 for all eight source templates.
+// CapturePoint.CaptureTime (Data0) is 60000 for all eight source templates.
 const CAPTURE_MS: u64 = 60_000;
 const ARATHI: NodeRules = NodeRules {
     map_id: 2107,
@@ -229,7 +229,7 @@ impl NodeBattle {
 }
 
 // TC BattlegroundPackets.h BattlegroundCapturePointState; widget values are
-// explicitly0 uncontrolled,1 partial,2 captured in both pinned map scripts.
+// explicitly 0 uncontrolled, 1 partial, 2 captured in both pinned map scripts.
 pub fn capture_point_state(owner: NodeOwner) -> i32 {
     match owner {
         NodeOwner::Neutral => 1,

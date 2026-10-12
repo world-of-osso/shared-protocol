@@ -1,5 +1,5 @@
 //! Retail capture-the-flag maps: TC a352b1fa battleground_warsong_gulch.cpp and
-//! battleground_twin_peaks.cpp share flag entries, capture triggers30/31 and rules.
+//! battleground_twin_peaks.cpp share flag entries, capture triggers 30/31 and rules.
 use super::{BgInstance, BgOutcome, BgPhase, BgTeam, BgTemplate, FlagObjective, FlagState};
 
 #[derive(Debug)]
@@ -31,8 +31,8 @@ pub fn flag_rules(map_id: u32) -> Option<&'static FlagRules> {
     }
 }
 
-/// Both scripts end at17 minutes elapsed, which includes Battleground.h
-/// BG_START_DELAY_2M; Twin Peaks sets Timer4248 to start+15min.
+/// Both scripts end at 17 minutes elapsed, which includes Battleground.h
+/// BG_START_DELAY_2M; Twin Peaks sets Timer 4248 to start+15min.
 pub const FLAG_MATCH_MS: u64 = 15 * 60 * 1000;
 const FLAG_CAPTURES_ALLIANCE: u32 = 1581;
 const FLAG_CAPTURES_HORDE: u32 = 1582;
@@ -76,7 +76,7 @@ impl FlagBattle {
     }
 
     /// TC OnUpdate time limit: more captures win, equal non-zero scores go to the
-    /// team that captured last, and0-0 is a tie.
+    /// team that captured last, and 0-0 is a tie.
     pub fn advance(&mut self, delta_ms: u64, instance: &mut BgInstance) {
         if instance.phase != BgPhase::InProgress {
             return;
@@ -112,7 +112,7 @@ impl FlagBattle {
     }
 }
 
-// GameObject.h FlagState: InBase1, Taken2, Dropped3.
+// GameObject.h FlagState: InBase 1, Taken 2, Dropped 3.
 fn flag_state(flag: FlagState) -> i32 {
     match flag {
         FlagState::AtBase => 1,
@@ -121,7 +121,7 @@ fn flag_state(flag: FlagState) -> i32 {
     }
 }
 
-// TC UpdateFlagState: the other team's control widget is2 while taken, else1.
+// TC UpdateFlagState: the other team's control widget is 2 while taken, else 1.
 fn flag_control(flag: FlagState) -> i32 {
     match flag {
         FlagState::Carried { .. } => 2,

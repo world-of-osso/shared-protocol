@@ -81,8 +81,8 @@ pub fn warsong_gulch() -> BgTemplate {
 }
 
 /// Arathi Basin — 15v15 node control (5 bases, 1500 resources to win).
-/// BattlemasterList1018/map2107, build12.1.0.69933; TDB1210 start7056/7055.
-/// Resource limit: Map.csv map2107 PvpLongDescription and world_state1780.
+/// BattlemasterList 1018/map 2107, build 12.1.0.69933; TDB1210 start 7056/7055.
+/// Resource limit: Map.csv map 2107 PvpLongDescription and world_state 1780.
 pub fn arathi_basin() -> BgTemplate {
     BgTemplate {
         id: 1018,
@@ -114,7 +114,7 @@ pub fn alterac_valley() -> BgTemplate {
     }
 }
 
-/// Mainline BattlemasterList120/map761, TDB starts1798/1799; world_state1780.
+/// Mainline BattlemasterList 120/map 761, TDB starts 1798/1799; world_state 1780.
 pub fn battle_for_gilneas() -> BgTemplate {
     BgTemplate {
         id: 120,
@@ -130,8 +130,8 @@ pub fn battle_for_gilneas() -> BgTemplate {
     }
 }
 
-/// BattlemasterList108 (12.1.0.69933): Capture the Flag, 5–10 players, levels30–90;
-/// BattlemasterListXMap623 → map726; TDB starts1726/1727. Three captures win.
+/// BattlemasterList 108 (12.1.0.69933): Capture the Flag, 5–10 players, levels 30–90;
+/// BattlemasterListXMap 623 → map 726; TDB starts 1726/1727. Three captures win.
 pub fn twin_peaks() -> BgTemplate {
     BgTemplate {
         id: 108,

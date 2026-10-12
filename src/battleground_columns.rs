@@ -1,5 +1,5 @@
-//! Scoreboard objective columns: PvpStat.db2 (FDID2992919) Description per stat and
-//! PvpScoreboardLayout.db2 (FDID2992918) OrderIndex, local build12.1.0.69933.
+//! Scoreboard objective columns: PvpStat.db2 (FDID 2992919) Description per stat and
+//! PvpScoreboardLayout.db2 (FDID 2992918) OrderIndex, local build 12.1.0.69933.
 //! Blizzard_PVPMatch/PVPMatchTable.lua sorts GetMatchPVPStatColumns by orderIndex.
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -12,7 +12,7 @@ const fn column(stat: u32, title: &'static str) -> PvpStatColumn {
     PvpStatColumn { stat, title }
 }
 
-// Order0 Flag Returns, order1 Flag Captures.
+// Order 0 Flag Returns, order 1 Flag Captures.
 const WARSONG: [PvpStatColumn; 2] = [column(929, "Flag Returns"), column(928, "Flag Captures")];
 const ARATHI: [PvpStatColumn; 2] = [
     column(926, "Bases Assaulted"),

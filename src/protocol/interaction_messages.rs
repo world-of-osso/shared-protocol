@@ -157,11 +157,11 @@ pub struct GatherableResource {
     pub parent_skill: u32,
 }
 
-/// TDB1210 Mainline WSG/Twin Peaks227740/227741 use type36 (new flags).
+/// TDB1210 Mainline WSG/Twin Peaks 227740/227741 use type 36 (new flags).
 pub const GAMEOBJECT_TYPE_BATTLEGROUND_FLAG: u8 = 36;
 /// TDB1210 Arathi/Gilneas capturePoint templates; TC GameObjectTypes.
 pub const GAMEOBJECT_TYPE_CAPTURE_POINT: u8 = 42;
-/// Shared by Warsong Gulch2106 and Twin Peaks726 (TC script GameObjects).
+/// Shared by Warsong Gulch 2106 and Twin Peaks 726 (TC script GameObjects).
 pub const WARSONG_ALLIANCE_FLAG_ENTRY: u32 = 227741;
 pub const WARSONG_HORDE_FLAG_ENTRY: u32 = 227740;
 
