@@ -1,5 +1,5 @@
 use crate::components::{CharacterAppearance, EquipmentVisualSlot};
-use crate::protocol::ProtocolRegistrationExt;
+use crate::protocol::{ArenaQueueMode, ProtocolRegistrationExt};
 use bevy::prelude::*;
 use lightyear::prelude::*;
 use serde::de::DeserializeOwned;
@@ -388,6 +388,7 @@ pub struct PvpBracketStatsSnapshot {
 pub enum PvpQueueKindSnapshot {
     Battleground { battleground_id: u32, name: String },
     RatedBracket { bracket: PvpBracketSnapshot },
+    Arena { mode: ArenaQueueMode },
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -432,6 +433,25 @@ pub struct BattlegroundSnapshot {
     pub outcome: Option<crate::battleground::BgOutcome>,
     pub players: Vec<BattlegroundPlayerScoreSnapshot>,
     pub honor_reward: Option<u32>,
+    pub arena: Option<ArenaMatchSnapshot>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ArenaUnitSnapshot {
+    pub character_id: u64,
+    pub name: String,
+    pub class: u8,
+    pub team: crate::battleground::BgTeam,
+    pub health: u32,
+    pub max_health: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ArenaMatchSnapshot {
+    pub mode: ArenaQueueMode,
+    pub preparation_remaining_secs: Option<u32>,
+    pub shadow_sight_available: bool,
+    pub units: Vec<ArenaUnitSnapshot>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]

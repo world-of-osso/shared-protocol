@@ -564,6 +564,18 @@ pub struct QueueForBattleground {
     pub battleground_id: u32,
 }
 
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum ArenaQueueMode {
+    Skirmish2v2,
+    Skirmish3v3,
+    SoloShuffle,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct QueueForArena {
+    pub mode: ArenaQueueMode,
+}
+
 /// Echo the match identity so a stale popup cannot accept another invitation.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct RespondToBattlegroundInvite {
