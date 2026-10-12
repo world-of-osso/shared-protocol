@@ -60,6 +60,11 @@ pub struct ScenarioStage {
 /// AchievementChannel, client to server. Each request produces one bounded page.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum QueryAchievementCatalog {
+    /// Another online player; nested Comparison requests are rejected by the server.
+    Comparison {
+        target_entity: u64,
+        query: Box<QueryAchievementCatalog>,
+    },
     Summary {
         scope: AchievementScope,
     },
@@ -160,6 +165,13 @@ pub struct AchievementCatalogEntry {
 /// AchievementChannel, server to client. Unknown IDs return empty terminal pages.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum AchievementCatalogPage {
+    /// Target-correlated reply; missing targets return an explicit error, not own progress.
+    Comparison {
+        target_entity: u64,
+        target_name: String,
+        page: Option<Box<AchievementCatalogPage>>,
+        error: Option<String>,
+    },
     Summary(AchievementSummary),
     Statistics {
         category_id: u32,
