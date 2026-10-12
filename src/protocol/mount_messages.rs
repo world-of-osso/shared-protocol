@@ -21,6 +21,8 @@ pub struct SummonRandomFavouriteMount;
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct MountJournalUpdate {
+    /// World entry replaces the catalog; later updates replace only changed rows.
+    pub complete: bool,
     pub mounts: Vec<MountJournalEntry>,
     pub error: Option<String>,
 }

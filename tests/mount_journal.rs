@@ -13,6 +13,7 @@ fn round_trip<T: serde::Serialize + serde::de::DeserializeOwned + PartialEq + st
 #[test]
 fn mount_journal_preserves_authentic_metadata_and_account_state_on_wire() {
     round_trip(MountJournalUpdate {
+        complete: true,
         mounts: vec![MountJournalEntry {
             mount_id: 18,
             spell_id: 6648,
