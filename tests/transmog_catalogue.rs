@@ -4,8 +4,8 @@ use shared::protocol::{
 
 #[test]
 fn transmog_state_roundtrips_authored_catalogue_outfit_and_illusion_data() {
-    // Local Retail12.1 DB2 identities: Gladius821, TransmogIllusion3,
-    // OutfitEntry2. These namespaces must never be substituted for each other.
+    // Local Retail12.1 DB2 identities: Gladius821, TransmogIllusion3 (SpellItemEnchantment
+    // 1898 Lifestealing, icon136130), OutfitEntry2. These namespaces never substitute.
     let value = serde_json::json!({
         "npc":54442,"slots":[],
         "catalogue":[{"source":{"source_id":821,"appearance_id":154,"item_id":2488,
@@ -14,7 +14,8 @@ fn transmog_state_roundtrips_authored_catalogue_outfit_and_illusion_data() {
         "sets":[{"set_id":13,"parent_set_id":80,"name":"Wild Combatant's Chain Armor","source_ids":[70594]}],
         "outfit_entries":[{"id":2,"name":"Outfit 1","order_index":2,"cost":0,"source":1,"flags":35,"set_type":1}],
         "outfits":[{"id":2,"name":"Gladius","choices":[{"slot":"MainHand","choice":{"Source":821}}],"illusions":[]}],
-        "illusions":[{"id":3,"enchantment_id":1898,"cost":10000,"unlock_condition_id":0,"flags":0,"collected":false}],
+        "illusions":[{"id":3,"enchantment_id":1898,"name":"Lifestealing","icon_fdid":136130,
+            "cost":10000,"unlock_condition_id":0,"flags":0,"collected":false}],
         "outfit_slots":[{"id":13,"slot":"MainHand","flags":3,"collection_type":0}],
         "outfit_options":[{"id":1,"slot_info_id":13,"name":"One Handed Weapon","option":1,"flags":0}],
         "custom_sets":[{"id":1,"name":"Gladius","choices":[{"slot":"MainHand","choice":{"Source":821}}]}]

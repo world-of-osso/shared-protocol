@@ -62,6 +62,9 @@ pub struct TransmogOutfit {
 pub struct TransmogIllusion {
     pub id: u32,
     pub enchantment_id: u32,
+    /// SpellItemEnchantment.Name_lang and IconFileDataID (C_TransmogCollection.GetIllusionInfo).
+    pub name: String,
+    pub icon_fdid: u32,
     pub cost: u64,
     pub unlock_condition_id: u32,
     pub flags: u32,
