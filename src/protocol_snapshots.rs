@@ -48,6 +48,8 @@ pub struct QuestObjectiveSnapshot {
     pub current: u32,
     pub required: u32,
     pub completed: bool,
+    /// Displayed but not required for quest completion.
+    pub optional: bool,
     pub kind: crate::protocol::QuestObjectiveKind,
     /// Creature, game object or item id the objective counts.
     pub object_id: u32,
