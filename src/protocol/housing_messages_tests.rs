@@ -10,6 +10,7 @@ fn housing_wire_preserves_real_decor_identity_quantities_and_requested_transform
         command: HousingCommand::PlaceDecor {
             house_id: 42,
             decor_id: 1693,
+            variant_id: None,
             transform: DecorTransform {
                 position: [1.25, 2.0, -3.0],
                 yaw: std::f32::consts::FRAC_PI_2,

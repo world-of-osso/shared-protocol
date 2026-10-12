@@ -64,6 +64,8 @@ pub enum HousingCommand {
     PlaceDecor {
         house_id: u64,
         decor_id: u32,
+        /// None selects the undyed stack; a dyed variant must be explicitly identified.
+        variant_id: Option<u64>,
         transform: DecorTransform,
     },
     MoveDecor {
@@ -176,6 +178,15 @@ pub struct PlacedDecor {
     pub dyes: Vec<DecorDye>,
 }
 
+/// An actual owned dyed stack, not a catalog unlock or a new decor grant.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct StoredDecorVariant {
+    pub variant_id: u64,
+    pub decor_id: u32,
+    pub quantity: u32,
+    pub dyes: Vec<DecorDye>,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct HouseLayout {
     pub house_id: u64,
@@ -212,6 +223,8 @@ pub struct HousingState {
     pub plots: Vec<HousingPlot>,
     pub owned_houses: Vec<HousingHouse>,
     pub stored: Vec<StoredDecor>,
+    /// Owned dyed variants are included in stored totals, never counted twice.
+    pub stored_variants: Vec<StoredDecorVariant>,
     /// The account's placed instances per decor across all its houses; Retail
     /// HousingCatalogEntryInfo.totalNumPlaced. Owned = stored + placed.
     pub placed: Vec<StoredDecor>,
