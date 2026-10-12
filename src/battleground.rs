@@ -15,6 +15,8 @@ pub enum BgObjective {
     PowerOrbs,
     /// Control moving mine carts and escort them to authored depots.
     Payload,
+    /// Collect spawned resources before the opposing team.
+    ResourceRace,
 }
 
 /// Level bracket for battleground matchmaking.
@@ -204,6 +206,38 @@ pub fn silvershard_mines() -> BgTemplate {
     }
 }
 
+/// BattlemasterList894/map1803, build12.1.0.69933; TDB WorldState13846.
+pub fn seething_shore() -> BgTemplate {
+    BgTemplate {
+        id: 894,
+        name: "Seething Shore".into(),
+        map_id: 1803,
+        team_size: 10,
+        min_players_per_team: 5,
+        objective: BgObjective::ResourceRace,
+        max_duration_secs: 0,
+        win_score: 1500,
+        starting_reinforcements: 0,
+        bracket: LevelBracket::new(40, 90),
+    }
+}
+
+/// BattlemasterList1110/map2656, build12.1.0.69933; TDB WorldState24960.
+pub fn deephaul_ravine() -> BgTemplate {
+    BgTemplate {
+        id: 1110,
+        name: "Deephaul Ravine".into(),
+        map_id: 2656,
+        team_size: 10,
+        min_players_per_team: 5,
+        objective: BgObjective::Payload,
+        max_duration_secs: 0,
+        win_score: 1500,
+        starting_reinforcements: 0,
+        bracket: LevelBracket::new(19, 90),
+    }
+}
+
 /// All built-in battleground templates.
 pub fn all_templates() -> Vec<BgTemplate> {
     vec![
@@ -214,6 +248,8 @@ pub fn all_templates() -> Vec<BgTemplate> {
         eye_of_the_storm(),
         temple_of_kotmogu(),
         silvershard_mines(),
+        seething_shore(),
+        deephaul_ravine(),
         alterac_valley(),
     ]
 }
@@ -225,6 +261,12 @@ pub fn template_by_id(id: u32) -> Option<BgTemplate> {
 
 /// Authored TDB objective objects a match on `map_id` needs loaded and usable.
 pub fn objective_object_entries(map_id: u32) -> Vec<u32> {
+    if map_id == 2656 {
+        return vec![422413];
+    }
+    if map_id == 1803 {
+        return SEETHING_OBJECTS.to_vec();
+    }
     if map_id == 998 {
         // TC OnInit dynamically spawns orange, blue, green, purple from TDB templates.
         return KOTMOGU_ORBS.iter().map(|orb| orb.entry).collect();
@@ -251,6 +293,9 @@ pub fn has_implemented_objectives(map_id: u32) -> bool {
 
 /// Whether `entry` is an objective object of any queueable battleground map.
 pub fn is_objective_entry(entry: u32) -> bool {
+    if entry == DEEPHAUL_DROP_ENTRY {
+        return true;
+    }
     all_templates()
         .iter()
         .any(|template| objective_object_entries(template.map_id).contains(&entry))
@@ -633,6 +678,24 @@ pub use kotmogu::*;
 #[path = "battleground_silvershard.rs"]
 mod silvershard;
 pub use silvershard::*;
+
+#[path = "battleground_seething.rs"]
+mod seething;
+pub use seething::*;
+
+#[cfg(test)]
+#[path = "battleground_seething_tests.rs"]
+mod seething_tests;
+
+#[path = "battleground_deephaul.rs"]
+mod deephaul;
+#[path = "battleground_motion.rs"]
+mod motion;
+pub use deephaul::*;
+
+#[cfg(test)]
+#[path = "battleground_deephaul_tests.rs"]
+mod deephaul_tests;
 
 // -- Scoring & Rewards --
 
