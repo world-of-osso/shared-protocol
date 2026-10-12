@@ -32,9 +32,9 @@ fn av_template() {
 }
 
 #[test]
-fn all_templates_returns_three() {
+fn all_templates_returns_four() {
     let templates = all_templates();
-    assert_eq!(templates.len(), 3);
+    assert_eq!(templates.len(), 4);
 }
 
 #[test]
@@ -60,6 +60,7 @@ fn lookup_by_id() {
     assert_eq!(template_by_id(1014).unwrap().name, "Warsong Gulch");
     assert_eq!(template_by_id(1018).unwrap().name, "Arathi Basin");
     assert_eq!(template_by_id(3).unwrap().name, "Alterac Valley");
+    assert_eq!(template_by_id(120).unwrap().name, "The Battle for Gilneas");
     assert!(template_by_id(999).is_none());
 }
 

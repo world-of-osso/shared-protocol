@@ -409,6 +409,8 @@ pub struct BattlegroundPlayerScoreSnapshot {
     pub healing_done: u64,
     pub flag_captures: u32,
     pub flag_returns: u32,
+    /// Source PvPStatID/value pairs measured by objective interactions.
+    pub objective_scores: Vec<(u32, u32)>,
     /// Unknown honor policies are absent, not synthetic zero rewards/badges.
     pub honorable_kills: Option<u32>,
     pub honor_level: Option<u32>,
@@ -429,6 +431,8 @@ pub struct BattlegroundSnapshot {
     pub score_a: u32,
     pub score_b: u32,
     pub flags: crate::battleground::FlagObjective,
+    /// Authored WorldState IDs and authoritative values; no client-side scoring.
+    pub world_states: Vec<(u32, i32)>,
     pub outcome: Option<crate::battleground::BgOutcome>,
     pub players: Vec<BattlegroundPlayerScoreSnapshot>,
     pub honor_reward: Option<u32>,

@@ -50,7 +50,7 @@ pub struct BgTemplate {
     pub min_players_per_team: u8,
     /// Primary objective type.
     pub objective: BgObjective,
-    /// Maximum match duration in seconds. Match ends early if objective met.
+    /// Maximum match duration in seconds; zero means no timed end.
     pub max_duration_secs: u32,
     /// Score required to win (flag captures, resource points, etc.).
     pub win_score: u32,
@@ -91,7 +91,7 @@ pub fn arathi_basin() -> BgTemplate {
         team_size: 15,
         min_players_per_team: 8,
         objective: BgObjective::NodeControl,
-        max_duration_secs: 25 * 60,
+        max_duration_secs: 0,
         win_score: 1500,
         starting_reinforcements: 0,
         bracket: LevelBracket::new(10, 90),
@@ -114,9 +114,30 @@ pub fn alterac_valley() -> BgTemplate {
     }
 }
 
+/// Mainline BattlemasterList120/map761, TDB starts1798/1799; world_state1780.
+pub fn battle_for_gilneas() -> BgTemplate {
+    BgTemplate {
+        id: 120,
+        name: "The Battle for Gilneas".into(),
+        map_id: 761,
+        team_size: 10,
+        min_players_per_team: 3,
+        objective: BgObjective::NodeControl,
+        max_duration_secs: 0,
+        win_score: 1500,
+        starting_reinforcements: 0,
+        bracket: LevelBracket::new(20, 90),
+    }
+}
+
 /// All built-in battleground templates.
 pub fn all_templates() -> Vec<BgTemplate> {
-    vec![warsong_gulch(), arathi_basin(), alterac_valley()]
+    vec![
+        warsong_gulch(),
+        arathi_basin(),
+        battle_for_gilneas(),
+        alterac_valley(),
+    ]
 }
 
 /// Find a template by ID.
@@ -439,6 +460,7 @@ impl BgInstance {
         };
         score.score += points;
         if tmpl.win_score > 0 && score.score >= tmpl.win_score {
+            score.score = tmpl.win_score;
             self.end(BgOutcome::Winner(team));
         }
     }
@@ -468,7 +490,7 @@ impl BgInstance {
             return;
         }
         self.elapsed_secs += delta_secs;
-        if self.elapsed_secs >= tmpl.max_duration_secs {
+        if tmpl.max_duration_secs > 0 && self.elapsed_secs >= tmpl.max_duration_secs {
             self.end(BgOutcome::Draw);
         }
     }
@@ -482,6 +504,9 @@ impl BgInstance {
 #[path = "battleground_objectives.rs"]
 mod objectives;
 pub use objectives::*;
+#[path = "battleground_nodes.rs"]
+mod nodes;
+pub use nodes::*;
 
 // -- Scoring & Rewards --
 
