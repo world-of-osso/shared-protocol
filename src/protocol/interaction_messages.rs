@@ -157,8 +157,13 @@ pub struct GatherableResource {
     pub parent_skill: u32,
 }
 
-/// TDB1210 Mainline WSG227740/227741 use type36 (new flags).
+/// TDB1210 Mainline WSG/Twin Peaks 227740/227741 use type 36 (new flags).
 pub const GAMEOBJECT_TYPE_BATTLEGROUND_FLAG: u8 = 36;
+/// TrinityCore GAMEOBJECT_TYPE_FLAGSTAND: Kotmogu Orb of Power templates use this type.
+pub const GAMEOBJECT_TYPE_FLAGSTAND: u8 = 24;
+/// TDB1210 Arathi/Gilneas capturePoint templates; TC GameObjectTypes.
+pub const GAMEOBJECT_TYPE_CAPTURE_POINT: u8 = 42;
+/// Shared by Warsong Gulch 2106 and Twin Peaks 726 (TC script GameObjects).
 pub const WARSONG_ALLIANCE_FLAG_ENTRY: u32 = 227741;
 pub const WARSONG_HORDE_FLAG_ENTRY: u32 = 227740;
 
@@ -191,14 +196,25 @@ impl GameObjectInfo {
     /// triggers a linked trap), take no cursor, highlight or click.
     pub fn is_battleground_flag(&self) -> bool {
         self.go_type == GAMEOBJECT_TYPE_BATTLEGROUND_FLAG
-            && matches!(
-                self.entry,
-                WARSONG_ALLIANCE_FLAG_ENTRY | WARSONG_HORDE_FLAG_ENTRY
-            )
+            && crate::battleground::is_objective_entry(self.entry)
+    }
+
+    pub fn is_battleground_orb(&self) -> bool {
+        self.go_type == GAMEOBJECT_TYPE_FLAGSTAND
+            && crate::battleground::KOTMOGU_ORBS
+                .iter()
+                .any(|orb| orb.entry == self.entry)
+    }
+
+    pub fn is_battleground_capture_point(&self) -> bool {
+        self.go_type == GAMEOBJECT_TYPE_CAPTURE_POINT
+            && crate::battleground::is_objective_entry(self.entry)
     }
 
     pub fn is_usable(&self) -> bool {
-        self.is_battleground_flag()
+        self.is_battleground_capture_point()
+            || self.is_battleground_orb()
+            || self.is_battleground_flag()
             || matches!(
                 self.go_type,
                 GAMEOBJECT_TYPE_GUILD_BANK
