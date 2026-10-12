@@ -47,6 +47,7 @@ mod threat_messages;
 mod tooltip_messages;
 mod trainer_messages;
 mod transfer_messages;
+mod transmog_catalogue;
 mod transmog_messages;
 mod world_time_messages;
 
@@ -87,6 +88,7 @@ pub use threat_messages::*;
 pub use tooltip_messages::*;
 pub use trainer_messages::*;
 pub use transfer_messages::*;
+pub use transmog_catalogue::*;
 pub use transmog_messages::*;
 pub use world_time_messages::*;
 
