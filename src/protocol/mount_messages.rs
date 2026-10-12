@@ -1,4 +1,13 @@
 //! Retail account Mount Journal. IDs are Mount.db2 IDs, not creature displays.
+
+/// Journal categories, distinct from terrain capability flags.
+pub mod mount_journal_types {
+    pub const GROUND: u32 = 1;
+    pub const FLYING: u32 = 2;
+    pub const AQUATIC: u32 = 4;
+    pub const SKYRIDING: u32 = 8;
+    pub const RIDE_ALONG: u32 = 16;
+}
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -28,6 +37,8 @@ pub struct MountJournalEntry {
     pub display_id: u32,
     /// Capability flags aggregated from MountTypeXCapability (ground/flying/water).
     pub capability_flags: u32,
+    pub journal_types: u32,
+    pub flags: u32,
     pub collected: bool,
     pub favourite: bool,
     pub usable: bool,
