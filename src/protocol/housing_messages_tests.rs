@@ -29,6 +29,10 @@ fn housing_wire_preserves_real_decor_identity_quantities_and_requested_transform
                 decor_id: 1693,
                 quantity: 1,
             }],
+            placed: vec![StoredDecor {
+                decor_id: 2330,
+                quantity: 2,
+            }],
             ..HousingState::default()
         },
         error: Some("Only the owner may edit this house.".into()),

@@ -131,6 +131,9 @@ pub struct HousingState {
     pub plots: Vec<HousingPlot>,
     pub owned_houses: Vec<HousingHouse>,
     pub stored: Vec<StoredDecor>,
+    /// The account's placed instances per decor across all its houses; Retail
+    /// HousingCatalogEntryInfo.totalNumPlaced. Owned = stored + placed.
+    pub placed: Vec<StoredDecor>,
     pub layout: Option<HouseLayout>,
 }
 
