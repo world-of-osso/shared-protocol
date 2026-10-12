@@ -76,6 +76,7 @@ fn protocol_plugin_registers_encounter_messages() {
         caster: 3669,
         spell_id: 20805,
         severity: EncounterSeverity::Low,
+        warning_text: "Casting Lightning Bolt".into(),
     });
     assert_wire_round_trip(&EncounterTimelineEvent::Phase {
         caster: 3669,
