@@ -55,6 +55,39 @@ fn kobold_camp_cleanup(current: u32) -> QuestEntrySnapshot {
 }
 
 #[test]
+fn world_quest_availability_round_trip_preserves_window_area_and_authentic_rewards() {
+    assert_wire_round_trip(&WorldQuestAvailability {
+        server_time: 1000,
+        quests: vec![AvailableWorldQuest {
+            quest_id: 86948,
+            title: "Twilight Bonds".into(),
+            map_id: 0,
+            zone_id: 4922,
+            ui_map_id: 241,
+            position: QuestPoiPoint { x: -4995, y: -4653 },
+            expires_at: 87400,
+            rewards: QuestRewards {
+                money: 125,
+                ..Default::default()
+            },
+            xp: 900,
+            currencies: vec![WorldQuestNumericReward {
+                id: 1717,
+                amount: 1,
+            }],
+            reputation: vec![WorldQuestNumericReward {
+                id: 2159,
+                amount: 75,
+            }],
+        }],
+    });
+    assert_wire_round_trip(&WorldQuestAvailability {
+        server_time: 87400,
+        quests: vec![],
+    });
+}
+
+#[test]
 fn quest_share_messages_round_trip() {
     assert_wire_round_trip(&PushQuestToParty { quest_id: 62 });
     assert_wire_round_trip(&QuestShareOffer {
