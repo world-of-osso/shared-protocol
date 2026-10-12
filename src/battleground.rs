@@ -9,6 +9,10 @@ pub enum BgObjective {
     NodeControl,
     /// Deplete the enemy team's reinforcement count (e.g. Alterac Valley).
     Reinforcements,
+    /// Carry Orbs of Power for location-dependent victory points.
+    PowerOrbs,
+    /// Control moving mine carts and escort them to authored depots.
+    Payload,
 }
 
 /// Level bracket for battleground matchmaking.
@@ -50,7 +54,7 @@ pub struct BgTemplate {
     pub min_players_per_team: u8,
     /// Primary objective type.
     pub objective: BgObjective,
-    /// Maximum match duration in seconds. Match ends early if objective met.
+    /// Maximum match duration in seconds; zero means no timed end.
     pub max_duration_secs: u32,
     /// Score required to win (flag captures, resource points, etc.).
     pub win_score: u32,
@@ -81,19 +85,20 @@ pub fn warsong_gulch() -> BgTemplate {
 }
 
 /// Arathi Basin — 15v15 node control (5 bases, 1500 resources to win).
-/// Resource limit: Map.csv build 12.1.0.69933, map 529 PvpLongDescription.
+/// BattlemasterList 1018/map 2107, build 12.1.0.69933; TDB1210 start 7056/7055.
+/// Resource limit: Map.csv map 2107 PvpLongDescription and world_state 1780.
 pub fn arathi_basin() -> BgTemplate {
     BgTemplate {
-        id: 2,
+        id: 1018,
         name: "Arathi Basin".into(),
-        map_id: 529,
+        map_id: 2107,
         team_size: 15,
         min_players_per_team: 8,
         objective: BgObjective::NodeControl,
-        max_duration_secs: 25 * 60,
+        max_duration_secs: 0,
         win_score: 1500,
         starting_reinforcements: 0,
-        bracket: LevelBracket::new(10, 60),
+        bracket: LevelBracket::new(10, 90),
     }
 }
 
@@ -113,14 +118,140 @@ pub fn alterac_valley() -> BgTemplate {
     }
 }
 
+/// Mainline BattlemasterList 120/map 761, TDB starts 1798/1799; world_state 1780.
+pub fn battle_for_gilneas() -> BgTemplate {
+    BgTemplate {
+        id: 120,
+        name: "The Battle for Gilneas".into(),
+        map_id: 761,
+        team_size: 10,
+        min_players_per_team: 3,
+        objective: BgObjective::NodeControl,
+        max_duration_secs: 0,
+        win_score: 1500,
+        starting_reinforcements: 0,
+        bracket: LevelBracket::new(20, 90),
+    }
+}
+
+/// BattlemasterList 108 (12.1.0.69933): Capture the Flag, 5–10 players, levels 30–90;
+/// BattlemasterListXMap 623 → map 726; TDB starts 1726/1727. Three captures win.
+pub fn twin_peaks() -> BgTemplate {
+    BgTemplate {
+        id: 108,
+        name: "Twin Peaks".into(),
+        map_id: 726,
+        team_size: 10,
+        min_players_per_team: 5,
+        objective: BgObjective::FlagCapture,
+        max_duration_secs: 0,
+        win_score: 3,
+        starting_reinforcements: 0,
+        bracket: LevelBracket::new(30, 90),
+    }
+}
+
+/// BattlemasterList 7 (12.1.0.69933): Domination, 8–15 players, levels 20–90;
+/// BattlemasterListXMap 370 → map 566; TDB starts 1103/1104. Map.csv: earn 1500 resources.
+pub fn eye_of_the_storm() -> BgTemplate {
+    BgTemplate {
+        id: 7,
+        name: "Eye of the Storm".into(),
+        map_id: 566,
+        team_size: 15,
+        min_players_per_team: 8,
+        objective: BgObjective::NodeControl,
+        max_duration_secs: 0,
+        win_score: 1500,
+        starting_reinforcements: 0,
+        bracket: LevelBracket::new(20, 90),
+    }
+}
+
+/// BattlemasterList 699, local 12.1.0.69933: Power Orbs, 2–10 per team, levels 40–90.
+/// TDB1210 starts 4059/4060 map 998; WorldState 17388 caps victory points at 1500.
+pub fn temple_of_kotmogu() -> BgTemplate {
+    BgTemplate {
+        id: 699,
+        name: "Temple of Kotmogu".into(),
+        map_id: 998,
+        team_size: 10,
+        min_players_per_team: 2,
+        objective: BgObjective::PowerOrbs,
+        max_duration_secs: 0,
+        win_score: 1500,
+        starting_reinforcements: 0,
+        bracket: LevelBracket::new(40, 90),
+    }
+}
+
+/// Local BattlemasterList 708/XMap 627: Payload map 727, 3–10 per team, levels 30–90.
+/// Pinned TC SilvershardMines::Score::Max is 1500; no unsourced match-duration timer.
+pub fn silvershard_mines() -> BgTemplate {
+    BgTemplate {
+        id: 708,
+        name: "Silvershard Mines".into(),
+        map_id: 727,
+        team_size: 10,
+        min_players_per_team: 3,
+        objective: BgObjective::Payload,
+        max_duration_secs: 0,
+        win_score: 1500,
+        starting_reinforcements: 0,
+        bracket: LevelBracket::new(30, 90),
+    }
+}
+
 /// All built-in battleground templates.
 pub fn all_templates() -> Vec<BgTemplate> {
-    vec![warsong_gulch(), arathi_basin(), alterac_valley()]
+    vec![
+        warsong_gulch(),
+        arathi_basin(),
+        battle_for_gilneas(),
+        twin_peaks(),
+        eye_of_the_storm(),
+        temple_of_kotmogu(),
+        silvershard_mines(),
+        alterac_valley(),
+    ]
 }
 
 /// Find a template by ID.
 pub fn template_by_id(id: u32) -> Option<BgTemplate> {
     all_templates().into_iter().find(|t| t.id == id)
+}
+
+/// Authored TDB objective objects a match on `map_id` needs loaded and usable.
+pub fn objective_object_entries(map_id: u32) -> Vec<u32> {
+    if map_id == 998 {
+        // TC OnInit dynamically spawns orange, blue, green, purple from TDB templates.
+        return KOTMOGU_ORBS.iter().map(|orb| orb.entry).collect();
+    }
+    if let Some(rules) = node_rules(map_id) {
+        return rules.nodes.iter().map(|node| node.entry).collect();
+    }
+    if let Some(rules) = eye_rules(map_id) {
+        return vec![rules.flag_entry];
+    }
+    if flag_rules(map_id).is_some() {
+        return vec![
+            crate::protocol::WARSONG_ALLIANCE_FLAG_ENTRY,
+            crate::protocol::WARSONG_HORDE_FLAG_ENTRY,
+        ];
+    }
+    Vec::new()
+}
+
+/// Queue/entry eligibility includes NPC objective maps without fabricating GO placements.
+pub fn has_implemented_objectives(map_id: u32) -> bool {
+    map_id == 727 || !objective_object_entries(map_id).is_empty()
+}
+
+/// Whether `entry` is an objective object of any queueable battleground map.
+pub fn is_objective_entry(entry: u32) -> bool {
+    all_templates()
+        .iter()
+        .any(|template| objective_object_entries(template.map_id).contains(&entry))
 }
 
 // -- BG Queue --
@@ -438,6 +569,7 @@ impl BgInstance {
         };
         score.score += points;
         if tmpl.win_score > 0 && score.score >= tmpl.win_score {
+            score.score = tmpl.win_score;
             self.end(BgOutcome::Winner(team));
         }
     }
@@ -467,7 +599,7 @@ impl BgInstance {
             return;
         }
         self.elapsed_secs += delta_secs;
-        if self.elapsed_secs >= tmpl.max_duration_secs {
+        if tmpl.max_duration_secs > 0 && self.elapsed_secs >= tmpl.max_duration_secs {
             self.end(BgOutcome::Draw);
         }
     }
@@ -481,6 +613,24 @@ impl BgInstance {
 #[path = "battleground_objectives.rs"]
 mod objectives;
 pub use objectives::*;
+#[path = "battleground_nodes.rs"]
+mod nodes;
+pub use nodes::*;
+#[path = "battleground_flags.rs"]
+mod flags;
+pub use flags::*;
+#[path = "battleground_columns.rs"]
+mod columns;
+pub use columns::*;
+#[path = "battleground_eye.rs"]
+mod eye;
+pub use eye::*;
+#[path = "battleground_kotmogu.rs"]
+mod kotmogu;
+pub use kotmogu::*;
+#[path = "battleground_silvershard.rs"]
+mod silvershard;
+pub use silvershard::*;
 
 // -- Scoring & Rewards --
 

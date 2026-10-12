@@ -20,6 +20,8 @@ pub enum TransmogChoice {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct TransmogSource {
     pub source_id: u32,
+    /// Retail Enum.TransmogSource, authored ItemModifiedAppearance.TransmogSourceTypeEnum.
+    pub source_type: u8,
     pub appearance_id: u32,
     pub item_id: u32,
     pub display_id: u32,
@@ -42,10 +44,19 @@ pub struct TransmogSlot {
     pub sources: Vec<TransmogSource>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Default)]
 pub struct TransmogState {
     pub npc: u64,
+    /// Paid Apply still validates only these collected eligible choices.
     pub slots: Vec<TransmogSlot>,
+    /// Started sets; their primary appearances carry the collection states.
+    pub sets: Vec<super::TransmogSet>,
+    pub outfit_entries: Vec<super::TransmogOutfitEntry>,
+    pub outfits: Vec<super::TransmogOutfit>,
+    pub custom_sets: Vec<super::TransmogCustomSet>,
+    pub illusions: Vec<super::TransmogIllusion>,
+    pub outfit_slots: Vec<super::TransmogOutfitSlot>,
+    pub outfit_options: Vec<super::TransmogOutfitOption>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -96,6 +107,12 @@ pub(super) fn register_transmog_protocol(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<TransmogFailed>()
         .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<super::SaveTransmogCustomSet>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<super::SaveTransmogOutfit>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<super::TransmogOutfitFailed>()
+        .add_direction(NetworkDirection::ServerToClient);
 }
 
 #[cfg(test)]
@@ -117,6 +134,7 @@ mod tests {
                 can_hide: true,
                 sources: vec![TransmogSource {
                     source_id: 821,
+                    source_type: 3,
                     appearance_id: 154,
                     item_id: 2488,
                     display_id: 1542,
@@ -125,7 +143,11 @@ mod tests {
                     inventory_type: 13,
                 }],
             }],
+            ..Default::default()
         };
+        // Enum.TransmogSource.Vendor = 3 for authentic Gladius source821.
+        let json = serde_json::to_value(&state).unwrap();
+        assert_eq!(json["slots"][0]["sources"][0]["source_type"], 3);
         let bytes = bincode::serde::encode_to_vec(&state, bincode::config::standard()).unwrap();
         let (decoded, consumed): (TransmogState, usize) =
             bincode::serde::decode_from_slice(&bytes, bincode::config::standard()).unwrap();

@@ -1,4 +1,25 @@
 use super::*;
+
+#[test]
+fn cooldown_assist_effective_costs_preserve_numbers_and_unavailable_readings_on_wire() {
+    assert_wire_round_trip(&SpellCostSnapshot {
+        spells: vec![
+            SpellCostReading {
+                spell_id: 12294,
+                costs: Ok(vec![EffectivePowerCost {
+                    power_type: 1,
+                    amount: 300.0,
+                }]),
+                affordable: false,
+            },
+            SpellCostReading {
+                spell_id: 133,
+                costs: Err("caster base mana absent".into()),
+                affordable: false,
+            },
+        ],
+    });
+}
 use crate::components::{
     AuraView, CreatureClassification, PowerEntry, PowerType, UnitAuras, UnitFactionTemplate,
     UnitLevel, UnitPowers, UnitRunes, UnitTarget, UnitVignette,

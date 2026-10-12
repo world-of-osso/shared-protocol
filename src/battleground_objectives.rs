@@ -130,13 +130,10 @@ pub struct CaptureNode {
 #[derive(Debug, Clone, PartialEq)]
 pub struct NodeObjective {
     pub nodes: Vec<CaptureNode>,
-    /// Resource points awarded per owned node per tick.
-    pub points_per_node_per_tick: u32,
 }
 
-/// Points per tick based on number of owned nodes (AB-style scaling).
-/// 1 node=10, 2=10, 3=10, 4=30, 5=30 per tick.
-const AB_POINTS_PER_TICK: [u32; 6] = [0, 10, 10, 10, 30, 30];
+/// Points per two-second tick, TC a352b1fa battleground_arathi_basin.cpp.
+const AB_POINTS_PER_TICK: [u32; 6] = [0, 2, 3, 4, 7, 60];
 
 impl NodeObjective {
     /// Create AB-style 5-node objective.
@@ -150,7 +147,6 @@ impl NodeObjective {
                     owner: NodeOwner::Neutral,
                 })
                 .collect(),
-            points_per_node_per_tick: 10,
         }
     }
 
@@ -195,7 +191,7 @@ impl NodeObjective {
     pub fn tick_resources(&self, instance: &mut BgInstance, tmpl: &BgTemplate) {
         for team in [BgTeam::A, BgTeam::B] {
             let count = self.owned_count(team);
-            let points = AB_POINTS_PER_TICK.get(count).copied().unwrap_or(30);
+            let points = AB_POINTS_PER_TICK[count];
             if points > 0 {
                 instance.add_score(team, points, tmpl);
             }
