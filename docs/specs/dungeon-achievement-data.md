@@ -36,4 +36,4 @@ Client rendering, account/guild achievement evaluation and every Retail scenario
 
 ## Player comparison
 
-AchievementChannel carries target-entity-correlated Comparison requests wrapping one ordinary bounded catalog query. Replies identify the authoritative online player and contain that player’s page or an explicit error. Missing/offline/non-player/self targets and nested comparisons fail without substituting viewer progress. Account/character facts and unknown dates retain ordinary catalog semantics.
+AchievementChannel carries target-entity-correlated Comparison requests carrying one closed, nonrecursive ordinary bounded catalog query. Replies identify the authoritative online player and contain that player’s page or an explicit error. Missing/offline/non-player/self targets and nested comparisons fail during wire decoding without substituting viewer progress. Account/character facts and unknown dates retain ordinary catalog semantics.

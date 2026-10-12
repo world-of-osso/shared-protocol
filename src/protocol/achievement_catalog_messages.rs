@@ -63,7 +63,7 @@ pub enum QueryAchievementCatalog {
     /// Another online player; nested Comparison requests are rejected by the server.
     Comparison {
         target_entity: u64,
-        query: Box<QueryAchievementCatalog>,
+        query: Box<AchievementComparisonQuery>,
     },
     Summary {
         scope: AchievementScope,
@@ -169,7 +169,7 @@ pub enum AchievementCatalogPage {
     Comparison {
         target_entity: u64,
         target_name: String,
-        page: Option<Box<AchievementCatalogPage>>,
+        page: Option<Box<AchievementComparisonPage>>,
         error: Option<String>,
     },
     Summary(AchievementSummary),
@@ -202,4 +202,290 @@ pub enum AchievementCatalogPage {
         criteria: Vec<AchievementCriterionLine>,
         next_id: Option<u32>,
     },
+}
+
+/// Nonrecursive ordinary-query projection; the protocol layout tracer forbids recursive messages.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub enum AchievementComparisonQuery {
+    Summary {
+        scope: AchievementScope,
+    },
+    Categories {
+        after_id: u32,
+    },
+    Category {
+        category_id: u32,
+        after_id: u32,
+    },
+    Criteria {
+        achievement_id: u32,
+        after_id: u32,
+    },
+    Achievement {
+        achievement_id: u32,
+    },
+    Statistics {
+        category_id: u32,
+        after_id: u32,
+    },
+    Search {
+        text: String,
+        scope: AchievementScope,
+        after_id: u32,
+    },
+}
+
+/// Nonrecursive ordinary-page projection with unchanged catalog semantics.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub enum AchievementComparisonPage {
+    Summary(AchievementSummary),
+    Statistics {
+        category_id: u32,
+        achievements: Vec<AchievementCatalogEntry>,
+        next_id: Option<u32>,
+    },
+    Search {
+        text: String,
+        scope: AchievementScope,
+        achievements: Vec<AchievementCatalogEntry>,
+        next_id: Option<u32>,
+    },
+    Achievement {
+        achievement_id: u32,
+        entry: Option<AchievementCatalogEntry>,
+    },
+    Categories {
+        categories: Vec<AchievementCategoryEntry>,
+        next_id: Option<u32>,
+    },
+    Category {
+        category_id: u32,
+        achievements: Vec<AchievementCatalogEntry>,
+        next_id: Option<u32>,
+    },
+    Criteria {
+        achievement_id: u32,
+        criteria: Vec<AchievementCriterionLine>,
+        next_id: Option<u32>,
+    },
+}
+
+impl TryFrom<QueryAchievementCatalog> for AchievementComparisonQuery {
+    type Error = &'static str;
+    fn try_from(value: QueryAchievementCatalog) -> Result<Self, Self::Error> {
+        Ok(match value {
+            QueryAchievementCatalog::Comparison { .. } => {
+                return Err("nested achievement comparison is invalid");
+            }
+            QueryAchievementCatalog::Summary { scope } => {
+                AchievementComparisonQuery::Summary { scope }
+            }
+            QueryAchievementCatalog::Categories { after_id } => {
+                AchievementComparisonQuery::Categories { after_id }
+            }
+            QueryAchievementCatalog::Category {
+                category_id,
+                after_id,
+            } => AchievementComparisonQuery::Category {
+                category_id,
+                after_id,
+            },
+            QueryAchievementCatalog::Criteria {
+                achievement_id,
+                after_id,
+            } => AchievementComparisonQuery::Criteria {
+                achievement_id,
+                after_id,
+            },
+            QueryAchievementCatalog::Achievement { achievement_id } => {
+                AchievementComparisonQuery::Achievement { achievement_id }
+            }
+            QueryAchievementCatalog::Statistics {
+                category_id,
+                after_id,
+            } => AchievementComparisonQuery::Statistics {
+                category_id,
+                after_id,
+            },
+            QueryAchievementCatalog::Search {
+                text,
+                scope,
+                after_id,
+            } => AchievementComparisonQuery::Search {
+                text,
+                scope,
+                after_id,
+            },
+        })
+    }
+}
+
+impl From<AchievementComparisonQuery> for QueryAchievementCatalog {
+    fn from(value: AchievementComparisonQuery) -> Self {
+        match value {
+            AchievementComparisonQuery::Summary { scope } => {
+                QueryAchievementCatalog::Summary { scope }
+            }
+            AchievementComparisonQuery::Categories { after_id } => {
+                QueryAchievementCatalog::Categories { after_id }
+            }
+            AchievementComparisonQuery::Category {
+                category_id,
+                after_id,
+            } => QueryAchievementCatalog::Category {
+                category_id,
+                after_id,
+            },
+            AchievementComparisonQuery::Criteria {
+                achievement_id,
+                after_id,
+            } => QueryAchievementCatalog::Criteria {
+                achievement_id,
+                after_id,
+            },
+            AchievementComparisonQuery::Achievement { achievement_id } => {
+                QueryAchievementCatalog::Achievement { achievement_id }
+            }
+            AchievementComparisonQuery::Statistics {
+                category_id,
+                after_id,
+            } => QueryAchievementCatalog::Statistics {
+                category_id,
+                after_id,
+            },
+            AchievementComparisonQuery::Search {
+                text,
+                scope,
+                after_id,
+            } => QueryAchievementCatalog::Search {
+                text,
+                scope,
+                after_id,
+            },
+        }
+    }
+}
+
+impl TryFrom<AchievementCatalogPage> for AchievementComparisonPage {
+    type Error = &'static str;
+    fn try_from(value: AchievementCatalogPage) -> Result<Self, Self::Error> {
+        Ok(match value {
+            AchievementCatalogPage::Comparison { .. } => {
+                return Err("nested achievement comparison is invalid");
+            }
+            AchievementCatalogPage::Summary(value) => AchievementComparisonPage::Summary(value),
+            AchievementCatalogPage::Statistics {
+                category_id,
+                achievements,
+                next_id,
+            } => AchievementComparisonPage::Statistics {
+                category_id,
+                achievements,
+                next_id,
+            },
+            AchievementCatalogPage::Search {
+                text,
+                scope,
+                achievements,
+                next_id,
+            } => AchievementComparisonPage::Search {
+                text,
+                scope,
+                achievements,
+                next_id,
+            },
+            AchievementCatalogPage::Achievement {
+                achievement_id,
+                entry,
+            } => AchievementComparisonPage::Achievement {
+                achievement_id,
+                entry,
+            },
+            AchievementCatalogPage::Categories {
+                categories,
+                next_id,
+            } => AchievementComparisonPage::Categories {
+                categories,
+                next_id,
+            },
+            AchievementCatalogPage::Category {
+                category_id,
+                achievements,
+                next_id,
+            } => AchievementComparisonPage::Category {
+                category_id,
+                achievements,
+                next_id,
+            },
+            AchievementCatalogPage::Criteria {
+                achievement_id,
+                criteria,
+                next_id,
+            } => AchievementComparisonPage::Criteria {
+                achievement_id,
+                criteria,
+                next_id,
+            },
+        })
+    }
+}
+
+impl From<AchievementComparisonPage> for AchievementCatalogPage {
+    fn from(value: AchievementComparisonPage) -> Self {
+        match value {
+            AchievementComparisonPage::Summary(value) => AchievementCatalogPage::Summary(value),
+            AchievementComparisonPage::Statistics {
+                category_id,
+                achievements,
+                next_id,
+            } => AchievementCatalogPage::Statistics {
+                category_id,
+                achievements,
+                next_id,
+            },
+            AchievementComparisonPage::Search {
+                text,
+                scope,
+                achievements,
+                next_id,
+            } => AchievementCatalogPage::Search {
+                text,
+                scope,
+                achievements,
+                next_id,
+            },
+            AchievementComparisonPage::Achievement {
+                achievement_id,
+                entry,
+            } => AchievementCatalogPage::Achievement {
+                achievement_id,
+                entry,
+            },
+            AchievementComparisonPage::Categories {
+                categories,
+                next_id,
+            } => AchievementCatalogPage::Categories {
+                categories,
+                next_id,
+            },
+            AchievementComparisonPage::Category {
+                category_id,
+                achievements,
+                next_id,
+            } => AchievementCatalogPage::Category {
+                category_id,
+                achievements,
+                next_id,
+            },
+            AchievementComparisonPage::Criteria {
+                achievement_id,
+                criteria,
+                next_id,
+            } => AchievementCatalogPage::Criteria {
+                achievement_id,
+                criteria,
+                next_id,
+            },
+        }
+    }
 }
