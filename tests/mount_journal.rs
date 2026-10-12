@@ -16,6 +16,7 @@ fn mount_journal_preserves_authentic_metadata_and_account_state_on_wire() {
         mounts: vec![MountJournalEntry {
             mount_id: 18,
             spell_id: 6648,
+            teaching_items: vec![5655],
             name: "Chestnut Mare".into(),
             description: "Sturdy and steady; \"the horse that built Stormwind.\"".into(),
             source_text: r"|cFFFFD200Vendor: |rKatie Stokx|n|cFFFFD200Zone: |rStormwind City|n|cFFFFD200Cost: |r1|TINTERFACE\\MONEYFRAME\\UI-GOLDICON.BLP:0|t".into(),

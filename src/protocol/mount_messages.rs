@@ -29,6 +29,8 @@ pub struct MountJournalUpdate {
 pub struct MountJournalEntry {
     pub mount_id: u32,
     pub spell_id: u32,
+    /// Authentic Retail ItemXItemEffect / ItemEffect TriggerType 6 links.
+    pub teaching_items: Vec<u32>,
     pub name: String,
     pub description: String,
     pub source_text: String,
