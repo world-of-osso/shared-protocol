@@ -452,6 +452,8 @@ fn register_spell_messages(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<SpellChargesUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<SpellCostSnapshot>()
+        .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<CastFailed>()
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<CombatLogEvent>()
