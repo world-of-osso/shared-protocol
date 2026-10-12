@@ -33,6 +33,7 @@ fn kobold_camp_cleanup(current: u32) -> QuestEntrySnapshot {
             completed: false,
             kind: QuestObjectiveKind::Monster,
             object_id: 6,
+            optional: false,
         }],
         level: 2,
         sort_id: 9,
@@ -55,6 +56,39 @@ fn kobold_camp_cleanup(current: u32) -> QuestEntrySnapshot {
 }
 
 #[test]
+fn world_quest_availability_round_trip_preserves_window_area_and_authentic_rewards() {
+    assert_wire_round_trip(&WorldQuestAvailability {
+        server_time: 1000,
+        quests: vec![AvailableWorldQuest {
+            quest_id: 86948,
+            title: "Twilight Bonds".into(),
+            map_id: 0,
+            zone_id: 4922,
+            ui_map_id: 241,
+            position: QuestPoiPoint { x: -4995, y: -4653 },
+            expires_at: 87400,
+            rewards: QuestRewards {
+                money: 125,
+                ..Default::default()
+            },
+            xp: 900,
+            currencies: vec![WorldQuestNumericReward {
+                id: 1717,
+                amount: 1,
+            }],
+            reputation: vec![WorldQuestNumericReward {
+                id: 2159,
+                amount: 75,
+            }],
+        }],
+    });
+    assert_wire_round_trip(&WorldQuestAvailability {
+        server_time: 87400,
+        quests: vec![],
+    });
+}
+
+#[test]
 fn quest_share_messages_round_trip() {
     assert_wire_round_trip(&PushQuestToParty { quest_id: 62 });
     assert_wire_round_trip(&QuestShareOffer {
@@ -73,6 +107,25 @@ fn quest_share_messages_round_trip() {
         quest_title: "The Fargodeep Mine".into(),
         recipient: false,
         reason: QuestPushReason::Accepted,
+    });
+}
+
+#[test]
+fn quest_weighted_bar_and_optional_objectives_round_trip() {
+    let mut entry = kobold_camp_cleanup(3);
+    entry.objectives[0].optional = true;
+    entry.objectives.push(QuestObjectiveSnapshot {
+        text: "Close Time Rifts".into(),
+        current: 90,
+        required: 100,
+        completed: false,
+        optional: false,
+        kind: QuestObjectiveKind::ProgressBar,
+        object_id: 0,
+    });
+    assert_wire_round_trip(&QuestLogSnapshot {
+        entries: vec![entry],
+        watched_quest_ids: vec![7],
     });
 }
 
