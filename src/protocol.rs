@@ -25,6 +25,9 @@ mod group_messages;
 mod guild_bank_messages;
 mod guild_charter_messages;
 mod guild_rank_messages;
+mod housing_messages;
+#[cfg(test)]
+mod housing_messages_tests;
 mod instance_messages;
 mod interaction_messages;
 mod inventory_messages;
@@ -66,6 +69,7 @@ pub use group_messages::*;
 pub use guild_bank_messages::*;
 pub use guild_charter_messages::*;
 pub use guild_rank_messages::*;
+pub use housing_messages::*;
 pub use instance_messages::*;
 pub use interaction_messages::*;
 pub use inventory_messages::*;
@@ -115,6 +119,7 @@ impl Plugin for ProtocolPlugin {
         pet_stable_messages::register_pet_stable_protocol(app);
         experience_messages::register_experience_protocol(app);
         merchant_messages::register_merchant_protocol(app);
+        housing_messages::register_housing_protocol(app);
         bank_messages::register_bank_protocol(app);
         guild_bank_messages::register_guild_bank_protocol(app);
         guild_rank_messages::register_guild_rank_protocol(app);

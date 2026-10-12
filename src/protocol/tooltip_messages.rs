@@ -48,6 +48,9 @@ pub struct TooltipDrop {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct CreatureTooltip {
     pub entry: u32,
+    /// `creature_template.name`, the Retail `SMSG_QUERY_CREATURE_RESPONSE` name. Clients
+    /// name creatures they cannot see with it, e.g. housing catalog decor vendors.
+    pub name: String,
     /// `creature_template.subname` ("Weaponsmith"); empty when none.
     pub subname: String,
     /// `creature_template.type` (Retail `CreatureType`: 1 Beast … 7 Humanoid …).
