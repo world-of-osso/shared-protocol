@@ -677,6 +677,13 @@ impl BgInstance {
 #[path = "battleground_objectives.rs"]
 mod objectives;
 pub use objectives::*;
+#[path = "battleground_alterac.rs"]
+mod alterac;
+pub use alterac::*;
+#[cfg(test)]
+#[path = "battleground_alterac_tests.rs"]
+mod alterac_tests;
+
 #[path = "battleground_nodes.rs"]
 mod nodes;
 pub use nodes::*;

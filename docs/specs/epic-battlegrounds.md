@@ -9,6 +9,9 @@ Retail epic queue metadata and reinforcement rules in `src/battleground.rs`, sou
 - [x] Refuse an under-minimum roster and levels outside the source bracket.
 - [x] A player death deducts one reinforcement; depletion ends the match once.
 
+- [ ] Alterac's15 authored nodes preserve initial ownership, four-minute contest/defense, neutral Snowfall counter-assault and permanent75-reinforcement tower destruction.
+- [ ] Alterac source captains cost100 once, generals end the match, and mine leaders change ownership with one reinforcement per45seconds per owned mine.
+
 ## How it works
 
 - [Battleground runtime and source ledger](../../../game-engine/docs/wiki/systems/battlegrounds.md)
@@ -17,10 +20,12 @@ Retail epic queue metadata and reinforcement rules in `src/battleground.rs`, sou
 ## Implementation inventory
 
 - `src/battleground.rs` — queue templates, roster eligibility and shared reinforcement state.
+- `src/battleground_alterac.rs` — source node/banner/WorldState, captain/general and mine rules.
 - `src/battleground_objectives.rs` — existing player-kill reinforcement rule.
 
 ## Tests asserting this spec
 
+- `src/battleground_alterac_tests.rs` — neutral counter-assault, timed tower/defense/permanent destruction, graveyards, captains/general and mine resource ticks.
 - `src/battleground_tests/templates_and_queue.rs` — source templates, bracket and ten-per-team admission.
 - `src/battleground_tests/state_and_objectives.rs` — reinforcement depletion, saturation and kill credit.
 - `src/battleground_tests/integration.rs` — Alterac reinforcement-to-victory pipeline.
