@@ -220,6 +220,22 @@ pub fn seething_shore() -> BgTemplate {
     }
 }
 
+/// BattlemasterList1110/map2656, build12.1.0.69933; TDB WorldState24960.
+pub fn deephaul_ravine() -> BgTemplate {
+    BgTemplate {
+        id: 1110,
+        name: "Deephaul Ravine".into(),
+        map_id: 2656,
+        team_size: 10,
+        min_players_per_team: 5,
+        objective: BgObjective::Payload,
+        max_duration_secs: 0,
+        win_score: 1500,
+        starting_reinforcements: 0,
+        bracket: LevelBracket::new(19, 90),
+    }
+}
+
 /// All built-in battleground templates.
 pub fn all_templates() -> Vec<BgTemplate> {
     vec![
@@ -231,6 +247,7 @@ pub fn all_templates() -> Vec<BgTemplate> {
         temple_of_kotmogu(),
         silvershard_mines(),
         seething_shore(),
+        deephaul_ravine(),
         alterac_valley(),
     ]
 }
@@ -242,6 +259,9 @@ pub fn template_by_id(id: u32) -> Option<BgTemplate> {
 
 /// Authored TDB objective objects a match on `map_id` needs loaded and usable.
 pub fn objective_object_entries(map_id: u32) -> Vec<u32> {
+    if map_id == 2656 {
+        return vec![422413];
+    }
     if map_id == 1803 {
         return SEETHING_OBJECTS.to_vec();
     }

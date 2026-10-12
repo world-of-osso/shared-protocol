@@ -24,6 +24,11 @@ const GILNEAS: [PvpStatColumn; 2] = [
 ];
 const TWIN_PEAKS: [PvpStatColumn; 2] = [column(290, "Flag Captures"), column(291, "Flag Returns")];
 const EYE_OF_THE_STORM: [PvpStatColumn; 1] = [column(183, "Flag Captures")];
+// Both OrderIndex0; retain source Layout row72 then73 ordering.
+const DEEPHAUL: [PvpStatColumn; 2] = [
+    column(1020, "Flag Captures"),
+    column(1021, "Carts Controlled"),
+];
 const SEETHING: [PvpStatColumn; 1] = [column(744, "Azerite Collected")];
 const SILVERSHARD: [PvpStatColumn; 1] = [column(428, "Carts Controlled")];
 const KOTMOGU: [PvpStatColumn; 2] = [
@@ -42,6 +47,7 @@ pub fn pvp_stat_columns(map_id: u32) -> &'static [PvpStatColumn] {
         998 => &KOTMOGU,
         727 => &SILVERSHARD,
         1803 => &SEETHING,
+        2656 => &DEEPHAUL,
         _ => &[],
     }
 }
