@@ -168,6 +168,8 @@ fn guild_bank_messages_round_trip() {
 
 #[test]
 fn game_object_animation_preserves_source_sequence_and_loop_policy() {
+    assert_wire_round_trip(&GameObjectCollision(false));
+    assert_wire_round_trip(&GameObjectCollision(true));
     assert_wire_round_trip(&GameObjectVisible(false));
     assert_wire_round_trip(&GameObjectVisible(true));
     assert_wire_round_trip(&GameObjectAnimation {
