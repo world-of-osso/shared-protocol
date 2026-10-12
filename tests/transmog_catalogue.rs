@@ -11,7 +11,7 @@ fn transmog_state_roundtrips_authored_catalogue_outfit_and_illusion_data() {
         "catalogue":[{"source":{"source_id":821,"appearance_id":154,"item_id":2488,
             "display_id":1542,"icon_fdid":135274,"name":"Gladius","inventory_type":13},
             "collection":"Collected","slots":["MainHand"]}],
-        "sets":[{"set_id":13,"parent_set_id":80,"name":"Wild Combatant's Chain Armor","source_ids":[6813]}],
+        "sets":[{"set_id":13,"parent_set_id":80,"name":"Wild Combatant's Chain Armor","source_ids":[70594]}],
         "outfit_entries":[{"id":2,"name":"Outfit 1","order_index":2,"cost":0,"source":1,"flags":35,"set_type":1}],
         "outfits":[{"id":2,"name":"Gladius","choices":[{"slot":"MainHand","choice":{"Source":821}}],"illusions":[]}],
         "illusions":[{"id":3,"enchantment_id":1898,"cost":10000,"unlock_condition_id":0,"flags":0,"collected":false}],
