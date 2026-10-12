@@ -42,10 +42,18 @@ pub struct TransmogSlot {
     pub sources: Vec<TransmogSource>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Default)]
 pub struct TransmogState {
     pub npc: u64,
+    /// Paid Apply still validates only these collected eligible choices.
     pub slots: Vec<TransmogSlot>,
+    pub catalogue: Vec<super::TransmogCatalogueSource>,
+    pub sets: Vec<super::TransmogSet>,
+    pub outfit_entries: Vec<super::TransmogOutfitEntry>,
+    pub outfits: Vec<super::TransmogOutfit>,
+    pub illusions: Vec<super::TransmogIllusion>,
+    pub outfit_slots: Vec<super::TransmogOutfitSlot>,
+    pub outfit_options: Vec<super::TransmogOutfitOption>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -96,6 +104,10 @@ pub(super) fn register_transmog_protocol(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<TransmogFailed>()
         .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<super::SaveTransmogOutfit>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<super::TransmogOutfitFailed>()
+        .add_direction(NetworkDirection::ServerToClient);
 }
 
 #[cfg(test)]
@@ -125,6 +137,7 @@ mod tests {
                     inventory_type: 13,
                 }],
             }],
+            ..Default::default()
         };
         let bytes = bincode::serde::encode_to_vec(&state, bincode::config::standard()).unwrap();
         let (decoded, consumed): (TransmogState, usize) =
