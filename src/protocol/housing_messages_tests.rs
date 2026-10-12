@@ -57,6 +57,40 @@ fn housing_wire_preserves_real_decor_identity_quantities_and_requested_transform
 }
 
 #[test]
+fn housing_dye_preview_and_commit_wire_keep_authentic_slot_ids_and_clear_selection() {
+    let request = HousingRequest {
+        request_id: 11,
+        command: HousingCommand::PreviewDecorDyes {
+            house_id: 42,
+            instance_id: 1,
+            changes: vec![
+                super::DecorDye {
+                    slot_id: 28,
+                    color_id: Some(23),
+                },
+                super::DecorDye {
+                    slot_id: 29,
+                    color_id: None,
+                },
+            ],
+        },
+    };
+    let bytes = bincode::serde::encode_to_vec(&request, bincode::config::standard()).unwrap();
+    let (decoded, used): (HousingRequest, usize) =
+        bincode::serde::decode_from_slice(&bytes, bincode::config::standard()).unwrap();
+    assert_eq!(decoded, request);
+    assert_eq!(used, bytes.len());
+    let commit = HousingCommand::CommitDecorDyes {
+        house_id: 42,
+        instance_id: 1,
+    };
+    let bytes = bincode::serde::encode_to_vec(&commit, bincode::config::standard()).unwrap();
+    let (decoded, _): (HousingCommand, usize) =
+        bincode::serde::decode_from_slice(&bytes, bincode::config::standard()).unwrap();
+    assert_eq!(decoded, commit);
+}
+
+#[test]
 fn housing_access_settings_roundtrip_keeps_each_limited_permission() {
     let access = super::HouseAccess {
         anyone: false,
