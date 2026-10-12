@@ -683,10 +683,12 @@ pub struct SummonPet {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct DismissPet;
 
-/// Account Toy Box activation; uses the player's selected target when needed.
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+/// Account Toy Box activation; uses the selected unit or a clicked ground point.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct UseToy {
     pub item_id: u32,
+    /// Server/Bevy coordinates for source cursor-targeted spells; otherwise absent.
+    pub destination: Option<[f32; 3]>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
