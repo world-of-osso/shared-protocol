@@ -474,7 +474,7 @@ impl BgInstance {
         }
     }
 
-    fn end(&mut self, outcome: BgOutcome) {
+    pub fn end(&mut self, outcome: BgOutcome) {
         self.phase = BgPhase::Ended;
         self.outcome = Some(outcome);
     }
