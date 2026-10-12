@@ -161,6 +161,8 @@ pub struct GatherableResource {
 
 /// TDB1210 Mainline WSG/Twin Peaks 227740/227741 use type 36 (new flags).
 pub const GAMEOBJECT_TYPE_BATTLEGROUND_FLAG: u8 = 36;
+/// Source NEW_FLAG_DROP: dynamically created by the base flag's DropGO template.
+pub const GAMEOBJECT_TYPE_BATTLEGROUND_FLAG_DROP: u8 = 37;
 /// TrinityCore GAMEOBJECT_TYPE_FLAGSTAND: Kotmogu Orb of Power templates use this type.
 pub const GAMEOBJECT_TYPE_FLAGSTAND: u8 = 24;
 /// TDB1210 Arathi/Gilneas capturePoint templates; TC GameObjectTypes.
@@ -197,8 +199,10 @@ impl GameObjectInfo {
     /// such as decoration (`GENERIC`, no `Use` case) and spell foci (`SPELL_FOCUS`, which only
     /// triggers a linked trap), take no cursor, highlight or click.
     pub fn is_battleground_flag(&self) -> bool {
-        self.go_type == GAMEOBJECT_TYPE_BATTLEGROUND_FLAG
-            && crate::battleground::is_objective_entry(self.entry)
+        matches!(
+            self.go_type,
+            GAMEOBJECT_TYPE_BATTLEGROUND_FLAG | GAMEOBJECT_TYPE_BATTLEGROUND_FLAG_DROP
+        ) && crate::battleground::is_objective_entry(self.entry)
     }
 
     pub fn is_battleground_orb(&self) -> bool {

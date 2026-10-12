@@ -2,6 +2,7 @@
 //! GameObject.cpp ControlZone; TDB1210 templates 213796/213794/213766 and paths.
 use std::collections::BTreeMap;
 
+use super::motion::{distance, follow_linear_path};
 use super::{BgInstance, BgOutcome, BgPhase, BgTeam, BgTemplate};
 
 pub type CartPaths = BTreeMap<u32, Vec<[f32; 3]>>;
@@ -111,20 +112,13 @@ impl MovingCart {
         let mut distance_left = delta_ms as f32 / 1000.0 * CART_SPEED;
         loop {
             let points = paths.get(&self.path).expect("validated source cart path");
-            let target = points[self.next_node];
-            let remaining = distance(self.position, target);
-            if remaining > distance_left {
-                let fraction = distance_left / remaining;
-                self.position = std::array::from_fn(|axis| {
-                    self.position[axis] + (target[axis] - self.position[axis]) * fraction
-                });
+            if !follow_linear_path(
+                &mut self.position,
+                &mut self.next_node,
+                points,
+                &mut distance_left,
+            ) {
                 return false;
-            }
-            self.position = target;
-            distance_left -= remaining;
-            self.next_node += 1;
-            if self.next_node < points.len() {
-                continue;
             }
             let Some(next) = next_path(self.path, switches) else {
                 return true;
@@ -352,14 +346,6 @@ fn next_path(path: u32, switches: [i32; 2]) -> Option<u32> {
         6014010 => Some(6014011),
         _ => None,
     }
-}
-
-fn distance(a: [f32; 3], b: [f32; 3]) -> f32 {
-    a.iter()
-        .zip(b)
-        .map(|(a, b)| (a - b) * (a - b))
-        .sum::<f32>()
-        .sqrt()
 }
 
 #[cfg(test)]
