@@ -21,6 +21,8 @@ Retail epic queue metadata and reinforcement rules in `src/battleground.rs`, sou
 
 - `src/battleground.rs` — queue templates, roster eligibility and shared reinforcement state.
 - `src/battleground_alterac.rs` — source node/banner/WorldState, captain/general and mine rules.
+- `src/battleground_columns.rs` — source63/65/61/64/82 scoreboard ordering.
+- `src/protocol/interaction_messages.rs` — source AV button/goober use identity.
 - `src/battleground_objectives.rs` — existing player-kill reinforcement rule.
 
 ## Tests asserting this spec
@@ -35,7 +37,7 @@ Retail epic queue metadata and reinforcement rules in `src/battleground.rs`, sou
 - [ ] Alterac node/tower/mine/captain/general pure rules need normal eight-second Opening casts, source prefab transitions and authoritative combat-death integration. Initial entry is ground-based, not transport-relative.
 - [ ] Isle nodes, gates, transports and vehicles still require map-specific rules and runtime integration.
 - [ ] Native HUD/source scoreboard columns and both-skin private real-server lifecycle proof remain pending.
-- [ ] Metadata registration alone does not admit either map through server/native objective eligibility.
+- [ ] Alterac source objective registration and button/goober identity now feed server/native eligibility; native rendering/HUD and live proof must be completed before publication. Isle remains objective-ineligible.
 
 ## Out of scope
 

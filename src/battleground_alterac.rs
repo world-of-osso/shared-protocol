@@ -1,6 +1,8 @@
 //! Alterac source rules: TC a352b1fa battleground_alterac_valley.cpp and alterac_valley.cpp.
 use super::{BgInstance, BgOutcome, BgPhase, BgTeam};
 
+pub const ALTERAC_OPENING_SPELL: u32 = 21651;
+pub const ALTERAC_NODE_COUNT: usize = 15;
 const CAPTURE_MS: u64 = 240_000;
 const MINE_TICK_MS: u64 = 45_000;
 const TOWER_LOSS: u32 = 75;
@@ -33,7 +35,7 @@ const fn tower(banners: [u32; 5], world_states: [u32; 5], owner: BgTeam) -> Node
     }
 }
 
-const NODES: [NodeSpec; 15] = [
+const NODES: [NodeSpec; ALTERAC_NODE_COUNT] = [
     grave(
         [179465, 179466, 179467, 179468, 0],
         [1325, 1326, 1327, 1328, 0],
@@ -196,7 +198,7 @@ impl NodeState {
 
 #[derive(Debug)]
 pub struct AlteracBattle {
-    nodes: [NodeState; 15],
+    nodes: [NodeState; ALTERAC_NODE_COUNT],
     mines: [Option<BgTeam>; 2],
     mine_elapsed_ms: u64,
     captains_alive: [bool; 2],
@@ -223,13 +225,35 @@ impl AlteracBattle {
         team: BgTeam,
         instance: &BgInstance,
     ) -> Result<u32, &'static str> {
+        let node = self.find_usable_banner(entry, team, instance)?;
+        self.nodes[node].interact(NODES[node], team)
+    }
+
+    pub fn check_interact(
+        &self,
+        entry: u32,
+        team: BgTeam,
+        instance: &BgInstance,
+    ) -> Result<(), &'static str> {
+        self.find_usable_banner(entry, team, instance).map(|_| ())
+    }
+
+    fn find_usable_banner(
+        &self,
+        entry: u32,
+        team: BgTeam,
+        instance: &BgInstance,
+    ) -> Result<usize, &'static str> {
         if instance.bg_id != 1 || instance.phase != BgPhase::InProgress {
             return Err("no active Alterac match");
         }
         let node = (0..NODES.len())
             .find(|index| self.banner_entry(*index) == Some(entry))
             .ok_or("banner is not the current Alterac objective")?;
-        self.nodes[node].interact(NODES[node], team)
+        if self.nodes[node].owner == Some(team) {
+            return Err("objective belongs to this team");
+        }
+        Ok(node)
     }
 
     pub fn banner_entry(&self, node: usize) -> Option<u32> {
@@ -342,6 +366,10 @@ impl AlteracBattle {
         states.extend(mine_world_states(self.mines[1], [804, 1355, 1356, 1357]));
         states
     }
+}
+
+pub fn is_alterac_banner_entry(entry: u32) -> bool {
+    entry != 0 && NODES.iter().any(|spec| spec.banners.contains(&entry))
 }
 
 pub fn alterac_banner_entries() -> Vec<u32> {

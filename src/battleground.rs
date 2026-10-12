@@ -278,6 +278,9 @@ pub fn template_by_id(id: u32) -> Option<BgTemplate> {
 
 /// Authored TDB objective objects a match on `map_id` needs loaded and usable.
 pub fn objective_object_entries(map_id: u32) -> Vec<u32> {
+    if map_id == 30 {
+        return alterac_banner_entries();
+    }
     if map_id == 2656 {
         return vec![422413];
     }

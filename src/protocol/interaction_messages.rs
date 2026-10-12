@@ -212,6 +212,10 @@ impl GameObjectInfo {
                 .any(|orb| orb.entry == self.entry)
     }
 
+    pub fn is_battleground_banner(&self) -> bool {
+        matches!(self.go_type, 1 | 10) && crate::battleground::is_alterac_banner_entry(self.entry)
+    }
+
     pub fn is_battleground_capture_point(&self) -> bool {
         self.go_type == GAMEOBJECT_TYPE_CAPTURE_POINT
             && crate::battleground::is_objective_entry(self.entry)
@@ -219,6 +223,7 @@ impl GameObjectInfo {
 
     pub fn is_usable(&self) -> bool {
         self.is_battleground_capture_point()
+            || self.is_battleground_banner()
             || self.is_battleground_orb()
             || self.is_battleground_flag()
             || matches!(
