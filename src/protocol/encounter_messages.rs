@@ -78,6 +78,8 @@ pub enum EncounterTimelineEvent {
         caster: u64,
         spell_id: u32,
         severity: EncounterSeverity,
+        /// Fully rendered addon enUS text, with pinned SpellName substitutions.
+        warning_text: String,
     },
     Phase {
         caster: u64,
