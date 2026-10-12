@@ -36,7 +36,14 @@ fn all_templates_lists_source_queue_maps() {
     let pairs: Vec<_> = all_templates().iter().map(|t| (t.id, t.map_id)).collect();
     assert_eq!(
         pairs,
-        [(1014, 2106), (1018, 2107), (120, 761), (108, 726), (3, 30)]
+        [
+            (1014, 2106),
+            (1018, 2107),
+            (120, 761),
+            (108, 726),
+            (7, 566),
+            (3, 30)
+        ]
     );
 }
 

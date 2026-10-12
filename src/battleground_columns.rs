@@ -23,6 +23,7 @@ const GILNEAS: [PvpStatColumn; 2] = [
     column(371, "Bases Defended"),
 ];
 const TWIN_PEAKS: [PvpStatColumn; 2] = [column(290, "Flag Captures"), column(291, "Flag Returns")];
+const EYE_OF_THE_STORM: [PvpStatColumn; 1] = [column(183, "Flag Captures")];
 
 /// Columns in source order for one battleground map; empty when the map has none.
 pub fn pvp_stat_columns(map_id: u32) -> &'static [PvpStatColumn] {
@@ -31,6 +32,7 @@ pub fn pvp_stat_columns(map_id: u32) -> &'static [PvpStatColumn] {
         2107 => &ARATHI,
         761 => &GILNEAS,
         726 => &TWIN_PEAKS,
+        566 => &EYE_OF_THE_STORM,
         _ => &[],
     }
 }

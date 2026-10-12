@@ -147,6 +147,23 @@ pub fn twin_peaks() -> BgTemplate {
     }
 }
 
+/// BattlemasterList 7 (12.1.0.69933): Domination, 8–15 players, levels 20–90;
+/// BattlemasterListXMap 370 → map 566; TDB starts 1103/1104. Map.csv: earn 1500 resources.
+pub fn eye_of_the_storm() -> BgTemplate {
+    BgTemplate {
+        id: 7,
+        name: "Eye of the Storm".into(),
+        map_id: 566,
+        team_size: 15,
+        min_players_per_team: 8,
+        objective: BgObjective::NodeControl,
+        max_duration_secs: 0,
+        win_score: 1500,
+        starting_reinforcements: 0,
+        bracket: LevelBracket::new(20, 90),
+    }
+}
+
 /// All built-in battleground templates.
 pub fn all_templates() -> Vec<BgTemplate> {
     vec![
@@ -154,6 +171,7 @@ pub fn all_templates() -> Vec<BgTemplate> {
         arathi_basin(),
         battle_for_gilneas(),
         twin_peaks(),
+        eye_of_the_storm(),
         alterac_valley(),
     ]
 }
@@ -167,6 +185,9 @@ pub fn template_by_id(id: u32) -> Option<BgTemplate> {
 pub fn objective_object_entries(map_id: u32) -> Vec<u32> {
     if let Some(rules) = node_rules(map_id) {
         return rules.nodes.iter().map(|node| node.entry).collect();
+    }
+    if let Some(rules) = eye_rules(map_id) {
+        return vec![rules.flag_entry];
     }
     if flag_rules(map_id).is_some() {
         return vec![
@@ -552,6 +573,9 @@ pub use flags::*;
 #[path = "battleground_columns.rs"]
 mod columns;
 pub use columns::*;
+#[path = "battleground_eye.rs"]
+mod eye;
+pub use eye::*;
 
 // -- Scoring & Rewards --
 
