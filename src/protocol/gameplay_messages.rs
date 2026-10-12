@@ -569,6 +569,8 @@ pub enum ArenaQueueMode {
     Skirmish2v2,
     Skirmish3v3,
     SoloShuffle,
+    Rated2v2,
+    Rated3v3,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]

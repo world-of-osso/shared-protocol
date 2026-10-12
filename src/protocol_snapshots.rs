@@ -453,6 +453,16 @@ pub struct ArenaMatchSnapshot {
     pub preparation_remaining_secs: Option<u32>,
     pub shadow_sight_available: bool,
     pub units: Vec<ArenaUnitSnapshot>,
+    pub rating_changes: Vec<ArenaRatingChange>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ArenaRatingChange {
+    pub character_id: u64,
+    pub rating_before: u32,
+    pub rating_after: u32,
+    pub mmr_before: u32,
+    pub mmr_after: u32,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
