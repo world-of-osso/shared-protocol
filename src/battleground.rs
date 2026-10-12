@@ -11,6 +11,8 @@ pub enum BgObjective {
     Reinforcements,
     /// Carry Orbs of Power for location-dependent victory points.
     PowerOrbs,
+    /// Control moving mine carts and escort them to authored depots.
+    Payload,
 }
 
 /// Level bracket for battleground matchmaking.
@@ -183,6 +185,23 @@ pub fn temple_of_kotmogu() -> BgTemplate {
     }
 }
 
+/// Local BattlemasterList 708/XMap 627: Payload map 727, 3–10 per team, levels 30–90.
+/// Pinned TC SilvershardMines::Score::Max is 1500; no unsourced match-duration timer.
+pub fn silvershard_mines() -> BgTemplate {
+    BgTemplate {
+        id: 708,
+        name: "Silvershard Mines".into(),
+        map_id: 727,
+        team_size: 10,
+        min_players_per_team: 3,
+        objective: BgObjective::Payload,
+        max_duration_secs: 0,
+        win_score: 1500,
+        starting_reinforcements: 0,
+        bracket: LevelBracket::new(30, 90),
+    }
+}
+
 /// All built-in battleground templates.
 pub fn all_templates() -> Vec<BgTemplate> {
     vec![
@@ -192,6 +211,7 @@ pub fn all_templates() -> Vec<BgTemplate> {
         twin_peaks(),
         eye_of_the_storm(),
         temple_of_kotmogu(),
+        silvershard_mines(),
         alterac_valley(),
     ]
 }

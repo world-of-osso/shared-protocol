@@ -1,6 +1,26 @@
 use super::*;
 
 #[test]
+fn silvershard_source_queue_and_scoreboard_column() {
+    let template = template_by_id(708).expect("Mainline Silvershard queue 708");
+    assert_eq!(
+        (
+            template.map_id,
+            template.min_players_per_team,
+            template.team_size
+        ),
+        (727, 3, 10)
+    );
+    assert_eq!(template.bracket, LevelBracket::new(30, 90));
+    assert_eq!((template.win_score, template.max_duration_secs), (1500, 0));
+    let columns: Vec<_> = pvp_stat_columns(727)
+        .iter()
+        .map(|column| (column.stat, column.title))
+        .collect();
+    assert_eq!(columns, [(428, "Carts Controlled")]);
+}
+
+#[test]
 fn kotmogu_source_queue_and_objective_columns() {
     let template = template_by_id(699).expect("Mainline Kotmogu queue 699");
     assert_eq!(

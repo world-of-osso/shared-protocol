@@ -24,6 +24,7 @@ const GILNEAS: [PvpStatColumn; 2] = [
 ];
 const TWIN_PEAKS: [PvpStatColumn; 2] = [column(290, "Flag Captures"), column(291, "Flag Returns")];
 const EYE_OF_THE_STORM: [PvpStatColumn; 1] = [column(183, "Flag Captures")];
+const SILVERSHARD: [PvpStatColumn; 1] = [column(428, "Carts Controlled")];
 const KOTMOGU: [PvpStatColumn; 2] = [
     column(418, "Orb Possessions"),
     column(419, "Victory Points"),
@@ -38,6 +39,7 @@ pub fn pvp_stat_columns(map_id: u32) -> &'static [PvpStatColumn] {
         726 => &TWIN_PEAKS,
         566 => &EYE_OF_THE_STORM,
         998 => &KOTMOGU,
+        727 => &SILVERSHARD,
         _ => &[],
     }
 }
