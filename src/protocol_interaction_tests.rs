@@ -77,6 +77,15 @@ fn interaction_messages_round_trip() {
     });
     assert_wire_round_trip(&InteractionClosed { npc: 8 });
     assert_wire_round_trip(&NpcFlags(NpcFlags::AUCTIONEER));
+    // TDB1210 Clerk Gretal215258 joins menu30243/OptionNpc50.
+    let clerk = NpcFlags(4_503_599_627_370_497);
+    assert!(clerk.contains(NpcFlags::CRAFTING_ORDERS));
+    assert!(clerk.contains(NpcFlags::GOSSIP));
+    assert_wire_round_trip(&clerk);
+    assert_wire_round_trip(&InteractionOpened {
+        npc: 215258,
+        kind: InteractionKind::Role(NpcRole::CraftingOrders),
+    });
 }
 
 #[test]
