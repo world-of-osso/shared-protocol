@@ -55,6 +55,18 @@ fn transmog_outfit_save_roundtrips_without_paid_apply_guids() {
 }
 
 #[test]
+fn transmog_outfit_icon_is_required_and_empty_is_explicit() {
+    let mut value = serde_json::json!({"id":2,"name":"Legacy","choices":[],"illusions":[]});
+    let missing =
+        serde_json::from_value::<shared::protocol::TransmogOutfit>(value.clone()).unwrap_err();
+    assert!(missing.to_string().contains("missing field `icon_fdid`"));
+    value["icon_fdid"] = serde_json::json!(0);
+    let empty: shared::protocol::TransmogOutfit = serde_json::from_value(value.clone()).unwrap();
+    assert_eq!(empty.icon_fdid, 0);
+    assert_eq!(serde_json::to_value(empty).unwrap(), value);
+}
+
+#[test]
 fn transmog_set_pieces_distinguish_all_three_collection_states() {
     for state in ["Collected", "Uncollected", "NonCollectable"] {
         let value = serde_json::json!({"npc":54442,"slots":[],"sets":[{"set_id":13,
