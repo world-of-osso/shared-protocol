@@ -28,6 +28,10 @@ pub enum HousingCommand {
     EnterNeighborhood {
         neighborhood_id: u32,
     },
+    /// Finder ports to the authored plot teleport; admission never purchases it.
+    VisitPlot {
+        plot_id: u32,
+    },
     /// Requires authoritative presence at this plot's authored cornerstone.
     PurchasePlot {
         plot_id: u32,
@@ -82,6 +86,15 @@ pub struct HousingRequest {
     pub command: HousingCommand,
 }
 
+/// Retail HousingPlotOwnerType: relationship to the requesting character/account.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub enum HousingPlotOwnerType {
+    None,
+    Stranger,
+    Friend,
+    SelfOwned,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct HousingPlot {
     pub plot_id: u32,
@@ -95,6 +108,7 @@ pub struct HousingPlot {
     pub cost: u64,
     pub house_id: Option<u64>,
     pub owner_character_id: Option<u64>,
+    pub owner_type: HousingPlotOwnerType,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]

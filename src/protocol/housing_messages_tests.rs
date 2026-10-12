@@ -55,3 +55,33 @@ fn housing_wire_preserves_real_decor_identity_quantities_and_requested_transform
     assert_eq!(decoded, reply);
     assert_eq!(consumed, encoded.len());
 }
+
+#[test]
+fn housing_plot_owner_relationship_and_source_plot_visit_roundtrip() {
+    use super::{HousingPlot, HousingPlotOwnerType};
+    let plot = HousingPlot {
+        plot_id: 417,
+        neighborhood_id: 1,
+        plot_index: 0,
+        name: String::new(),
+        cornerstone: [2942.744, -214.26563, 113.11285],
+        teleport: [2939.3438, -212.2554, 113.321],
+        cost: 10_000_000,
+        house_id: Some(1),
+        owner_character_id: Some(32),
+        owner_type: HousingPlotOwnerType::Friend,
+    };
+    let encoded = bincode::serde::encode_to_vec(&plot, bincode::config::standard()).unwrap();
+    let (decoded, consumed): (HousingPlot, usize) =
+        bincode::serde::decode_from_slice(&encoded, bincode::config::standard()).unwrap();
+    assert_eq!(decoded, plot);
+    assert_eq!(consumed, encoded.len());
+    let request = HousingRequest {
+        request_id: 9,
+        command: HousingCommand::VisitPlot { plot_id: 417 },
+    };
+    let bytes = bincode::serde::encode_to_vec(&request, bincode::config::standard()).unwrap();
+    let (decoded, _): (HousingRequest, usize) =
+        bincode::serde::decode_from_slice(&bytes, bincode::config::standard()).unwrap();
+    assert_eq!(decoded, request);
+}
