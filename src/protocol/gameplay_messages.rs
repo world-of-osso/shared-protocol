@@ -689,6 +689,8 @@ pub struct UseToy {
     pub item_id: u32,
     /// Server/Bevy coordinates for source cursor-targeted spells; otherwise absent.
     pub destination: Option<[f32; 3]>,
+    /// Same baked-geometry witness contract as ordinary player spell casts.
+    pub witness: Option<crate::protocol::WitnessRay>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -714,6 +716,8 @@ pub struct ToySnapshot {
     pub source_type: i32,
     pub source_text: String,
     pub spell_id: Option<u32>,
+    /// Source spell requires a witness when its selected unit is not the caster.
+    pub requires_target_witness: bool,
     pub learned: bool,
     pub favourite: bool,
     /// Missing metadata/effects are explicitly unusable, not invented.
