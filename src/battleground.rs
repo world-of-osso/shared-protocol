@@ -682,6 +682,16 @@ pub use seething::*;
 #[path = "battleground_seething_tests.rs"]
 mod seething_tests;
 
+#[path = "battleground_deephaul.rs"]
+mod deephaul;
+#[path = "battleground_motion.rs"]
+mod motion;
+pub use deephaul::*;
+
+#[cfg(test)]
+#[path = "battleground_deephaul_tests.rs"]
+mod deephaul_tests;
+
 // -- Scoring & Rewards --
 
 /// Honor currency ID (matches `currency.rs` ALL_CURRENCIES).
