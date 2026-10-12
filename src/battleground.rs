@@ -242,6 +242,11 @@ pub fn objective_object_entries(map_id: u32) -> Vec<u32> {
     Vec::new()
 }
 
+/// Queue/entry eligibility includes NPC objective maps without fabricating GO placements.
+pub fn has_implemented_objectives(map_id: u32) -> bool {
+    map_id == 727 || !objective_object_entries(map_id).is_empty()
+}
+
 /// Whether `entry` is an objective object of any queueable battleground map.
 pub fn is_objective_entry(entry: u32) -> bool {
     all_templates()
