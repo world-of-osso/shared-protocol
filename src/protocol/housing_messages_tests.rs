@@ -1,5 +1,6 @@
 use super::{
-    DecorTransform, HousingCommand, HousingReply, HousingRequest, HousingState, StoredDecor,
+    DecorTransform, HousingCommand, HousingReply, HousingRequest, HousingState,
+    NeighborhoodResident, NeighborhoodRoster, StoredDecor,
 };
 
 #[test]
@@ -25,6 +26,14 @@ fn housing_wire_preserves_real_decor_identity_quantities_and_requested_transform
         state: HousingState {
             build_key: "dcfc90fffd79ba00406ae46f5f657592".into(),
             opened_cornerstone: Some(417),
+            bulletin_board: Some(NeighborhoodRoster {
+                neighborhood_id: 1,
+                residents: vec![NeighborhoodResident {
+                    name: "Houseproof".into(),
+                    online: true,
+                    plot_index: 0,
+                }],
+            }),
             stored: vec![StoredDecor {
                 decor_id: 1693,
                 quantity: 1,

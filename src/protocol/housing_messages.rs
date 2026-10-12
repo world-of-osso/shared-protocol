@@ -121,6 +121,22 @@ pub struct HouseLayout {
     pub decor: Vec<PlacedDecor>,
 }
 
+/// Retail NeighborhoodRosterMemberInfo of a public neighborhood, which has no
+/// owner/manager ranks or subdivisions.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct NeighborhoodResident {
+    pub name: String,
+    pub online: bool,
+    /// Literal NeighborhoodPlot.PlotIndex of the resident's house.
+    pub plot_index: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct NeighborhoodRoster {
+    pub neighborhood_id: u32,
+    pub residents: Vec<NeighborhoodResident>,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
 pub struct HousingState {
     pub build_key: String,
@@ -128,6 +144,9 @@ pub struct HousingState {
     /// Present only in the reply to an authenticated, in-range UseGameObject.
     /// Plot identity, not a private owner/account ID or an ownership grant.
     pub opened_cornerstone: Option<u32>,
+    /// Present only in the reply to an authenticated, in-range use of the
+    /// neighborhood's authored bulletin board (PlayerInteractionType 72).
+    pub bulletin_board: Option<NeighborhoodRoster>,
     pub plots: Vec<HousingPlot>,
     pub owned_houses: Vec<HousingHouse>,
     pub stored: Vec<StoredDecor>,
