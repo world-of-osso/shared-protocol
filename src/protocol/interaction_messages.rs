@@ -131,6 +131,8 @@ pub const GAMEOBJECT_TYPE_KEYSTONE_RECEPTACLE: u8 = 49;
 pub const GAMEOBJECT_TYPE_MEETINGSTONE: u8 = 23;
 /// TrinityCore `GAMEOBJECT_TYPE_GENERIC`: decoration (fires, lamps).
 pub const GAMEOBJECT_TYPE_GENERIC: u8 = 5;
+/// TC a352b1fa SharedDefines.h: Cage of Carnage505683 is an authored trapdoor.
+pub const GAMEOBJECT_TYPE_TRAPDOOR: u8 = 35;
 /// TrinityCore `GAMEOBJECT_TYPE_SPELL_FOCUS`: a spell's required focus (bonfires, anvils).
 pub const GAMEOBJECT_TYPE_SPELL_FOCUS: u8 = 8;
 /// TrinityCore `GAMEOBJECT_TYPE_CHAIR`: using it seats the player.
