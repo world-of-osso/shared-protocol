@@ -7,9 +7,17 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum TradingPostRequest {
     Query,
-    Purchase { vendor_item_id: u32 },
-    Refund { vendor_item_id: u32 },
-    Freeze { vendor_item_id: Option<u32> },
+    Purchase {
+        vendor_item_id: u32,
+    },
+    Refund {
+        vendor_item_id: u32,
+    },
+    Freeze {
+        vendor_item_id: Option<u32>,
+    },
+    /// Traveler's Log: balance and thresholds only, no catalog rows.
+    Balance,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -63,6 +71,36 @@ pub struct TradingPostSnapshot {
     pub thresholds: Vec<TradingPostThreshold>,
     pub source_gaps: Vec<String>,
     pub error: Option<String>,
+    /// `items` is the whole catalog (vendor Query). Otherwise it holds only rows whose
+    /// purchase/collection state changed; `merge` applies them to the last full catalog.
+    pub catalog_complete: bool,
+}
+
+impl TradingPostSnapshot {
+    /// Apply `update` to the last snapshot: a complete catalog replaces it, a partial one
+    /// keeps the previous rows/categories and replaces rows by vendor item ID.
+    pub fn merge(previous: Option<&TradingPostSnapshot>, update: TradingPostSnapshot) -> Self {
+        let Some(previous) = previous.filter(|_| !update.catalog_complete) else {
+            return update;
+        };
+        let mut items = previous.items.clone();
+        for row in update.items {
+            match items.iter_mut().find(|item| item.id == row.id) {
+                Some(item) => *item = row,
+                None => items.push(row),
+            }
+        }
+        Self {
+            items,
+            categories: if update.categories.is_empty() {
+                previous.categories.clone()
+            } else {
+                update.categories
+            },
+            catalog_complete: previous.catalog_complete,
+            ..update
+        }
+    }
 }
 
 pub(super) fn register(app: &mut App) {
@@ -111,6 +149,7 @@ mod tests {
             TradingPostRequest::Freeze {
                 vendor_item_id: None,
             },
+            TradingPostRequest::Balance,
         ] {
             let bytes = serde_json::to_vec(&command).unwrap();
             assert_eq!(
@@ -118,5 +157,74 @@ mod tests {
                 command
             );
         }
+    }
+
+    fn snapshot(tender: u32, items: Vec<TradingPostItem>, complete: bool) -> TradingPostSnapshot {
+        TradingPostSnapshot {
+            npc_net_id: Some(9),
+            tender,
+            points: 0,
+            now_unix: 0,
+            month_end_unix: 0,
+            frozen_item_id: None,
+            categories: if complete {
+                vec![TradingPostCategory {
+                    id: 2,
+                    name: "Mounts".into(),
+                    model_scene_id: 418,
+                }]
+            } else {
+                Vec::new()
+            },
+            items,
+            thresholds: Vec::new(),
+            source_gaps: Vec::new(),
+            error: None,
+            catalog_complete: complete,
+        }
+    }
+
+    fn item(id: u32, purchased: bool) -> TradingPostItem {
+        TradingPostItem {
+            id,
+            category_id: 2,
+            item_id: 190000 + id,
+            name: format!("Mount {id}"),
+            description: String::new(),
+            icon_fdid: 0,
+            quality: 4,
+            price: 650,
+            purchased,
+            collected: purchased,
+            refund_seconds: 0,
+            ui_group_name: String::new(),
+            ui_group_priority: 0,
+            model_scene_id: 0,
+            creature_display_id: 0,
+            preview_item_ids: Vec::new(),
+            grant_unavailable: None,
+        }
+    }
+
+    #[test]
+    fn trading_post_partial_update_replaces_only_changed_rows_of_full_catalog() {
+        let full = snapshot(4000, vec![item(1, false), item(2, false)], true);
+        let merged =
+            TradingPostSnapshot::merge(Some(&full), snapshot(3350, vec![item(2, true)], false));
+        assert_eq!(merged.tender, 3350);
+        assert!(merged.catalog_complete);
+        assert_eq!(merged.categories, full.categories);
+        assert_eq!(merged.items, vec![item(1, false), item(2, true)]);
+        let balance = TradingPostSnapshot::merge(Some(&merged), snapshot(3350, Vec::new(), false));
+        assert_eq!(balance.items, merged.items);
+        let without_base =
+            TradingPostSnapshot::merge(None, snapshot(3350, vec![item(2, true)], false));
+        assert!(
+            !without_base.catalog_complete,
+            "a partial update never poses as the catalog"
+        );
+        let replaced =
+            TradingPostSnapshot::merge(Some(&merged), snapshot(100, vec![item(1, true)], true));
+        assert_eq!(replaced.items, vec![item(1, true)]);
     }
 }
