@@ -18,6 +18,13 @@ const ARATHI: [PvpStatColumn; 2] = [
     column(926, "Bases Assaulted"),
     column(927, "Bases Defended"),
 ];
+const ALTERAC: [PvpStatColumn; 5] = [
+    column(63, "Graveyards Assaulted"),
+    column(65, "Graveyards Defended"),
+    column(61, "Towers Assaulted"),
+    column(64, "Towers Defended"),
+    column(82, "Secondary Objectives"),
+];
 const GILNEAS: [PvpStatColumn; 2] = [
     column(370, "Bases Assaulted"),
     column(371, "Bases Defended"),
@@ -39,6 +46,7 @@ const KOTMOGU: [PvpStatColumn; 2] = [
 /// Columns in source order for one battleground map; empty when the map has none.
 pub fn pvp_stat_columns(map_id: u32) -> &'static [PvpStatColumn] {
     match map_id {
+        30 => &ALTERAC,
         2106 => &WARSONG,
         2107 => &ARATHI,
         761 => &GILNEAS,

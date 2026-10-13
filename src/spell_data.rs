@@ -185,6 +185,12 @@ pub enum CastFailReason {
     CantBeDisenchantedSkill,
     /// `SPELL_FAILED_NOT_KNOWN`.
     NotKnown,
+    /// `SPELL_FAILED_NOT_SHAPESHIFT`: the current form is forbidden.
+    NotShapeshift,
+    /// `SPELL_FAILED_ONLY_SHAPESHIFT`: a required form is absent.
+    OnlyShapeshift,
+    /// `SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW`: a native casting restriction applies.
+    CantDoThatRightNow,
 }
 
 /// Context needed to validate a cast attempt.

@@ -106,19 +106,37 @@ pub fn arathi_basin() -> BgTemplate {
     }
 }
 
-/// Alterac Valley — 40v40 reinforcement depletion.
+/// Mainline BattlemasterList1/map30: 10–40/team, levels20–90.
+/// TC a352b1fa battleground_alterac_valley.cpp starts each team at700.
 pub fn alterac_valley() -> BgTemplate {
     BgTemplate {
-        id: 3,
+        id: 1,
         name: "Alterac Valley".into(),
         map_id: 30,
         team_size: 40,
-        min_players_per_team: 20,
+        min_players_per_team: 10,
         objective: BgObjective::Reinforcements,
-        max_duration_secs: 40 * 60,
+        max_duration_secs: 0,
         win_score: 0,
-        starting_reinforcements: 600,
-        bracket: LevelBracket::new(10, 60),
+        starting_reinforcements: 700,
+        bracket: LevelBracket::new(20, 90),
+    }
+}
+
+/// Mainline BattlemasterList30/map628: 10–40/team, levels20–90.
+/// TC a352b1fa battleground_isle_of_conquest.cpp starts each team at400.
+pub fn isle_of_conquest() -> BgTemplate {
+    BgTemplate {
+        id: 30,
+        name: "Isle of Conquest".into(),
+        map_id: 628,
+        team_size: 40,
+        min_players_per_team: 10,
+        objective: BgObjective::Reinforcements,
+        max_duration_secs: 0,
+        win_score: 0,
+        starting_reinforcements: 400,
+        bracket: LevelBracket::new(20, 90),
     }
 }
 
@@ -251,6 +269,7 @@ pub fn all_templates() -> Vec<BgTemplate> {
         seething_shore(),
         deephaul_ravine(),
         alterac_valley(),
+        isle_of_conquest(),
     ]
 }
 
@@ -261,6 +280,9 @@ pub fn template_by_id(id: u32) -> Option<BgTemplate> {
 
 /// Authored TDB objective objects a match on `map_id` needs loaded and usable.
 pub fn objective_object_entries(map_id: u32) -> Vec<u32> {
+    if map_id == 30 {
+        return alterac_banner_entries();
+    }
     if map_id == 2656 {
         return vec![422413];
     }
@@ -660,6 +682,13 @@ impl BgInstance {
 #[path = "battleground_objectives.rs"]
 mod objectives;
 pub use objectives::*;
+#[path = "battleground_alterac.rs"]
+mod alterac;
+pub use alterac::*;
+#[cfg(test)]
+#[path = "battleground_alterac_tests.rs"]
+mod alterac_tests;
+
 #[path = "battleground_nodes.rs"]
 mod nodes;
 pub use nodes::*;
