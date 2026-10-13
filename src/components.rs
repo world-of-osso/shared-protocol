@@ -414,6 +414,47 @@ pub struct VehiclePassenger {
     pub seat_id: u32,
 }
 
+/// A source map-object transport's route and authoritative progress, in WoW coordinates.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    PartialEq,
+)]
+pub struct TransportState {
+    pub spawn_id: u32,
+    pub path_id: u32,
+    pub interior_map: u32,
+    pub knots: Vec<[f32; 3]>,
+    pub speed: f32,
+    pub elapsed_ms: u64,
+}
+
+/// A unit attached to a map-object transport, with ship-local feet and facing.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+)]
+pub struct TransportPassenger {
+    /// Replicated server entity bits, not a client-local entity.
+    pub transport: u64,
+    pub position: [f32; 3],
+    pub orientation: f32,
+}
+
 /// The player's map arrivals (`HandleMoveWorldportAck`). The server bumps it in the
 /// replication tick that sends the destination's objects near the player, so a client
 /// that sees the new count also has those objects.
