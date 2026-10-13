@@ -64,6 +64,13 @@ pub struct ChatMessage {
     pub channel: ChatType,
 }
 
+/// A creature-text SoundKit played for the same authoritative audience as its chat.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct CreatureTextSound {
+    pub speaker: u64,
+    pub sound_kit: u32,
+}
+
 /// Client request to set (or clear) their combat target.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct SetTarget {
