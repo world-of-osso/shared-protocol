@@ -63,6 +63,8 @@ fn register_core_messages(app: &mut App) {
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<ChatMessage>()
         .add_direction(NetworkDirection::Bidirectional);
+    app.register_protocol_message::<CreatureTextSound>()
+        .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<SetTarget>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<AttackSwing>()
