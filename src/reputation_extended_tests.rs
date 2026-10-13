@@ -46,7 +46,7 @@ fn can_access_at_required_standing() {
 fn can_access_above_required_standing() {
     let reg = sample_registry();
     let mut rep = CharacterReputation::new_for_race(&reg, HUMAN);
-    rep.set_rep(72, 42_000);
+    rep.set_rep(72, 21_000);
     let rewards = sample_rewards();
     assert!(can_access_reward(&rewards[0], &rep));
     assert!(can_access_reward(&rewards[1], &rep));
@@ -58,7 +58,7 @@ fn can_access_above_required_standing() {
 fn available_rewards_filters_by_standing() {
     let reg = sample_registry();
     let mut rep = CharacterReputation::new_for_race(&reg, HUMAN);
-    rep.set_rep(72, 30_000);
+    rep.set_rep(72, 9_000);
     let rewards = sample_rewards();
     let available = available_rewards(&rewards, 72, &rep);
     assert_eq!(available.len(), 2);
@@ -70,7 +70,7 @@ fn available_rewards_filters_by_standing() {
 fn available_rewards_filters_by_faction() {
     let reg = sample_registry();
     let mut rep = CharacterReputation::new_for_race(&reg, HUMAN);
-    rep.set_rep(76, 30_000);
+    rep.set_rep(76, 9_000);
     let rewards = sample_rewards();
     let available = available_rewards(&rewards, 76, &rep);
     assert_eq!(available.len(), 1);
@@ -90,7 +90,7 @@ fn upcoming_rewards_shows_next_unlocks() {
 #[test]
 fn upcoming_rewards_empty_at_exalted() {
     let mut rep = CharacterReputation::default();
-    rep.set_rep(72, 63_000);
+    rep.set_rep(72, 42_000);
     let rewards = sample_rewards();
     assert!(upcoming_rewards(&rewards, 72, &rep).is_empty());
 }
@@ -243,8 +243,8 @@ fn display_entry_values() {
     let entry = rep.display_entry(72);
     assert_eq!(entry.faction_id, 72);
     assert_eq!(entry.standing, Standing::Friendly);
-    assert_eq!(entry.value, 21_000);
-    assert_eq!(entry.progress, (0, 9_000));
+    assert_eq!(entry.value, 3_000);
+    assert_eq!(entry.progress, (0, 6_000));
 }
 
 #[test]

@@ -36,33 +36,24 @@ pub enum Standing {
     Exalted,
 }
 
-/// Reputation thresholds for each standing tier (cumulative from Hated = 0).
-///
-/// Hated:      0 –  5,999
-/// Hostile:    6,000 – 8,999
-/// Unfriendly: 9,000 – 11,999
-/// Neutral:    12,000 – 20,999
-/// Friendly:   21,000 – 29,999
-/// Honored:    30,000 – 41,999
-/// Revered:    42,000 – 62,999
-/// Exalted:    63,000 – 83,999
+/// Signed Retail standing. TrinityCore a352b1fa ReputationMgr.cpp38-59.
 const TIER_THRESHOLDS: [(Standing, i32); 8] = [
-    (Standing::Hated, 0),
-    (Standing::Hostile, 6_000),
-    (Standing::Unfriendly, 9_000),
-    (Standing::Neutral, 12_000),
-    (Standing::Friendly, 21_000),
-    (Standing::Honored, 30_000),
-    (Standing::Revered, 42_000),
-    (Standing::Exalted, 63_000),
+    (Standing::Hated, -42_000),
+    (Standing::Hostile, -6_000),
+    (Standing::Unfriendly, -3_000),
+    (Standing::Neutral, 0),
+    (Standing::Friendly, 3_000),
+    (Standing::Honored, 9_000),
+    (Standing::Revered, 21_000),
+    (Standing::Exalted, 42_000),
 ];
 
 /// Maximum reputation value.
-pub const REP_MAX: i32 = 83_999;
+pub const REP_MAX: i32 = 42_000;
 /// Minimum reputation value.
-pub const REP_MIN: i32 = 0;
+pub const REP_MIN: i32 = -42_000;
 /// Default neutral standing value.
-pub const REP_NEUTRAL: i32 = 12_000;
+pub const REP_NEUTRAL: i32 = 0;
 
 /// Determine the standing tier for a raw reputation value.
 pub fn standing_for_value(rep: i32) -> Standing {
@@ -116,6 +107,14 @@ pub struct SpilloverRule {
     pub rate: f32,
 }
 
+/// One ordered Faction DB2 baseline rule; masks are authored, not faction-team guesses.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, bitcode::Encode, bitcode::Decode)]
+pub struct ReputationBase {
+    pub race_mask: u64,
+    pub class_mask: u32,
+    pub value: i32,
+}
+
 /// Static definition of a faction.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, bitcode::Encode, bitcode::Decode)]
 pub struct FactionData {
@@ -123,22 +122,32 @@ pub struct FactionData {
     pub id: u32,
     /// Faction name (e.g. "Stormwind", "Orgrimmar").
     pub name: String,
-    /// Base reputation value per player race (indexed by race ID).
-    /// Races not in the map start at neutral (12,000).
-    pub base_standing: Vec<(u8, i32)>,
+    /// Ordered ReputationRaceMask/ClassMask/Base fields from Faction DB2.
+    pub base_standing: Vec<ReputationBase>,
     /// Spillover rules: rep changes with this faction cascade to others.
     pub spillover: Vec<SpilloverRule>,
 }
 
 impl FactionData {
-    /// Get the base reputation value for a race.
-    /// Returns neutral (12,000) if the race has no specific entry.
+    /// Class-independent callers use the Warrior class mask.
     pub fn base_rep_for_race(&self, race: u8) -> i32 {
+        self.base_rep_for_player(race, 1)
+    }
+
+    /// TC ReputationMgr.cpp839-857: first matching ordered race/class rule.
+    pub fn base_rep_for_player(&self, race: u8, class: u8) -> i32 {
+        let race_mask = race_mask(race);
+        let class_mask = class
+            .checked_sub(1)
+            .and_then(|bit| 1_u32.checked_shl(u32::from(bit)))
+            .unwrap_or(0);
         self.base_standing
             .iter()
-            .find(|(r, _)| *r == race)
-            .map(|(_, rep)| *rep)
-            .unwrap_or(REP_NEUTRAL)
+            .find(|base| {
+                (base.race_mask == 0 || base.race_mask & race_mask != 0)
+                    && (base.class_mask == 0 || base.class_mask & class_mask != 0)
+            })
+            .map_or(0, |base| base.value)
     }
 
     /// Get the starting standing tier for a race.
@@ -269,46 +278,49 @@ pub struct CharacterReputation {
     watched: Option<u32>,
 }
 
-/// Minimal built-in faction registry used by the gameplay server today.
+#[path = "reputation_factions.rs"]
+mod pinned_factions;
+
+/// Authenticated Mainline12.1.0.69933 Faction DB2 rows with a reputation index.
 pub fn default_faction_registry() -> FactionRegistry {
     let mut registry = FactionRegistry::new();
-    registry.add(FactionData {
-        id: 72,
-        name: "Stormwind".to_string(),
-        base_standing: vec![(1, 21_000), (2, 0)],
-        spillover: vec![
-            SpilloverRule {
-                faction_id: 47,
-                rate: 0.25,
-            },
-            SpilloverRule {
-                faction_id: 76,
-                rate: -0.5,
-            },
-        ],
-    });
-    registry.add(FactionData {
-        id: 76,
-        name: "Orgrimmar".to_string(),
-        base_standing: vec![(2, 21_000), (1, 0)],
-        spillover: Vec::new(),
-    });
-    registry.add(FactionData {
-        id: 47,
-        name: "Ironforge".to_string(),
-        base_standing: vec![(1, 21_000), (2, 0)],
-        spillover: Vec::new(),
-    });
+    for &(id, name, rules) in pinned_factions::FACTIONS {
+        registry.add(FactionData {
+            id,
+            name: name.into(),
+            base_standing: rules
+                .into_iter()
+                .map(|(race_mask, class_mask, value)| ReputationBase {
+                    race_mask,
+                    class_mask,
+                    value,
+                })
+                .collect(),
+            spillover: Vec::new(),
+        });
+    }
     registry
+}
+
+/// ChrRaces.PlayableRaceBit, matching TrinityCore RaceMask.h GetRaceBit.
+fn race_mask(race: u8) -> u64 {
+    pinned_factions::RACE_BITS
+        .iter()
+        .find(|(id, _)| *id == race)
+        .map_or(0, |(_, bit)| 1_u64 << bit)
 }
 
 impl CharacterReputation {
     /// Initialize reputation for a character based on their race.
     pub fn new_for_race(registry: &FactionRegistry, race: u8) -> Self {
-        let mut values = HashMap::new();
-        for faction in registry.iter() {
-            values.insert(faction.id, faction.base_rep_for_race(race));
-        }
+        Self::new_for_player(registry, race, 1)
+    }
+
+    pub fn new_for_player(registry: &FactionRegistry, race: u8, class: u8) -> Self {
+        let values = registry
+            .iter()
+            .map(|faction| (faction.id, faction.base_rep_for_player(race, class)))
+            .collect();
         Self {
             values,
             tracked: Vec::new(),
@@ -370,6 +382,34 @@ impl CharacterReputation {
     pub fn set_rep(&mut self, faction_id: u32, value: i32) {
         self.values
             .insert(faction_id, value.clamp(REP_MIN, REP_MAX));
+    }
+
+    /// Raw signed faction standings for gameplay criteria.
+    pub fn values(&self) -> impl Iterator<Item = (u32, i32)> + '_ {
+        self.values.iter().map(|(&id, &value)| (id, value))
+    }
+
+    /// Rebase legacy saved values, preserving recoverable deltas and tracking choices.
+    pub fn migrate_legacy_baselines(&mut self, registry: &FactionRegistry, race: u8, class: u8) {
+        for (&id, value) in &mut self.values {
+            let old_base = match (id, race) {
+                (72 | 47, 1) | (76, 2) => 21_000,
+                (72 | 47, 2) | (76, 1) => 0,
+                _ => 12_000,
+            };
+            let new_base = registry
+                .get(id)
+                .map_or(0, |faction| faction.base_rep_for_player(race, class));
+            *value = value
+                .saturating_sub(old_base)
+                .saturating_add(new_base)
+                .clamp(REP_MIN, REP_MAX);
+        }
+        for faction in registry.iter() {
+            self.values
+                .entry(faction.id)
+                .or_insert_with(|| faction.base_rep_for_player(race, class));
+        }
     }
 
     /// Number of tracked factions.
