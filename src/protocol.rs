@@ -45,6 +45,7 @@ mod protocol_check;
 mod protocol_layout;
 mod quest_messages;
 mod registration;
+mod renown_messages;
 mod spell_messages;
 mod taxi_messages;
 mod threat_messages;
@@ -89,6 +90,7 @@ pub use protocol_check::{
 };
 pub use protocol_layout::ProtocolRegistrationExt;
 pub use quest_messages::*;
+pub use renown_messages::*;
 pub use spell_messages::*;
 pub use taxi_messages::*;
 pub use threat_messages::*;
@@ -115,6 +117,7 @@ impl Plugin for ProtocolPlugin {
         challenge_messages::register(app);
         adventure_guide_messages::register(app);
         trading_post_messages::register(app);
+        renown_messages::register(app);
         register_channels(app);
         inventory_messages::register_inventory_protocol(app);
         quest_messages::register_quest_protocol(app);
