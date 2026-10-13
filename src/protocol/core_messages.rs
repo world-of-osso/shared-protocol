@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::components::{CharacterAppearance, EquipmentAppearance};
 use crate::protocol_snapshots::GuildSnapshot;
 
-/// Social emote animation kind.
+/// Social text-emote kind; some (such as Love) have no animation.
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum EmoteKind {
     Dance,
@@ -11,6 +11,8 @@ pub enum EmoteKind {
     Sit,
     Sleep,
     Kneel,
+    /// Retail TextEmote225; EmotesText EmoteID0 (no animation).
+    Love,
 }
 
 /// Chat message type.
@@ -176,6 +178,8 @@ pub struct GroupUninviteIntent {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct EmoteIntent {
     pub emote: EmoteKind,
+    /// Selected server entity snapshotted for this request, never a creature definition ID.
+    pub target_entity: Option<u64>,
 }
 
 /// `CMSG_STAND_STATE_CHANGE`: the player asks to stand, sit, sleep or kneel. The server

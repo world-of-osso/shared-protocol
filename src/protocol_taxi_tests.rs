@@ -59,6 +59,14 @@ fn taxi_messages_round_trip() {
 }
 
 #[test]
+fn forced_facing_round_trips_exact_epoch_and_yaw() {
+    assert_wire_round_trip(&crate::components::ForcedFacing {
+        epoch: 42,
+        yaw: 1.25,
+    });
+}
+
+#[test]
 fn taxi_errors_use_retail_wording() {
     assert_eq!(
         TaxiError::NotEnoughMoney.message(),
