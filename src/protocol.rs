@@ -13,7 +13,6 @@ use crate::components::{
 
 mod achievement_catalog_messages;
 mod adventure_guide_messages;
-mod trading_post_messages;
 mod bank_messages;
 mod challenge_messages;
 mod channels;
@@ -50,6 +49,7 @@ mod spell_messages;
 mod taxi_messages;
 mod threat_messages;
 mod tooltip_messages;
+mod trading_post_messages;
 mod trainer_messages;
 mod transfer_messages;
 mod transmog_catalogue;
@@ -58,7 +58,6 @@ mod world_time_messages;
 
 pub use achievement_catalog_messages::*;
 pub use adventure_guide_messages::*;
-pub use trading_post_messages::*;
 pub use bank_messages::*;
 pub use challenge_messages::*;
 pub use channels::*;
@@ -94,6 +93,7 @@ pub use spell_messages::*;
 pub use taxi_messages::*;
 pub use threat_messages::*;
 pub use tooltip_messages::*;
+pub use trading_post_messages::*;
 pub use trainer_messages::*;
 pub use transfer_messages::*;
 pub use transmog_catalogue::*;
