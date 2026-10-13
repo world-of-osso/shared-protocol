@@ -417,4 +417,6 @@ pub struct PlayerInput {
     /// `MovementControl::epoch` of that position: input from before a server teleport
     /// is stale.
     pub epoch: u32,
+    /// Ship-local movement frame; absent for ordinary world movement or disembark.
+    pub transport: Option<crate::components::TransportPassenger>,
 }

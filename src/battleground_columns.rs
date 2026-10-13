@@ -25,6 +25,11 @@ const ALTERAC: [PvpStatColumn; 5] = [
     column(64, "Towers Defended"),
     column(82, "Secondary Objectives"),
 ];
+// Layout rows 16/17: OrderIndex 0/1.
+const ISLE_OF_CONQUEST: [PvpStatColumn; 2] = [
+    column(245, "Bases Assaulted"),
+    column(246, "Bases Defended"),
+];
 const GILNEAS: [PvpStatColumn; 2] = [
     column(370, "Bases Assaulted"),
     column(371, "Bases Defended"),
@@ -47,6 +52,7 @@ const KOTMOGU: [PvpStatColumn; 2] = [
 pub fn pvp_stat_columns(map_id: u32) -> &'static [PvpStatColumn] {
     match map_id {
         30 => &ALTERAC,
+        628 => &ISLE_OF_CONQUEST,
         2106 => &WARSONG,
         2107 => &ARATHI,
         761 => &GILNEAS,
