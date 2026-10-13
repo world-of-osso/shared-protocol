@@ -281,6 +281,9 @@ pub fn objective_object_entries(map_id: u32) -> Vec<u32> {
     if map_id == 30 {
         return alterac_banner_entries();
     }
+    if map_id == 628 {
+        return isle_banner_entries();
+    }
     if map_id == 2656 {
         return vec![422413];
     }
@@ -686,6 +689,12 @@ pub use alterac::*;
 #[cfg(test)]
 #[path = "battleground_alterac_tests.rs"]
 mod alterac_tests;
+#[path = "battleground_isle.rs"]
+mod isle;
+pub use isle::*;
+#[cfg(test)]
+#[path = "battleground_isle_tests.rs"]
+mod isle_tests;
 
 #[path = "battleground_nodes.rs"]
 mod nodes;
