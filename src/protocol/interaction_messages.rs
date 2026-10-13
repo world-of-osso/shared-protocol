@@ -79,6 +79,8 @@ impl NpcFlags {
     /// TDB1210 Clerks215258/219043/219048/235626: NPCFlags2 bit20;
     /// each joins menu30243 OptionNpc50 ("create a crafting order").
     pub const CRAFTING_ORDERS: u64 = 0x0010_0000_0000_0000;
+    /// TDB1210 Seabraid vendors185467/185468, NPCFlags2 bit19.
+    pub const TRADING_POST: u64 = 0x0008_0000_0000_0000;
 
     /// Bits of AzerothCore (3.3.5) `NPCFlags` that exist in Retail. AzerothCore
     /// bits 0x1 (GOSSIP) … 0x0400_0000 (MAILBOX) have the same value and meaning in
@@ -117,6 +119,8 @@ pub enum NpcRole {
     Transmogrifier,
     /// Retail `PlayerInteractionType::ProfessionsCustomerOrders`.
     CraftingOrders,
+    /// Retail PlayerInteractionType::PerksProgramVendor57.
+    TradingPost,
 }
 
 /// Retail/TrinityCore `GAMEOBJECT_TYPE_BUTTON`, including source AV banners.
@@ -135,6 +139,8 @@ pub const GAMEOBJECT_TYPE_KEYSTONE_RECEPTACLE: u8 = 49;
 pub const GAMEOBJECT_TYPE_MEETINGSTONE: u8 = 23;
 /// TrinityCore `GAMEOBJECT_TYPE_GENERIC`: decoration (fires, lamps).
 pub const GAMEOBJECT_TYPE_GENERIC: u8 = 5;
+/// TC a352b1fa SharedDefines.h: Cage of Carnage505683 is an authored trapdoor.
+pub const GAMEOBJECT_TYPE_TRAPDOOR: u8 = 35;
 /// TrinityCore `GAMEOBJECT_TYPE_SPELL_FOCUS`: a spell's required focus (bonfires, anvils).
 pub const GAMEOBJECT_TYPE_SPELL_FOCUS: u8 = 8;
 /// TrinityCore `GAMEOBJECT_TYPE_CHAIR`: using it seats the player.
@@ -194,6 +200,57 @@ pub struct GameObjectInfo {
     pub name: String,
     pub scale: f32,
 }
+
+/// Server-selected authored M2 sequence for a world object's state transition.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
+pub struct GameObjectAnimation {
+    pub animation_id: u16,
+    pub looping: bool,
+}
+
+/// Hidden respawning objects retain their authoritative entity and aura ownership.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
+pub struct GameObjectVisible(pub bool);
+
+/// Authoritative model collision, independent of animation (Dalaran water toggles inversely).
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Clone,
+    Copy,
+    Debug,
+    PartialEq,
+    Eq,
+)]
+pub struct GameObjectCollision(pub bool);
 
 impl GameObjectInfo {
     /// Whether a player can use the object: the types whose TrinityCore `GameObject::Use`
@@ -372,6 +429,9 @@ mod transmog_tests {
 pub(super) fn register_interaction_protocol(app: &mut App) {
     app.protocol_component::<NpcFlags>().replicate();
     app.protocol_component::<GameObjectInfo>().replicate();
+    app.protocol_component::<GameObjectAnimation>().replicate();
+    app.protocol_component::<GameObjectVisible>().replicate();
+    app.protocol_component::<GameObjectCollision>().replicate();
     app.protocol_component::<GatherableResource>().replicate();
     app.add_channel::<InteractionChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),

@@ -242,6 +242,8 @@ pub struct UnitFactionTemplate(pub u32);
 pub struct UnitFlags(pub u32);
 
 impl UnitFlags {
+    /// TC a352b1fa UnitDefines.h: arena preparation, aura215.
+    pub const ARENA_PREPARATION: u32 = 0x0000_0020;
     /// TC UNIT_FLAG_NON_ATTACKABLE: no attacks, regardless of the attacker's owner.
     pub const NON_ATTACKABLE: u32 = 0x0000_0002;
     /// TC UNIT_FLAG_IMMUNE_TO_PC: players and player-controlled units cannot attack.

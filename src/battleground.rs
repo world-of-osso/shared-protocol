@@ -3,6 +3,8 @@ use serde::{Deserialize, Serialize};
 /// Type of PvP objective for a battleground.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum BgObjective {
+    /// Defeat every living member of the opposing arena team.
+    Elimination,
     /// Capture the enemy flag and return it to your base (e.g. Warsong Gulch).
     FlagCapture,
     /// Control territory nodes that tick score over time (e.g. Arathi Basin).
@@ -674,7 +676,7 @@ impl BgInstance {
         }
     }
 
-    fn end(&mut self, outcome: BgOutcome) {
+    pub fn end(&mut self, outcome: BgOutcome) {
         self.phase = BgPhase::Ended;
         self.outcome = Some(outcome);
     }
