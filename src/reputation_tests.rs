@@ -1,5 +1,25 @@
 use super::*;
 
+#[test]
+fn achievements_criteria_reputation_uses_signed_retail_standing_and_pinned_baselines() {
+    assert_eq!(standing_for_value(-42000), Standing::Hated);
+    assert_eq!(standing_for_value(-6000), Standing::Hostile);
+    assert_eq!(standing_for_value(-3000), Standing::Unfriendly);
+    assert_eq!(standing_for_value(0), Standing::Neutral);
+    assert_eq!(standing_for_value(3000), Standing::Friendly);
+    assert_eq!(standing_for_value(9000), Standing::Honored);
+    assert_eq!(standing_for_value(21000), Standing::Revered);
+    assert_eq!(standing_for_value(42000), Standing::Exalted);
+    let registry = default_faction_registry();
+    let human = CharacterReputation::new_for_race(&registry, 1);
+    assert_eq!(human.get_value(72), 4000);
+    assert_eq!(human.get_value(576), -2900);
+    let orc = CharacterReputation::new_for_race(&registry, 2);
+    assert_eq!(orc.get_value(72), -42000);
+    assert_eq!(orc.get_value(76), 4000);
+    assert_eq!(registry.len(), 435);
+}
+
 // Race IDs (matching WoW convention)
 const HUMAN: u8 = 1;
 const ORC: u8 = 2;
@@ -10,17 +30,25 @@ const TAUREN: u8 = 6;
 
 const IRONFORGE_ID: u32 = 47;
 
+fn baseline(race: u8, value: i32) -> ReputationBase {
+    ReputationBase {
+        race_mask: race_mask(race),
+        class_mask: 0,
+        value,
+    }
+}
+
 fn stormwind() -> FactionData {
     FactionData {
         id: 72,
         name: "Stormwind".to_string(),
         base_standing: vec![
-            (HUMAN, 21_000),     // Friendly
-            (DWARF, 21_000),     // Friendly
-            (NIGHT_ELF, 12_000), // Neutral
-            (ORC, 0),            // Hated
-            (UNDEAD, 0),         // Hated
-            (TAUREN, 6_000),     // Hostile
+            baseline(HUMAN, 3_000),
+            baseline(DWARF, 3_000),
+            baseline(NIGHT_ELF, 0),
+            baseline(ORC, -42_000),
+            baseline(UNDEAD, -42_000),
+            baseline(TAUREN, -6_000),
         ],
         spillover: vec![
             SpilloverRule {
@@ -40,11 +68,11 @@ fn orgrimmar() -> FactionData {
         id: 76,
         name: "Orgrimmar".to_string(),
         base_standing: vec![
-            (ORC, 21_000),    // Friendly
-            (TAUREN, 21_000), // Friendly
-            (UNDEAD, 12_000), // Neutral
-            (HUMAN, 0),       // Hated
-            (DWARF, 0),       // Hated
+            baseline(ORC, 3_000),
+            baseline(TAUREN, 3_000),
+            baseline(UNDEAD, 0),
+            baseline(HUMAN, -42_000),
+            baseline(DWARF, -42_000),
         ],
         spillover: vec![],
     }
@@ -54,7 +82,11 @@ fn ironforge() -> FactionData {
     FactionData {
         id: IRONFORGE_ID,
         name: "Ironforge".to_string(),
-        base_standing: vec![(HUMAN, 21_000), (DWARF, 21_000), (ORC, 0)],
+        base_standing: vec![
+            baseline(HUMAN, 3_000),
+            baseline(DWARF, 3_000),
+            baseline(ORC, -42_000),
+        ],
         spillover: vec![],
     }
 }
@@ -63,55 +95,55 @@ fn ironforge() -> FactionData {
 
 #[test]
 fn standing_hated() {
-    assert_eq!(standing_for_value(0), Standing::Hated);
-    assert_eq!(standing_for_value(5_999), Standing::Hated);
+    assert_eq!(standing_for_value(-42_000), Standing::Hated);
+    assert_eq!(standing_for_value(-6_001), Standing::Hated);
 }
 
 #[test]
 fn standing_hostile() {
-    assert_eq!(standing_for_value(6_000), Standing::Hostile);
-    assert_eq!(standing_for_value(8_999), Standing::Hostile);
+    assert_eq!(standing_for_value(-6_000), Standing::Hostile);
+    assert_eq!(standing_for_value(-3_001), Standing::Hostile);
 }
 
 #[test]
 fn standing_unfriendly() {
-    assert_eq!(standing_for_value(9_000), Standing::Unfriendly);
-    assert_eq!(standing_for_value(11_999), Standing::Unfriendly);
+    assert_eq!(standing_for_value(-3_000), Standing::Unfriendly);
+    assert_eq!(standing_for_value(-1), Standing::Unfriendly);
 }
 
 #[test]
 fn standing_neutral() {
-    assert_eq!(standing_for_value(12_000), Standing::Neutral);
-    assert_eq!(standing_for_value(20_999), Standing::Neutral);
+    assert_eq!(standing_for_value(0), Standing::Neutral);
+    assert_eq!(standing_for_value(2_999), Standing::Neutral);
 }
 
 #[test]
 fn standing_friendly() {
-    assert_eq!(standing_for_value(21_000), Standing::Friendly);
-    assert_eq!(standing_for_value(29_999), Standing::Friendly);
+    assert_eq!(standing_for_value(3_000), Standing::Friendly);
+    assert_eq!(standing_for_value(8_999), Standing::Friendly);
 }
 
 #[test]
 fn standing_honored() {
-    assert_eq!(standing_for_value(30_000), Standing::Honored);
-    assert_eq!(standing_for_value(41_999), Standing::Honored);
+    assert_eq!(standing_for_value(9_000), Standing::Honored);
+    assert_eq!(standing_for_value(20_999), Standing::Honored);
 }
 
 #[test]
 fn standing_revered() {
-    assert_eq!(standing_for_value(42_000), Standing::Revered);
-    assert_eq!(standing_for_value(62_999), Standing::Revered);
+    assert_eq!(standing_for_value(21_000), Standing::Revered);
+    assert_eq!(standing_for_value(41_999), Standing::Revered);
 }
 
 #[test]
 fn standing_exalted() {
-    assert_eq!(standing_for_value(63_000), Standing::Exalted);
-    assert_eq!(standing_for_value(83_999), Standing::Exalted);
+    assert_eq!(standing_for_value(42_000), Standing::Exalted);
+    assert_eq!(standing_for_value(50_000), Standing::Exalted);
 }
 
 #[test]
 fn standing_clamps_to_bounds() {
-    assert_eq!(standing_for_value(-100), Standing::Hated);
+    assert_eq!(standing_for_value(-100_000), Standing::Hated);
     assert_eq!(standing_for_value(100_000), Standing::Exalted);
 }
 
@@ -119,32 +151,32 @@ fn standing_clamps_to_bounds() {
 
 #[test]
 fn threshold_values() {
-    assert_eq!(threshold_for_standing(Standing::Hated), 0);
-    assert_eq!(threshold_for_standing(Standing::Neutral), 12_000);
-    assert_eq!(threshold_for_standing(Standing::Exalted), 63_000);
+    assert_eq!(threshold_for_standing(Standing::Hated), -42_000);
+    assert_eq!(threshold_for_standing(Standing::Neutral), 0);
+    assert_eq!(threshold_for_standing(Standing::Exalted), 42_000);
 }
 
 // --- Tier progress ---
 
 #[test]
 fn progress_at_tier_start() {
-    let (into, size) = tier_progress(12_000);
+    let (into, size) = tier_progress(0);
     assert_eq!(into, 0);
-    assert_eq!(size, 9_000); // Neutral: 12000–20999
+    assert_eq!(size, 3_000);
 }
 
 #[test]
 fn progress_midway() {
-    let (into, size) = tier_progress(15_000);
-    assert_eq!(into, 3_000);
-    assert_eq!(size, 9_000);
+    let (into, size) = tier_progress(1_500);
+    assert_eq!(into, 1_500);
+    assert_eq!(size, 3_000);
 }
 
 #[test]
 fn progress_exalted() {
-    let (into, size) = tier_progress(70_000);
-    assert_eq!(into, 7_000);
-    assert_eq!(size, 21_000); // Exalted: 63000–83999
+    let (into, size) = tier_progress(42_000);
+    assert_eq!(into, 0);
+    assert_eq!(size, 1);
 }
 
 // --- FactionData ---
@@ -152,9 +184,9 @@ fn progress_exalted() {
 #[test]
 fn base_rep_for_known_race() {
     let sw = stormwind();
-    assert_eq!(sw.base_rep_for_race(HUMAN), 21_000);
-    assert_eq!(sw.base_rep_for_race(ORC), 0);
-    assert_eq!(sw.base_rep_for_race(TAUREN), 6_000);
+    assert_eq!(sw.base_rep_for_race(HUMAN), 3_000);
+    assert_eq!(sw.base_rep_for_race(ORC), -42_000);
+    assert_eq!(sw.base_rep_for_race(TAUREN), -6_000);
 }
 
 #[test]
@@ -246,9 +278,9 @@ fn new_for_race_human() {
     let reg = sample_registry();
     let rep = CharacterReputation::new_for_race(&reg, HUMAN);
 
-    assert_eq!(rep.get_value(72), 21_000); // Stormwind: Friendly for humans
+    assert_eq!(rep.get_value(72), 3_000);
     assert_eq!(rep.get_standing(72), Standing::Friendly);
-    assert_eq!(rep.get_value(76), 0); // Orgrimmar: Hated for humans
+    assert_eq!(rep.get_value(76), -42_000);
     assert_eq!(rep.get_standing(76), Standing::Hated);
     assert_eq!(rep.faction_count(), 3);
 }
@@ -266,7 +298,7 @@ fn new_for_race_orc() {
 fn gain_rep_quest_turnin() {
     let reg = sample_registry();
     let mut rep = CharacterReputation::new_for_race(&reg, HUMAN);
-    let base = rep.get_value(72); // 21000
+    let base = rep.get_value(72);
 
     let result = rep.gain_rep(72, 500, RepGainSource::QuestTurnIn);
     assert_eq!(result.old_value, base);
@@ -279,10 +311,9 @@ fn gain_rep_quest_turnin() {
 fn gain_rep_crosses_tier() {
     let reg = sample_registry();
     let mut rep = CharacterReputation::new_for_race(&reg, HUMAN);
-    // Human starts at 21000 (Friendly). Need 9000 more for Honored (30000).
-    let result = rep.gain_rep(72, 9_000, RepGainSource::MobKill);
+    let result = rep.gain_rep(72, 6_000, RepGainSource::MobKill);
 
-    assert_eq!(result.new_value, 30_000);
+    assert_eq!(result.new_value, 9_000);
     assert_eq!(result.old_standing, Standing::Friendly);
     assert_eq!(result.new_standing, Standing::Honored);
     assert!(result.tier_changed());
@@ -294,7 +325,7 @@ fn gain_rep_mob_kill() {
     let mut rep = CharacterReputation::new_for_race(&reg, HUMAN);
 
     rep.gain_rep(72, 10, RepGainSource::MobKill);
-    assert_eq!(rep.get_value(72), 21_010);
+    assert_eq!(rep.get_value(72), 3_010);
 }
 
 #[test]
@@ -304,7 +335,7 @@ fn gain_rep_repeatable_turnin() {
 
     rep.gain_rep(72, 250, RepGainSource::RepeatableTurnIn);
     rep.gain_rep(72, 250, RepGainSource::RepeatableTurnIn);
-    assert_eq!(rep.get_value(72), 21_500);
+    assert_eq!(rep.get_value(72), 3_500);
 }
 
 #[test]
@@ -313,7 +344,7 @@ fn lose_rep() {
     let mut rep = CharacterReputation::new_for_race(&reg, HUMAN);
 
     let result = rep.lose_rep(72, 1_000, RepGainSource::MobKill);
-    assert_eq!(result.new_value, 20_000);
+    assert_eq!(result.new_value, 2_000);
     assert_eq!(result.actual_change(), -1_000);
 }
 
@@ -321,7 +352,7 @@ fn lose_rep() {
 fn lose_rep_crosses_tier_down() {
     let reg = sample_registry();
     let mut rep = CharacterReputation::new_for_race(&reg, HUMAN);
-    // 21000 (Friendly) - 2000 = 19000 (Neutral)
+    // Friendly3000 minus2000 returns to Neutral1000.
     let result = rep.lose_rep(72, 2_000, RepGainSource::MobKill);
     assert_eq!(result.old_standing, Standing::Friendly);
     assert_eq!(result.new_standing, Standing::Neutral);
@@ -331,16 +362,16 @@ fn lose_rep_crosses_tier_down() {
 #[test]
 fn rep_clamps_at_max() {
     let mut rep = CharacterReputation::default();
-    rep.set_rep(72, 80_000);
+    rep.set_rep(72, 41_000);
     let result = rep.gain_rep(72, 10_000, RepGainSource::Admin);
     assert_eq!(result.new_value, REP_MAX);
-    assert_eq!(result.actual_change(), REP_MAX - 80_000);
+    assert_eq!(result.actual_change(), 1_000);
 }
 
 #[test]
 fn rep_clamps_at_min() {
     let mut rep = CharacterReputation::default();
-    rep.set_rep(72, 1_000);
+    rep.set_rep(72, -41_000);
     let result = rep.lose_rep(72, 5_000, RepGainSource::MobKill);
     assert_eq!(result.new_value, REP_MIN);
 }
@@ -366,7 +397,7 @@ fn has_standing_check() {
 #[test]
 fn set_rep_directly() {
     let mut rep = CharacterReputation::default();
-    rep.set_rep(72, 42_000);
+    rep.set_rep(72, 21_000);
     assert_eq!(rep.get_standing(72), Standing::Revered);
 }
 
@@ -442,10 +473,9 @@ fn spillover_enemy_faction() {
 fn spillover_enemy_clamps_at_zero() {
     let reg = sample_registry();
     let mut rep = CharacterReputation::new_for_race(&reg, HUMAN);
-    // Org starts at 0 (Hated) for humans
-    assert_eq!(rep.get_value(76), 0);
+    assert_eq!(rep.get_value(76), -42_000);
 
-    // Gaining Stormwind rep tries to reduce Org by 500, but already at 0
+    // Opposing spillover cannot lower standing below Retail's signed minimum.
     let results = rep.gain_rep_with_spillover(72, 1000, RepGainSource::MobKill, &reg);
     let org_result = results.iter().find(|r| r.faction_id == 76).unwrap();
     assert_eq!(org_result.new_value, REP_MIN);
