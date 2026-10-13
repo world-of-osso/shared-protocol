@@ -216,7 +216,8 @@ impl GameObjectInfo {
 
     pub fn is_battleground_banner(&self) -> bool {
         matches!(self.go_type, GAMEOBJECT_TYPE_BUTTON | 10)
-            && crate::battleground::is_alterac_banner_entry(self.entry)
+            && (crate::battleground::is_alterac_banner_entry(self.entry)
+                || crate::battleground::is_isle_banner_entry(self.entry))
     }
 
     pub fn is_battleground_capture_point(&self) -> bool {
