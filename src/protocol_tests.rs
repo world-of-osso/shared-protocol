@@ -149,6 +149,7 @@ fn chat_history_response_round_trip() {
 fn emote_messages_round_trip() {
     let intent = EmoteIntent {
         emote: EmoteKind::Sit,
+        target_entity: None,
     };
     let encoded = serde_json::to_string(&intent).unwrap();
     let decoded: EmoteIntent = serde_json::from_str(&encoded).unwrap();
@@ -162,6 +163,16 @@ fn emote_messages_round_trip() {
     let encoded = serde_json::to_string(&event).unwrap();
     let decoded: EmoteEvent = serde_json::from_str(&encoded).unwrap();
     assert_eq!(event, decoded);
+}
+
+#[test]
+fn emote_intent_preserves_each_request_target_on_the_wire() {
+    for target in [77_u64, 88] {
+        let input = serde_json::json!({"emote": "Wave", "target_entity": target});
+        let intent: EmoteIntent = serde_json::from_value(input.clone()).unwrap();
+        let output = serde_json::to_value(intent).unwrap();
+        assert_eq!(output, input, "per-emote target {target}");
+    }
 }
 
 fn sample_auction_query() -> AuctionSearchQuery {
