@@ -107,14 +107,53 @@ fn isle_neutral_assault_can_be_counter_assaulted_and_restarts_capture() {
 }
 
 #[test]
+fn isle_gate_states_start_closed_and_keep_banners_require_a_breach() {
+    let (mut battle, instance) = fixture();
+    for (closed, open) in [
+        (4317, 4322),
+        (4318, 4321),
+        (4319, 4320),
+        (4328, 4323),
+        (4327, 4324),
+        (4326, 4325),
+    ] {
+        assert_eq!(state(&battle, &instance, closed), 1);
+        assert_eq!(state(&battle, &instance, open), 0);
+    }
+    assert!(battle.interact(195396, BgTeam::B, &instance).is_err());
+    assert!(battle.interact(195393, BgTeam::A, &instance).is_err());
+}
+
+#[test]
 fn isle_keep_graveyard_can_be_taken_from_its_initial_owner() {
     let (mut battle, mut instance) = fixture();
     assert!(battle.interact(195396, BgTeam::A, &instance).is_err());
+    assert_eq!(battle.gate_destroyed(195698, &instance), Ok(BgTeam::A));
     assert_eq!(battle.interact(195396, BgTeam::B, &instance), Ok(245));
     assert_eq!(state(&battle, &instance, 4343), 1);
     battle.advance(60_000, &mut instance);
     assert_eq!(state(&battle, &instance, 4340), 1);
     assert_eq!(state(&battle, &instance, 4339), 0);
+}
+
+#[test]
+fn isle_gate_breach_opens_only_its_keep_without_changing_reinforcements() {
+    let (mut battle, mut instance) = fixture();
+    assert_eq!(battle.gate_destroyed(195495, &instance), Ok(BgTeam::B));
+    assert_eq!(state(&battle, &instance, 4318), 0);
+    assert_eq!(state(&battle, &instance, 4321), 1);
+    assert_eq!(state(&battle, &instance, 4317), 1);
+    assert_eq!(state(&battle, &instance, 4328), 1);
+    assert!(battle.keep_is_breached(BgTeam::B));
+    assert!(!battle.keep_is_breached(BgTeam::A));
+    assert_eq!(battle.interact(195393, BgTeam::A, &instance), Ok(245));
+    assert!(battle.interact(195396, BgTeam::B, &instance).is_err());
+    assert_eq!(instance.score_a.reinforcements, 400);
+    assert_eq!(instance.score_b.reinforcements, 400);
+    assert!(battle.gate_destroyed(12345, &instance).is_err());
+    instance.end(BgOutcome::Winner(BgTeam::A));
+    assert!(battle.gate_destroyed(195699, &instance).is_err());
+    assert_eq!(state(&battle, &instance, 4327), 1);
 }
 
 #[test]

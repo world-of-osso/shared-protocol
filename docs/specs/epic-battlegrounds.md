@@ -12,6 +12,7 @@ Retail epic queue metadata and reinforcement rules in `src/battleground.rs`, sou
 - [x] Alterac's15 authored nodes preserve initial ownership, four-minute contest/defense, neutral Snowfall counter-assault and permanent75-reinforcement tower destruction.
 - [x] Alterac source captains cost100 once, generals end the match, and mine leaders change ownership with one reinforcement per45seconds per owned mine.
 - [x] Isle's seven source nodes preserve one-minute contest/defense, Quarry/Refinery45-second reinforcement ticks, source WorldStates and245/246 assault/defense columns. Boss deaths award the opposing team victory; live gate breach remains a separate runtime gap.
+- [x] Isle's six sourced gates begin closed. An authoritative gate-destruction event flips that gate's open/closed WorldStates and enables its keep banner, without changing reinforcements. Building damage and native siege reachability require separate server/live proof.
 
 ## How it works
 
