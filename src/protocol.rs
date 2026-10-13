@@ -13,6 +13,7 @@ use crate::components::{
 
 mod achievement_catalog_messages;
 mod adventure_guide_messages;
+mod trading_post_messages;
 mod bank_messages;
 mod challenge_messages;
 mod channels;
@@ -57,6 +58,7 @@ mod world_time_messages;
 
 pub use achievement_catalog_messages::*;
 pub use adventure_guide_messages::*;
+pub use trading_post_messages::*;
 pub use bank_messages::*;
 pub use challenge_messages::*;
 pub use channels::*;
@@ -112,6 +114,7 @@ impl Plugin for ProtocolPlugin {
         register_messages(app);
         challenge_messages::register(app);
         adventure_guide_messages::register(app);
+        trading_post_messages::register(app);
         register_channels(app);
         inventory_messages::register_inventory_protocol(app);
         quest_messages::register_quest_protocol(app);
