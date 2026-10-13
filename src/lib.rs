@@ -41,6 +41,7 @@ pub mod threat;
 pub mod ticket;
 pub mod trade;
 pub mod transmog;
+pub mod transport_route;
 pub mod types;
 pub mod xp;
 
