@@ -225,7 +225,7 @@ pub struct UnitLevel(pub u8);
 )]
 pub struct UnitFactionTemplate(pub u32);
 
-/// PlayerCondition.CurrentPvpFaction: 0 unknown/neutral, 1 Horde, 2 Alliance.
+/// PlayerCondition.CurrentPvpFaction: 0 unknown, 1 Horde/non-Alliance, 2 Alliance.
 /// Authoritative entered BG/arena team, otherwise the player's racial faction.
 /// Distinct from reaction templates (arena teams do not change those templates).
 #[derive(
