@@ -492,7 +492,7 @@ pub struct WorldArrival(pub u32);
     Default,
 )]
 pub struct MovementControl {
-    /// Bumped by the server on every teleport.
+    /// Bumped on teleports and explicit server-facing corrections to reject stale input.
     pub epoch: u32,
     /// The server drives the movement (taxi flight or ballistic knockback).
     pub controlled: bool,
@@ -515,6 +515,25 @@ pub struct Player {
     pub race: u8,
     pub class: u8,
     pub appearance: CharacterAppearance,
+}
+
+/// One-shot server facing for the matching MovementControl epoch. Unlike an ordinary
+/// Rotation snapshot, the owning client must adopt this yaw before sending new input.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+)]
+pub struct ForcedFacing {
+    pub epoch: u32,
+    pub yaw: f32,
 }
 
 /// A player's active `ChrSpecialization` ID; 0 when the class has no spec data.

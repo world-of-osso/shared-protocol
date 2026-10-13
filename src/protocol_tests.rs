@@ -149,6 +149,7 @@ fn chat_history_response_round_trip() {
 fn emote_messages_round_trip() {
     let intent = EmoteIntent {
         emote: EmoteKind::Sit,
+        target_entity: None,
     };
     let encoded = serde_json::to_string(&intent).unwrap();
     let decoded: EmoteIntent = serde_json::from_str(&encoded).unwrap();
@@ -162,6 +163,16 @@ fn emote_messages_round_trip() {
     let encoded = serde_json::to_string(&event).unwrap();
     let decoded: EmoteEvent = serde_json::from_str(&encoded).unwrap();
     assert_eq!(event, decoded);
+}
+
+#[test]
+fn emote_intent_preserves_each_request_target_on_the_wire() {
+    for target in [77_u64, 88] {
+        let input = serde_json::json!({"emote": "Wave", "target_entity": target});
+        let intent: EmoteIntent = serde_json::from_value(input.clone()).unwrap();
+        let output = serde_json::to_value(intent).unwrap();
+        assert_eq!(output, input, "per-emote target {target}");
+    }
 }
 
 fn sample_auction_query() -> AuctionSearchQuery {
@@ -519,6 +530,16 @@ fn arena_skirmish_request_round_trip_keeps_bracket() {
         let decoded: QueueForArena = bitcode::deserialize(&encoded).unwrap();
         assert_eq!(request, decoded);
     }
+}
+
+#[test]
+fn solo_shuffle_round_wins_survive_wire_without_rating() {
+    let wire = serde_json::json!({"mode":"SoloShuffle", "preparation_remaining_secs":60,
+        "shadow_sight_available":false, "units":[], "rating_changes":[],
+        "shuffle":{"round":3,"total_rounds":6,"rounds_won":[[11,2],[12,0],[13,1],[14,1],[15,1],[16,1]]}});
+    let snapshot: ArenaMatchSnapshot = serde_json::from_value(wire.clone()).unwrap();
+    assert_eq!(serde_json::to_value(&snapshot).unwrap(), wire);
+    assert!(snapshot.rating_changes.is_empty());
 }
 
 #[test]

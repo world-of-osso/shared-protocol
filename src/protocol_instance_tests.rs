@@ -90,3 +90,30 @@ fn protocol_plugin_registers_instance_messages() {
     assert!(app.is_message_registered::<SetSavedInstanceExtend>());
     assert!(app.is_message_registered::<RaidInstanceMessage>());
 }
+
+#[test]
+fn achievement_comparison_has_finite_registered_layout_and_rejects_nested_wire_requests() {
+    use crate::protocol::{AchievementComparisonQuery, QueryAchievementCatalog};
+    let query = QueryAchievementCatalog::Comparison {
+        target_entity: 42,
+        query: Box::new(AchievementComparisonQuery::Category {
+            category_id: 92,
+            after_id: 633,
+        }),
+    };
+    let encoded = serde_json::to_string(&query).unwrap();
+    assert_eq!(
+        serde_json::from_str::<QueryAchievementCatalog>(&encoded).unwrap(),
+        query
+    );
+    let nested = serde_json::json!({"Comparison": {"target_entity":42,"query":{"Comparison":{"target_entity":43,"query":{"Summary":{"scope":"All"}}}}}});
+    assert!(serde_json::from_value::<QueryAchievementCatalog>(nested).is_err());
+    assert_wire_round_trip(&query);
+    let mut app = App::new();
+    app.init_resource::<ProtocolHasher>()
+        .init_resource::<ReplicationRules>()
+        .init_resource::<ReplicationRegistry>();
+    app.add_plugins(ProtocolPlugin);
+    assert!(app.is_message_registered::<QueryAchievementCatalog>());
+    assert!(app.is_message_registered::<AchievementCatalogPage>());
+}
