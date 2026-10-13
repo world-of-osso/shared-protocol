@@ -256,6 +256,8 @@ impl UnitFlags {
     /// `UNIT_FLAG_PET_IN_COMBAT`: on a player's pet, the pet is going after a target to
     /// attack (`PetAI::DoAttack`); the pet bar's Attack button is active while it is set.
     pub const PET_IN_COMBAT: u32 = 0x0000_0800;
+    /// TC UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT (UnitDefines.h).
+    pub const PREVENT_EMOTES_FROM_CHAT_TEXT: u32 = 0x2000_0000;
 
     pub fn is_selectable(self) -> bool {
         self.0 & Self::NOT_SELECTABLE == 0
@@ -270,6 +272,48 @@ impl UnitFlags {
             && self.is_attackable()
             && (!player_controlled || self.0 & Self::IMMUNE_TO_PC == 0)
     }
+}
+
+/// TC `UnitData::Flags2`; separate bit namespace from `UnitFlags`.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Default,
+)]
+pub struct UnitFlags2(pub u32);
+
+impl UnitFlags2 {
+    pub const FEIGN_DEATH: u32 = 0x0000_0001;
+}
+
+/// TC `UnitData::Flags3`; FAKE_DEAD displays death without killing the unit.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Default,
+)]
+pub struct UnitFlags3(pub u32);
+
+impl UnitFlags3 {
+    pub const FAKE_DEAD: u32 = 0x0000_2000;
 }
 
 #[cfg(test)]

@@ -6,9 +6,9 @@ use crate::components::{
     ActiveSpec, CombatRatings, CombatStatus, CreatureClassification, CreatureMotion, DerivedStats,
     EquipmentAppearance, FeatherFall, Gold, GuildMembership, Health, Mana, ModelDisplay, Mounted,
     MovementControl, MovementSpeed, Npc, Player, PlayerMotion, PlayerStandState, Position,
-    PresenceStatus, Rotation, UnitAuras, UnitFactionTemplate, UnitFlags, UnitLevel, UnitPose,
-    UnitPowers, UnitRunes, UnitScale, UnitStats, UnitSummonedBy, UnitTap, UnitTarget,
-    UnitThreatList, UnitVignette, WorldArrival, Zone,
+    PresenceStatus, Rotation, UnitAuras, UnitFactionTemplate, UnitFlags, UnitFlags2, UnitFlags3,
+    UnitLevel, UnitPose, UnitPowers, UnitRunes, UnitScale, UnitStats, UnitSummonedBy, UnitTap,
+    UnitTarget, UnitThreatList, UnitVignette, WorldArrival, Zone,
 };
 
 mod achievement_catalog_messages;
@@ -177,6 +177,8 @@ fn register_replicated_components(app: &mut App) {
         .replicate();
     app.protocol_component::<UnitFactionTemplate>().replicate();
     app.protocol_component::<UnitFlags>().replicate();
+    app.protocol_component::<UnitFlags2>().replicate();
+    app.protocol_component::<UnitFlags3>().replicate();
     app.protocol_component::<UnitTarget>().replicate();
     app.protocol_component::<CreatureMotion>().replicate();
     app.protocol_component::<PlayerMotion>().replicate();
