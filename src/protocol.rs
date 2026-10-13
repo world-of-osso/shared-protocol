@@ -178,6 +178,8 @@ fn register_replicated_components(app: &mut App) {
     app.protocol_component::<crate::level_scaling::LevelScaling>()
         .replicate();
     app.protocol_component::<UnitFactionTemplate>().replicate();
+    app.protocol_component::<crate::components::CurrentPvpFaction>()
+        .replicate();
     app.protocol_component::<UnitFlags>().replicate();
     app.protocol_component::<UnitTarget>().replicate();
     app.protocol_component::<CreatureMotion>().replicate();
