@@ -256,6 +256,11 @@ fn cooldown_and_charges_round_trip() {
 
 #[test]
 fn cast_failed_round_trips_every_reason() {
+    assert_wire_round_trip(&CastFailed {
+        spell_id: 61810,
+        reason: CastFailReason::IncorrectArea,
+        detail: Some("Requires area group1103".into()),
+    });
     let reasons = [
         CastFailReason::NoTarget,
         CastFailReason::OutOfRange,
