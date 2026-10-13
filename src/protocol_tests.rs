@@ -522,6 +522,16 @@ fn arena_skirmish_request_round_trip_keeps_bracket() {
 }
 
 #[test]
+fn solo_shuffle_round_wins_survive_wire_without_rating() {
+    let wire = serde_json::json!({"mode":"SoloShuffle", "preparation_remaining_secs":60,
+        "shadow_sight_available":false, "units":[], "rating_changes":[],
+        "shuffle":{"round":3,"total_rounds":6,"rounds_won":[[11,2],[12,0],[13,1],[14,1],[15,1],[16,1]]}});
+    let snapshot: ArenaMatchSnapshot = serde_json::from_value(wire.clone()).unwrap();
+    assert_eq!(serde_json::to_value(&snapshot).unwrap(), wire);
+    assert!(snapshot.rating_changes.is_empty());
+}
+
+#[test]
 fn arena_rating_change_keeps_pre_post_rating_and_mmr_on_wire() {
     let value = ArenaRatingChange {
         character_id: 41,

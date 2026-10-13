@@ -458,6 +458,16 @@ pub struct ArenaMatchSnapshot {
     pub shadow_sight_available: bool,
     pub units: Vec<ArenaUnitSnapshot>,
     pub rating_changes: Vec<ArenaRatingChange>,
+    pub shuffle: Option<SoloShuffleSnapshot>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SoloShuffleSnapshot {
+    /// Current1-based round; six rounds total under the realm's unrated policy.
+    pub round: u8,
+    pub total_rounds: u8,
+    /// Character identity, cumulative round wins. Never team totals or rating.
+    pub rounds_won: Vec<(u64, u8)>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
