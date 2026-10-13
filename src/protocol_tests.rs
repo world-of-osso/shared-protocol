@@ -493,6 +493,7 @@ fn pvp_state_update_round_trip() {
                 outcome: None,
                 players: Vec::new(),
                 honor_reward: None,
+                arena: None,
             }),
         }),
         message: Some("queued for Warsong Gulch".into()),
@@ -502,6 +503,38 @@ fn pvp_state_update_round_trip() {
     let encoded = serde_json::to_string(&update).unwrap();
     let decoded: PvpStateUpdate = serde_json::from_str(&encoded).unwrap();
     assert_eq!(update, decoded);
+}
+
+#[test]
+fn arena_skirmish_request_round_trip_keeps_bracket() {
+    for mode in [
+        ArenaQueueMode::Skirmish2v2,
+        ArenaQueueMode::Skirmish3v3,
+        ArenaQueueMode::SoloShuffle,
+        ArenaQueueMode::Rated2v2,
+        ArenaQueueMode::Rated3v3,
+    ] {
+        let request = QueueForArena { mode };
+        let encoded = bitcode::serialize(&request).unwrap();
+        let decoded: QueueForArena = bitcode::deserialize(&encoded).unwrap();
+        assert_eq!(request, decoded);
+    }
+}
+
+#[test]
+fn arena_rating_change_keeps_pre_post_rating_and_mmr_on_wire() {
+    let value = ArenaRatingChange {
+        character_id: 41,
+        rating_before: 0,
+        rating_after: 48,
+        mmr_before: 1500,
+        mmr_after: 1512,
+    };
+    let encoded = bitcode::serialize(&value).unwrap();
+    assert_eq!(
+        bitcode::deserialize::<ArenaRatingChange>(&encoded).unwrap(),
+        value
+    );
 }
 
 #[test]

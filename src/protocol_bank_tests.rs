@@ -167,6 +167,22 @@ fn guild_bank_messages_round_trip() {
 }
 
 #[test]
+fn game_object_animation_preserves_source_sequence_and_loop_policy() {
+    assert_wire_round_trip(&GameObjectCollision(false));
+    assert_wire_round_trip(&GameObjectCollision(true));
+    assert_wire_round_trip(&GameObjectVisible(false));
+    assert_wire_round_trip(&GameObjectVisible(true));
+    assert_wire_round_trip(&GameObjectAnimation {
+        animation_id: 147,
+        looping: true,
+    });
+    assert_wire_round_trip(&GameObjectAnimation {
+        animation_id: 148,
+        looping: false,
+    });
+}
+
+#[test]
 fn game_object_use_round_trips() {
     assert_wire_round_trip(&UseGameObject { object: 9 });
     assert_wire_round_trip(&GameObjectInfo {

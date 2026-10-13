@@ -433,7 +433,7 @@ pub struct VehiclePassenger {
 )]
 pub struct WorldArrival(pub u32);
 
-/// Server-authoritative repositioning of a player (graveyard release, taxi).
+/// Server-authoritative repositioning of a player (graveyard release, taxi, knockback).
 /// The owning client adopts `Position` when `epoch` changes and follows it while
 /// `controlled`, sending no movement input.
 #[derive(
@@ -453,7 +453,7 @@ pub struct WorldArrival(pub u32);
 pub struct MovementControl {
     /// Bumped on teleports and explicit server-facing corrections to reject stale input.
     pub epoch: u32,
-    /// The server drives the movement (taxi flight).
+    /// The server drives the movement (taxi flight or ballistic knockback).
     pub controlled: bool,
 }
 
