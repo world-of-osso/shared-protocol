@@ -79,6 +79,8 @@ impl NpcFlags {
     /// TDB1210 Clerks215258/219043/219048/235626: NPCFlags2 bit20;
     /// each joins menu30243 OptionNpc50 ("create a crafting order").
     pub const CRAFTING_ORDERS: u64 = 0x0010_0000_0000_0000;
+    /// TDB1210 Seabraid vendors185467/185468, NPCFlags2 bit19.
+    pub const TRADING_POST: u64 = 0x0008_0000_0000_0000;
 
     /// Bits of AzerothCore (3.3.5) `NPCFlags` that exist in Retail. AzerothCore
     /// bits 0x1 (GOSSIP) … 0x0400_0000 (MAILBOX) have the same value and meaning in
@@ -117,6 +119,8 @@ pub enum NpcRole {
     Transmogrifier,
     /// Retail `PlayerInteractionType::ProfessionsCustomerOrders`.
     CraftingOrders,
+    /// Retail PlayerInteractionType::PerksProgramVendor57.
+    TradingPost,
 }
 
 /// Retail/TrinityCore `GAMEOBJECT_TYPE_BUTTON`, including source AV banners.
