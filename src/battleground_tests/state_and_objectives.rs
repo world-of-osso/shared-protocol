@@ -54,15 +54,15 @@ fn score_ignored_after_ended() {
 fn reinforcement_depletion_ends_match() {
     let tmpl = alterac_valley();
     let bg_match = BgMatch {
-        bg_id: 3,
+        bg_id: tmpl.id,
         team_a: vec![1],
         team_b: vec![2],
     };
     let mut inst = BgInstance::from_match(&bg_match, &tmpl);
     inst.start();
-    assert_eq!(inst.score_a.reinforcements, 600);
+    assert_eq!(inst.score_a.reinforcements, 700);
 
-    inst.deduct_reinforcements(BgTeam::A, 599);
+    inst.deduct_reinforcements(BgTeam::A, 699);
     assert_eq!(inst.phase, BgPhase::InProgress);
     assert_eq!(inst.score_a.reinforcements, 1);
 
@@ -75,7 +75,7 @@ fn reinforcement_depletion_ends_match() {
 fn reinforcement_saturates_at_zero() {
     let tmpl = alterac_valley();
     let bg_match = BgMatch {
-        bg_id: 3,
+        bg_id: tmpl.id,
         team_a: vec![1],
         team_b: vec![2],
     };
@@ -310,7 +310,7 @@ fn node_ab_has_five_nodes() {
 fn kill_deducts_reinforcements() {
     let tmpl = alterac_valley();
     let bg_match = BgMatch {
-        bg_id: 3,
+        bg_id: tmpl.id,
         team_a: vec![1],
         team_b: vec![2],
     };
@@ -318,24 +318,24 @@ fn kill_deducts_reinforcements() {
     inst.start();
 
     on_kill_reinforcement(&mut inst, BgTeam::A);
-    assert_eq!(inst.score_a.reinforcements, 599);
+    assert_eq!(inst.score_a.reinforcements, 699);
 
     on_kill_reinforcement(&mut inst, BgTeam::B);
-    assert_eq!(inst.score_b.reinforcements, 599);
+    assert_eq!(inst.score_b.reinforcements, 699);
 }
 
 #[test]
 fn kills_deplete_reinforcements_to_zero() {
     let tmpl = alterac_valley();
     let bg_match = BgMatch {
-        bg_id: 3,
+        bg_id: tmpl.id,
         team_a: vec![1],
         team_b: vec![2],
     };
     let mut inst = BgInstance::from_match(&bg_match, &tmpl);
     inst.start();
 
-    for _ in 0..600 {
+    for _ in 0..700 {
         on_kill_reinforcement(&mut inst, BgTeam::B);
     }
     assert_eq!(inst.phase, BgPhase::Ended);
