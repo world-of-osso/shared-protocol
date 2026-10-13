@@ -358,6 +358,8 @@ fn register_pvp_messages(app: &mut App) {
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<QueueForBattleground>()
         .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<QueueForArena>()
+        .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<QueueForRatedPvp>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<SelectPvpTalent>()
