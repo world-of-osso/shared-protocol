@@ -4,8 +4,8 @@ Replicated source flag fields for encounter scripts, including TC a352b1fa Ruby 
 
 ## What it must do
 
-- [ ] Preserve independent32-bit UnitFlags/UnitFlags2/UnitFlags3 fields through the wire.
-- [ ] Use source bits: PREVENT_EMOTES_FROM_CHAT_TEXT0x20000000, FEIGN_DEATH0x1 in flags2, FAKE_DEAD0x2000 in flags3; retain unrelated bits.
+- [x] Preserve independent32-bit UnitFlags/UnitFlags2/UnitFlags3 fields through encoded payloads.
+- [x] Use source bits: PREVENT_EMOTES_FROM_CHAT_TEXT0x20000000, FEIGN_DEATH0x1 in flags2, FAKE_DEAD0x2000 in flags3; retain unrelated bits.
 - [ ] Register flags2/flags3 as replicated components alongside flags1. All peers require matching protocol schemas.
 
 ## How it works
