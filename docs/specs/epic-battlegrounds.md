@@ -11,6 +11,7 @@ Retail epic queue metadata and reinforcement rules in `src/battleground.rs`, sou
 
 - [x] Alterac's15 authored nodes preserve initial ownership, four-minute contest/defense, neutral Snowfall counter-assault and permanent75-reinforcement tower destruction.
 - [x] Alterac source captains cost100 once, generals end the match, and mine leaders change ownership with one reinforcement per45seconds per owned mine.
+- [x] Isle's seven source nodes preserve one-minute contest/defense, Quarry/Refinery45-second reinforcement ticks, source WorldStates and245/246 assault/defense columns. Boss deaths award the opposing team victory; live gate breach remains a separate runtime gap.
 
 ## How it works
 
@@ -21,6 +22,7 @@ Retail epic queue metadata and reinforcement rules in `src/battleground.rs`, sou
 
 - `src/battleground.rs` — queue templates, roster eligibility and shared reinforcement state.
 - `src/battleground_alterac.rs` — source node/banner/WorldState, captain/general and mine rules.
+- `src/battleground_isle.rs` — source seven-node capture, resource/reinforcement and boss-victory rules.
 - `src/battleground_columns.rs` — source63/65/61/64/82 scoreboard ordering.
 - `src/protocol/interaction_messages.rs` — source AV button/goober use identity.
 - `src/battleground_objectives.rs` — existing player-kill reinforcement rule.
@@ -34,10 +36,10 @@ Retail epic queue metadata and reinforcement rules in `src/battleground.rs`, sou
 
 ## Known gaps (current cycle)
 
-- [ ] Alterac node/tower/mine/captain/general pure rules need normal eight-second Opening casts, source prefab transitions and authoritative combat-death integration. Initial entry is ground-based, not transport-relative.
-- [ ] Isle nodes, gates, transports and vehicles still require map-specific rules and runtime integration.
-- [ ] Native HUD/source scoreboard columns and both-skin private real-server lifecycle proof remain pending.
-- [ ] Alterac source objective registration and button/goober identity now feed server/native eligibility; native rendering/HUD and live proof must be completed before publication. Isle remains objective-ineligible.
+- [ ] Alterac normal Opening, source spawn groups and authoritative deaths have server-channel proof; native both-skin Snowfall capture/return is partial live proof, not normal-combat victory.
+- [ ] Isle normal Opening/node/spawn-group integration and both-skin Quarry capture/tick/return are implemented; destructible gates, siege vehicles, hangar transport and victory remain open.
+- [ ] Both epics' native whole-match victory, preparation, resurrection and reward boundaries remain unproved; source HUD/scoreboard and partial private lifecycle proof are tracked in the linked runtime ledger.
+- [ ] Both maps are objective-eligible. Eligibility does not certify canonical asset publication, siege reachability or complete native gameplay.
 
 ## Out of scope
 
