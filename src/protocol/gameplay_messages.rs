@@ -535,6 +535,22 @@ pub struct IgnoreListStateUpdate {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct QueryLfgStatus;
 
+/// Authored follower entries with currently prepared population and entrance data.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct QueryFollowerDungeons;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct FollowerDungeonEntry {
+    pub id: u32,
+    pub name: String,
+    pub map_id: u32,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct FollowerDungeons {
+    pub entries: Vec<FollowerDungeonEntry>,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct QueueForLfg {
     pub role: GroupRoleSnapshot,
