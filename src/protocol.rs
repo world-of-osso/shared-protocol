@@ -161,6 +161,8 @@ fn register_replicated_components(app: &mut App) {
     app.protocol_component::<crate::components::VehiclePassenger>()
         .replicate();
     app.protocol_component::<MovementControl>().replicate();
+    app.protocol_component::<crate::components::ForcedFacing>()
+        .replicate();
     app.protocol_component::<WorldArrival>().replicate();
     app.protocol_component::<Zone>().replicate();
     app.protocol_component::<GuildMembership>().replicate();
