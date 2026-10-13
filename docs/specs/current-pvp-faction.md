@@ -4,10 +4,10 @@ Replicate the player's faction used by `PlayerCondition.CurrentPvpFaction`, foll
 
 ## What it must do
 
-- [ ] Carry 0 for unknown,1 for Horde/non-Alliance,2 for Alliance. Known neutral Pandaren follows TC's outside-match non-Alliance condition branch without changing neutral reactions.
-- [ ] Use racial faction outside matches; entered BG/arena team inside matches.
-- [ ] Preserve racial faction while invited or when entry fails; restore it after successful return.
-- [ ] Transmit faction-only changes independently of reaction templates.
+- [x] Carry 0 for unknown,1 for Horde/non-Alliance,2 for Alliance. Known neutral Pandaren follows TC's outside-match non-Alliance condition branch without changing neutral reactions.
+- [x] Use racial faction outside matches; entered BG/arena team inside matches.
+- [x] Preserve racial faction while invited or when entry fails; restore it after successful return.
+- [x] Transmit faction-only changes independently of reaction templates.
 
 ## How it works
 
@@ -25,7 +25,7 @@ Replicate the player's faction used by `PlayerCondition.CurrentPvpFaction`, foll
 
 ## Known gaps (current cycle)
 
-- [ ] Entry, return, wire and authored War Banner condition proof pending.
+- Independent review unavailable; no independent PASS claim. Paired server/client protocol revision is required.
 
 ## Out of scope
 
