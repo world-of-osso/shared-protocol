@@ -7,8 +7,8 @@ use crate::components::{
     EquipmentAppearance, FeatherFall, Gold, GuildMembership, Health, Mana, ModelDisplay, Mounted,
     MovementControl, MovementSpeed, Npc, Player, PlayerMotion, PlayerStandState, Position,
     PresenceStatus, Rotation, UnitAuras, UnitFactionTemplate, UnitFlags, UnitFlags2, UnitFlags3,
-    UnitLevel, UnitPose, UnitPowers, UnitRunes, UnitScale, UnitStats, UnitSummonedBy, UnitTap,
-    UnitTarget, UnitThreatList, UnitVignette, WorldArrival, Zone,
+    UnitIsPet, UnitLevel, UnitPose, UnitPowers, UnitRunes, UnitScale, UnitStats, UnitSummonedBy,
+    UnitTap, UnitTarget, UnitThreatList, UnitVignette, WorldArrival, Zone,
 };
 
 mod achievement_catalog_messages;
@@ -208,6 +208,7 @@ fn register_replicated_components(app: &mut App) {
         .replicate();
     app.protocol_component::<UnitVignette>().replicate();
     app.protocol_component::<UnitSummonedBy>().replicate();
+    app.protocol_component::<UnitIsPet>().replicate();
 }
 
 #[cfg(test)]

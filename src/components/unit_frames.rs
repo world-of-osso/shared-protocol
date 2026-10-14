@@ -718,8 +718,8 @@ pub struct UnitVignette(pub u32);
 
 /// The unit that owns this one (`UF::UnitData::SummonedBy`, set by TrinityCore
 /// `Unit::SetOwnerGUID` from `Unit::SetMinion`): a hunter pet carries its owner's
-/// entity bits. The owner's client finds its pet (`UnitPet`, `UnitIsUnit("pet", …)`)
-/// as the unit summoned by its player.
+/// entity bits. Ownership also includes other minions; UnitIsPet distinguishes
+/// designated pets for `UnitPet` / `UnitIsUnit("pet", …)`.
 #[derive(
     Component,
     Reflect,
@@ -734,3 +734,20 @@ pub struct UnitVignette(pub u32);
     Eq,
 )]
 pub struct UnitSummonedBy(pub u64);
+
+/// Source pet designation, independent of PLAYER_CONTROLLED and general minion ownership.
+/// True for actual pet constructors / SummonProperties Control=PET, not ally guardians.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+)]
+pub struct UnitIsPet(pub bool);
