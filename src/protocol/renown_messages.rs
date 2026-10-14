@@ -8,6 +8,10 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub enum RenownRequest {
     Query,
+    /// Retail C_Reputation.SetWatchedFactionByID; zero clears the current watch.
+    SetWatchedFaction {
+        faction_id: u32,
+    },
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -64,6 +68,10 @@ pub struct RenownSnapshot {
     pub factions: Vec<MajorFactionSnapshot>,
     /// Missing source catalog, not fabricated empty content.
     pub source_error: Option<String>,
+    /// CharacterReputation's authoritative watched Faction ID, not a Covenant ID.
+    pub watched_faction: Option<u32>,
+    /// Watch refusal/unavailable state; does not invalidate the renown catalog.
+    pub watch_error: Option<String>,
 }
 
 pub(super) fn register(app: &mut App) {
