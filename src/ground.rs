@@ -38,6 +38,7 @@ pub struct Ground {
 }
 
 /// A placed WMO: its collision groups and placement transform.
+#[derive(Clone)]
 pub struct WmoCollision {
     world_from_local: Affine3A,
     local_from_world: Affine3A,

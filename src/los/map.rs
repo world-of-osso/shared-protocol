@@ -26,6 +26,24 @@ impl LosMap {
         }
     }
 
+    /// Read/parse a region before queries begin. Absent tiles are cached as absent;
+    /// other read and parse failures retain their path context.
+    pub fn preload_tiles(
+        &mut self,
+        tiles: impl IntoIterator<Item = (u32, u32)>,
+    ) -> Result<(), String> {
+        for tile in tiles {
+            self.load(tile)?;
+        }
+        Ok(())
+    }
+
+    /// Install a worker-prepared region without reading or parsing on this thread.
+    pub fn merge_preloaded(&mut self, prepared: Self) {
+        assert_eq!(self.dir, prepared.dir, "LOS cache directory mismatch");
+        self.tiles.extend(prepared.tiles);
+    }
+
     /// Whether the open segment `a..b` crosses no baked triangle; loads the tiles it needs.
     pub fn clear(&mut self, a: Vec3, b: Vec3) -> Result<bool, String> {
         self.load_around(a, b)?;

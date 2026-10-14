@@ -12,6 +12,9 @@ pub mod eye;
 pub mod map;
 pub mod tile;
 
+#[cfg(test)]
+mod map_tests;
+
 pub use bevy::math::Vec3;
 pub use body::Body;
 pub use map::LosMap;
