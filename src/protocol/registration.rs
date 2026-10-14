@@ -46,6 +46,10 @@ fn register_pet_battle_messages(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<SetBattlePetLoadout>()
         .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<SetBattlePetAbility>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<PetJournalDetailsUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<StartWildPetBattle>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<WildPetBattleActionRequest>()
