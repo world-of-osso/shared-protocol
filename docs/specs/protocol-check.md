@@ -4,6 +4,8 @@
 
 ## What it must do
 
+- [x] `PROTOCOL_SEMANTIC_EPOCH` is folded into the connect-time message-layout hash. **Bump on any meaning change of an existing field**, including bit assignments, numeric enum interpretations or units, even when serde shape is unchanged. Epoch1 replaces compact guild-right masks with pinned TC rights. Normal hosts use the constant through `ProtocolSemanticEpoch::default`; only version-simulation tests supply an older epoch. Fingerprint wire shape stays unchanged so earlier peers can receive/reject the differing hash.
+
 - [x] On `Connected`, each side sends a `ProtocolFingerprint`: lightyear's message and channel registry hashes and replicon's `ProtocolHash` (replication rules), each covering type names in registration order, plus message and component layout hashes covering each registered type's wire layout.
 - [x] A differing fingerprint rejects the connection on the receiving side: `ProtocolRejected(reason)` names every differing registry (message, component, channel, message layout, component layout; a layout is named only when that registry's type names match), and the link drops 1 s later so the peer also receives this side's fingerprint.
 - [x] Dropping a link disconnects the peer at once on either side: the peer sees `Disconnected` about 1 s after the rejection, not at its netcode timeout.
@@ -22,6 +24,7 @@
 ## Tests asserting this spec
 
 - `tests/protocol_check.rs`: server and client apps over real Netcode/UDP on localhost; matching registries verify, a client-only component, swapped component order, a server-only message and a client-only channel are rejected by both sides, and a missing fingerprint is rejected by each side. A server rejecting a client without the check disconnects it within 3 s (the netcode timeout would take 4.8 s). A component and a message that differ only by an added field (`tests/fixtures/layout-v1`/`-v2`, same crate name, so same type names) are rejected by both sides.
+- `tests/protocol_check.rs::identical_layouts_with_different_semantic_epochs_are_rejected_at_connect`: otherwise-identical real UDP peers both reject and disconnect for a semantic-epoch mismatch; existing matching-build cases prove equal epochs still verify.
 - `src/protocol/protocol_layout_tests.rs`: every real shared message and component traces a layout; a message registered around `ProtocolRegistrationExt` stops `finish`; a nested enum variant or variant field change alters the layout, identical shapes in different modules do not.
 
 ## Known gaps (current cycle)

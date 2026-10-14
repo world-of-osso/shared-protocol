@@ -23,8 +23,8 @@ only the fourteen implemented rights; unnamed/unsupported TC bits are not accept
 Server guild layout 3 translates layout-2 compact social bits individually; existing
 bank booleans, limits, tabs, money and member positions are unchanged. Layout 0/1
 migrations retain their existing default grants. Upgrade client and server together:
-right-value changes do not change message shapes, so the layout-only connect-time
-fingerprint does not detect this semantic mask change.
+[semantic epoch1](specs/protocol-check.md) folds this meaning change into the connect-time
+fingerprint even though field shapes are unchanged; different epochs are rejected.
 
 Retail source (local `~/.cache/wow-ui-sim/blizzard-ui/retail/AddOns/`):
 - `Blizzard_GuildControlUI/Blizzard_GuildControlUI.lua:4,137–238,536–620`: max 10, minimum 2, occupied-rank deletion, tab view/deposit/stacks controls.
