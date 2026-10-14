@@ -17,7 +17,7 @@ and a typed refusal. Tab withdrawal limits count stacks, not individual items. Z
 withdrawals. Gold limits are copper/day, shared with guild repairs; zero denies spending.
 Rank 0 alone is unlimited. Unknown flags and invalid ranks/tabs are rejected by the server.
 
-Rights use pinned TrinityCore `a352b1fa` `src/server/game/Guilds/Guild.h:94–118`
+Rights use pinned TrinityCore `a352b1fa` `src/server/game/Guilds/Guild.h:102–127`
 `GuildRankRights` values, not consecutive UI checkbox indices. `GUILD_RIGHT_ALL` is
 only the fourteen implemented rights; unnamed/unsupported TC bits are not accepted.
 Server guild layout 3 translates layout-2 compact social bits individually; existing
