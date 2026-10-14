@@ -25,6 +25,7 @@ mod group_messages;
 mod guild_bank_messages;
 mod guild_charter_messages;
 mod guild_rank_messages;
+mod guild_tabard_messages;
 mod housing_messages;
 #[cfg(test)]
 mod housing_messages_tests;
@@ -71,6 +72,7 @@ pub use group_messages::*;
 pub use guild_bank_messages::*;
 pub use guild_charter_messages::*;
 pub use guild_rank_messages::*;
+pub use guild_tabard_messages::*;
 pub use housing_messages::*;
 pub use instance_messages::*;
 pub use interaction_messages::*;
@@ -130,6 +132,7 @@ impl Plugin for ProtocolPlugin {
         guild_bank_messages::register_guild_bank_protocol(app);
         guild_rank_messages::register_guild_rank_protocol(app);
         guild_charter_messages::register_guild_charter_protocol(app);
+        guild_tabard_messages::register_guild_tabard_protocol(app);
         trainer_messages::register_trainer_protocol(app);
         transmog_messages::register_transmog_protocol(app);
         loot_messages::register_loot_protocol(app);

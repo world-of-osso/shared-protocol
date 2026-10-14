@@ -2,6 +2,40 @@ use shared::guild_creation::GuildTabardDesign;
 use shared::guild_tabards::GuildTabardCatalog;
 
 #[test]
+fn guild_tabard_wire_roundtrips_vendor_save_and_optional_snapshot_design() {
+    use shared::protocol::*;
+    let design = GuildTabardDesign {
+        icon: 1,
+        icon_color: 2,
+        border: 3,
+        border_color: 4,
+        background_color: 5,
+    };
+    let request = GuildTabardRequest::Save { npc: 701, design };
+    let bytes = bitcode::serialize(&request).unwrap();
+    assert_eq!(
+        bitcode::deserialize::<GuildTabardRequest>(&bytes).unwrap(),
+        request
+    );
+    for tabard in [None, Some(design)] {
+        let snapshot = shared::protocol_snapshots::GuildSnapshot {
+            guild_id: 7,
+            guild_name: "Raid Team".into(),
+            created_at: None,
+            motd: String::new(),
+            info_text: String::new(),
+            members: vec![],
+            tabard,
+        };
+        let bytes = bitcode::serialize(&snapshot).unwrap();
+        assert_eq!(
+            bitcode::deserialize::<shared::protocol_snapshots::GuildSnapshot>(&bytes).unwrap(),
+            snapshot
+        );
+    }
+}
+
+#[test]
 fn guild_tabard_catalog_resolves_installed_colors_components_and_rejects_invalid_ids() {
     let root =
         std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/guild-tabards-70391");

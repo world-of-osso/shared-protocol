@@ -93,6 +93,7 @@ fn guild_invite_messages_round_trip() {
 
     let state = GuildStateUpdate {
         guild: Some(GuildSnapshot {
+            tabard: None,
             guild_id: 3,
             guild_name: "Raid Team".into(),
             created_at: Some(1728600000),
