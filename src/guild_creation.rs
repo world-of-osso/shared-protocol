@@ -309,7 +309,18 @@ pub struct CreatedGuild {
 pub const TABARD_COST: u32 = 100_000;
 
 /// A guild tabard design.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(
+    bevy::prelude::Component,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Serialize,
+    Deserialize,
+)]
 pub struct GuildTabardDesign {
     /// Emblem icon ID.
     pub icon: u8,

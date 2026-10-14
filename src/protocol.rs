@@ -176,6 +176,8 @@ fn register_replicated_components(app: &mut App) {
     app.protocol_component::<WorldArrival>().replicate();
     app.protocol_component::<Zone>().replicate();
     app.protocol_component::<GuildMembership>().replicate();
+    app.protocol_component::<crate::guild_creation::GuildTabardDesign>()
+        .replicate();
     app.protocol_component::<PresenceStatus>().replicate();
     app.protocol_component::<EquipmentAppearance>().replicate();
     app.protocol_component::<crate::casting::CastState>()
