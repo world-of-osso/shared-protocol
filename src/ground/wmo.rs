@@ -94,13 +94,14 @@ impl WmoGroupCollision {
 
     /// Push the world height of every walkable face the local segment
     /// `top..bottom` (WMO-local Bevy space) crosses.
-    pub(super) fn walkable_hits(
+    pub(super) fn height_hits(
         &self,
-        top: Vec3,
-        bottom: Vec3,
+        segment: (Vec3, Vec3),
         world_from_local: &Affine3A,
         out: &mut Vec<f32>,
+        walkable_only: bool,
     ) {
+        let (top, bottom) = segment;
         if self.nodes.is_empty() {
             return;
         }
@@ -121,7 +122,7 @@ impl WmoGroupCollision {
                 .matrix3
                 .mul_vec3(file_to_local_bevy(normal).into())
                 .normalize_or_zero();
-            if world_normal.y.abs() >= min_normal_y {
+            if !walkable_only || world_normal.y.abs() >= min_normal_y {
                 let hit = file_to_local_bevy(start.lerp(end, t));
                 out.push(world_from_local.transform_point3(hit).y);
             }
