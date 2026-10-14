@@ -122,7 +122,7 @@ pub fn ground_at<'a>(
     ground_at_with_filter(feet, terrain, wmos, true)
 }
 
-/// Creature map height (TC Object.cpp:654-685), not player slope admission.
+/// Creature map height (TC a352b1fa Object.cpp:709-746/3131-3136), not player slope admission.
 pub fn collision_height<'a>(
     feet: Vec3,
     terrain: Option<f32>,
