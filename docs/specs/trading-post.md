@@ -4,9 +4,10 @@ Local Mainline PerksProgram API documentation defines categories, authored price
 
 ## What it must do
 
-- [ ] Query, purchase, refund and freeze/clear requests carry only authored vendor IDs; never client-provided balance, price or grant.
+- [x] Query, purchase, refund, freeze/clear and cart checkout requests carry only authored vendor IDs; never client-provided balance, price or grant. `Checkout.vendor_item_ids` preserves the Retail RequestCartCheckout list.
 - [ ] Snapshot carries actual active-vendor identity, balance, points, monthly expiry/clock, thresholds, categories, authored item/preview/UI group metadata, owned/receipt state, zero refundable seconds when disabled and explicit source/grant gaps.
 - [ ] Registered messages travel server/client through existing channels.
+- [x] Partial replies advance retained rows' refund durations by elapsed server time before replacing updated rows. A balance/freeze delta must not renew an earlier purchase's refund window.
 - [x] `TradingPostItem.usable` carries the querying player's evaluated class/race/level item restrictions for Retail's Useable Only filter. `None` preserves unavailable source/player facts; it is not inferred from grant availability and does not prohibit account-wide purchases.
 
 ## How it works
@@ -24,7 +25,7 @@ Local Mainline PerksProgram API documentation defines categories, authored price
 
 ## Known gaps (current cycle)
 
-- [ ] Real UDP transport/native integration proof pending.
+- [ ] Cart checkout real UDP/native integration proof pending; prior single-item query/purchase/refund transport proof does not certify the new request.
 
 ## Out of scope
 
