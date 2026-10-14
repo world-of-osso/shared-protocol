@@ -284,7 +284,11 @@ pub fn objective_object_entries(map_id: u32) -> Vec<u32> {
         return alterac_banner_entries();
     }
     if map_id == 628 {
-        return isle_banner_entries();
+        let mut entries = isle_banner_entries();
+        entries.extend(isle_gate_entries());
+        entries.extend(isle_keep_door_entries(BgTeam::A));
+        entries.extend(isle_keep_door_entries(BgTeam::B));
+        return entries;
     }
     if map_id == 2656 {
         return vec![422413];

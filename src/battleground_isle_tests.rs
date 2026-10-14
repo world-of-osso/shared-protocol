@@ -109,6 +109,15 @@ fn isle_neutral_assault_can_be_counter_assaulted_and_restarts_capture() {
 #[test]
 fn isle_gate_states_start_closed_and_keep_banners_require_a_breach() {
     let (mut battle, instance) = fixture();
+    let source_objects = objective_object_entries(628);
+    for entry in [
+        195494, 195495, 195496, 195698, 195699, 195700, 195451, 195452, 195223,
+    ] {
+        assert!(
+            source_objects.contains(&entry),
+            "source object {entry} absent"
+        );
+    }
     for (closed, open) in [
         (4317, 4322),
         (4318, 4321),

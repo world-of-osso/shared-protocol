@@ -359,6 +359,17 @@ pub fn is_isle_banner_entry(entry: u32) -> bool {
     entry != 0 && NODES.iter().any(|spec| spec.banners.contains(&entry))
 }
 
+pub fn isle_gate_entries() -> Vec<u32> {
+    GATES.iter().map(|gate| gate.entry).collect()
+}
+
+pub fn isle_keep_door_entries(team: BgTeam) -> &'static [u32] {
+    match team {
+        BgTeam::A => &[195451, 195452],
+        BgTeam::B => &[195223],
+    }
+}
+
 pub fn isle_banner_entries() -> Vec<u32> {
     NODES
         .into_iter()
