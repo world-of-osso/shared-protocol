@@ -30,6 +30,47 @@ pub struct PetBattleQueueUpdate {
 pub struct SetBattlePetLoadout {
     pub slots: [Option<u64>; 3],
 }
+/// Select one owned pet's unlocked species ability in a one-based ability slot.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct SetBattlePetAbility {
+    pub pet_id: u64,
+    pub slot: u8,
+    pub ability_id: u32,
+}
+
+/// Authored species option; locked options retain their real icon and required level.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PetJournalAbility {
+    pub id: u32,
+    pub name: String,
+    pub icon: u32,
+    pub family: u8,
+    pub slot: u8,
+    pub required_level: u8,
+}
+
+/// Server-derived combat fields; level and current XP remain in the account PetJournal.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct OwnedPetBattleSnapshot {
+    pub pet_id: u64,
+    pub health: i32,
+    pub max_health: i32,
+    pub power: i32,
+    pub speed: i32,
+    pub next_level_xp: u32,
+    /// Zero denotes a not-yet-unlocked slot, never an invented ability.
+    pub selected_abilities: [u32; 3],
+    pub choices: Vec<PetJournalAbility>,
+}
+
+/// Owner-only full combat detail snapshot and ability-change acknowledgement/refusal.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PetJournalDetailsUpdate {
+    pub pets: Vec<OwnedPetBattleSnapshot>,
+    pub locked: bool,
+    pub error: Option<String>,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct StartWildPetBattle {
     pub creature: u64,
