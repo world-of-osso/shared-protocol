@@ -99,7 +99,10 @@ impl AddAssign for CombatRatings {
 )]
 pub struct DerivedStats {
     pub spell_power: f32,
+    /// Melee UnitAttackPower; never substitutes for the ranged owner field.
     pub attack_power: f32,
+    /// UnitRangedAttackPower (TC UnitFields.RangedAttackPower).
+    pub ranged_attack_power: f32,
     /// Percent (5.0 = 5%), like the remaining fields.
     pub crit_pct: f32,
     pub haste_pct: f32,
@@ -332,6 +335,7 @@ mod tests {
         let derived = DerivedStats {
             spell_power: 1234.0,
             attack_power: 56.0,
+            ranged_attack_power: 789.0,
             crit_pct: 12.5,
             haste_pct: 7.25,
             mastery_pct: 18.0,
