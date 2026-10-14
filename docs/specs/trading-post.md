@@ -7,6 +7,7 @@ Local Mainline PerksProgram API documentation defines categories, authored price
 - [ ] Query, purchase, refund and freeze/clear requests carry only authored vendor IDs; never client-provided balance, price or grant.
 - [ ] Snapshot carries actual active-vendor identity, balance, points, monthly expiry/clock, thresholds, categories, authored item/preview/UI group metadata, owned/receipt state, zero refundable seconds when disabled and explicit source/grant gaps.
 - [ ] Registered messages travel server/client through existing channels.
+- [x] `TradingPostItem.usable` carries the querying player's evaluated class/race/level item restrictions for Retail's Useable Only filter. `None` preserves unavailable source/player facts; it is not inferred from grant availability and does not prohibit account-wide purchases.
 
 ## How it works
 
