@@ -174,9 +174,37 @@ impl NodeState {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+struct GateSpec {
+    entry: u32,
+    team: BgTeam,
+    closed_state: u32,
+    open_state: u32,
+}
+
+const fn gate(entry: u32, team: BgTeam, closed_state: u32, open_state: u32) -> GateSpec {
+    GateSpec {
+        entry,
+        team,
+        closed_state,
+        open_state,
+    }
+}
+
+/// TC GetWorldStateFromGateEntry and GetGateIDFromEntry, Front/West/East per keep.
+const GATES: [GateSpec; 6] = [
+    gate(195494, BgTeam::B, 4317, 4322),
+    gate(195495, BgTeam::B, 4318, 4321),
+    gate(195496, BgTeam::B, 4319, 4320),
+    gate(195698, BgTeam::A, 4328, 4323),
+    gate(195699, BgTeam::A, 4327, 4324),
+    gate(195700, BgTeam::A, 4326, 4325),
+];
+
 #[derive(Debug)]
 pub struct IsleBattle {
     nodes: [NodeState; 7],
+    destroyed_gates: [bool; 6],
     resource_elapsed_ms: u64,
 }
 
@@ -184,6 +212,7 @@ impl Default for IsleBattle {
     fn default() -> Self {
         Self {
             nodes: NODES.map(NodeState::initial),
+            destroyed_gates: [false; 6],
             resource_elapsed_ms: 0,
         }
     }
@@ -220,9 +249,42 @@ impl IsleBattle {
         if instance.bg_id != 30 || instance.phase != BgPhase::InProgress {
             return Err("no active Isle of Conquest match");
         }
-        (0..NODES.len())
+        let node = (0..NODES.len())
             .find(|&node| self.nodes[node].banner(NODES[node]) == Some(entry))
-            .ok_or("banner is not the current Isle of Conquest objective")
+            .ok_or("banner is not the current Isle of Conquest objective")?;
+        let keep = match node {
+            5 => Some(BgTeam::A),
+            6 => Some(BgTeam::B),
+            _ => None,
+        };
+        if keep.is_some_and(|team| !self.keep_is_breached(team)) {
+            return Err("keep gates have not been breached");
+        }
+        Ok(node)
+    }
+
+    /// A source destructible-building death opens its keep, not an admin outcome.
+    pub fn gate_destroyed(
+        &mut self,
+        entry: u32,
+        instance: &BgInstance,
+    ) -> Result<BgTeam, &'static str> {
+        if instance.bg_id != 30 || instance.phase != BgPhase::InProgress {
+            return Err("no active Isle of Conquest match");
+        }
+        let index = GATES
+            .iter()
+            .position(|gate| gate.entry == entry)
+            .ok_or("object is not an Isle of Conquest gate")?;
+        self.destroyed_gates[index] = true;
+        Ok(GATES[index].team)
+    }
+
+    pub fn keep_is_breached(&self, team: BgTeam) -> bool {
+        GATES
+            .iter()
+            .zip(self.destroyed_gates)
+            .any(|(gate, destroyed)| gate.team == team && destroyed)
     }
 
     pub fn advance(&mut self, delta_ms: u64, instance: &mut BgInstance) {
@@ -271,6 +333,17 @@ impl IsleBattle {
             .zip(NODES)
             .flat_map(|(node, spec)| node.world_states(spec))
             .collect();
+        states.extend(
+            GATES
+                .iter()
+                .zip(self.destroyed_gates)
+                .flat_map(|(gate, destroyed)| {
+                    [
+                        (gate.closed_state, i32::from(!destroyed)),
+                        (gate.open_state, i32::from(destroyed)),
+                    ]
+                }),
+        );
         states.extend([
             (4221, 1),
             (4222, 1),
@@ -284,6 +357,17 @@ impl IsleBattle {
 
 pub fn is_isle_banner_entry(entry: u32) -> bool {
     entry != 0 && NODES.iter().any(|spec| spec.banners.contains(&entry))
+}
+
+pub fn isle_gate_entries() -> Vec<u32> {
+    GATES.iter().map(|gate| gate.entry).collect()
+}
+
+pub fn isle_keep_door_entries(team: BgTeam) -> &'static [u32] {
+    match team {
+        BgTeam::A => &[195451, 195452],
+        BgTeam::B => &[195223],
+    }
 }
 
 pub fn isle_banner_entries() -> Vec<u32> {
