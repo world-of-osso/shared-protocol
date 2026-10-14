@@ -195,6 +195,20 @@ pub struct CurrencyEntrySnapshot {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ReputationSnapshot {
     pub entries: Vec<ReputationEntrySnapshot>,
+    /// Owner-only status bar state; None removes a cleared watch, not an omitted update.
+    pub watched: Option<WatchedReputationSnapshot>,
+}
+
+/// ReputationBar.lua's normalized values, independent of the Journeys reward catalog.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct WatchedReputationSnapshot {
+    pub faction_id: u32,
+    pub name: String,
+    pub value: u32,
+    pub maximum: u32,
+    pub capped: bool,
+    pub is_major_faction: bool,
+    pub reaction: crate::reputation::Standing,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
