@@ -90,6 +90,14 @@ impl TradingPostSnapshot {
             return update;
         };
         let mut items = previous.items.clone();
+        // Retained durations belong to the previous server timestamp, not the new delta.
+        let elapsed = update
+            .now_unix
+            .saturating_sub(previous.now_unix)
+            .clamp(0, i64::from(u32::MAX)) as u32;
+        for row in &mut items {
+            row.refund_seconds = row.refund_seconds.saturating_sub(elapsed);
+        }
         for row in update.items {
             match items.iter_mut().find(|item| item.id == row.id) {
                 Some(item) => *item = row,
@@ -215,6 +223,36 @@ mod tests {
             preview_item_ids: Vec::new(),
             grant_unavailable: None,
         }
+    }
+
+    #[test]
+    fn trading_post_partial_update_keeps_retained_refund_expiry_on_the_server_clock() {
+        let mut full = snapshot(1000, vec![item(4, true), item(5, false)], true);
+        full.now_unix = 1790812900;
+        full.items[0].refund_seconds = 60;
+        let mut delta = snapshot(925, vec![item(5, true)], false);
+        delta.now_unix = 1790812920;
+        delta.items[0].refund_seconds = 600;
+        let merged = TradingPostSnapshot::merge(Some(&full), delta);
+        assert_eq!(
+            merged.items[0].refund_seconds, 40,
+            "retained row must not receive a fresh60s window"
+        );
+        assert_eq!(
+            merged.items[1].refund_seconds, 600,
+            "new row's duration is already relative to new server time"
+        );
+        let mut freeze = snapshot(925, Vec::new(), false);
+        freeze.now_unix = 1790812959;
+        freeze.frozen_item_id = Some(4);
+        let merged = TradingPostSnapshot::merge(Some(&merged), freeze);
+        assert_eq!(merged.items[0].refund_seconds, 1);
+        assert_eq!(merged.items[1].refund_seconds, 561);
+        let mut balance = snapshot(925, Vec::new(), false);
+        balance.now_unix = 1790812960;
+        let expired = TradingPostSnapshot::merge(Some(&merged), balance);
+        assert_eq!(expired.items[0].refund_seconds, 0);
+        assert_eq!(expired.items[1].refund_seconds, 560);
     }
 
     #[test]
