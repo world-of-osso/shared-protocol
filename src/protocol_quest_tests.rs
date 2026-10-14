@@ -38,6 +38,9 @@ fn kobold_camp_cleanup(current: u32) -> QuestEntrySnapshot {
         level: 2,
         sort_id: 9,
         objectives_text: "Kill 8 Kobold Vermin, then return to Marshal McBride.".into(),
+        description: "Clear the kobold camp.".into(),
+        rewards: QuestRewards::default(),
+        pushable: true,
         completion_text: String::new(),
         watched: true,
         pois: vec![QuestPoiSnapshot {
