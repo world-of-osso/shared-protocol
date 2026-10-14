@@ -223,6 +223,8 @@ pub struct CharacterListEntry {
     pub class: u8,
     pub appearance: CharacterAppearance,
     pub equipment_appearance: EquipmentAppearance,
+    /// Registered guild design for the character-selection model; not owned-item data.
+    pub tabard: Option<crate::guild_creation::GuildTabardDesign>,
 }
 
 /// Client sends after connecting to authenticate.

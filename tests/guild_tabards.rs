@@ -36,6 +36,32 @@ fn guild_tabard_wire_roundtrips_vendor_save_and_optional_snapshot_design() {
 }
 
 #[test]
+fn guild_tabard_character_selection_payload_retains_registered_design() {
+    let design = GuildTabardDesign {
+        icon: 1,
+        icon_color: 2,
+        border: 3,
+        border_color: 4,
+        background_color: 5,
+    };
+    let entry = shared::protocol::CharacterListEntry {
+        character_id: 7,
+        name: "Guildmaster".into(),
+        level: 80,
+        race: 1,
+        class: 2,
+        appearance: Default::default(),
+        equipment_appearance: Default::default(),
+        tabard: Some(design),
+    };
+    let bytes = bitcode::serialize(&entry).unwrap();
+    assert_eq!(
+        bitcode::deserialize::<shared::protocol::CharacterListEntry>(&bytes).unwrap(),
+        entry
+    );
+}
+
+#[test]
 fn guild_tabard_catalog_resolves_installed_colors_components_and_rejects_invalid_ids() {
     let root =
         std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/guild-tabards-70391");
