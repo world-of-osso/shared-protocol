@@ -15,8 +15,8 @@ use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
 use shared::ProtocolPlugin;
 use shared::protocol::{
-    ProtocolCheckTimeout, ProtocolRegistrationExt, ProtocolRejected, ProtocolVerified,
-    defer_lightyear_protocol_check,
+    PROTOCOL_SEMANTIC_EPOCH, ProtocolCheckTimeout, ProtocolRegistrationExt, ProtocolRejected,
+    ProtocolSemanticEpoch, ProtocolVerified, defer_lightyear_protocol_check,
 };
 
 const TICK: Duration = Duration::from_millis(10);
@@ -285,6 +285,21 @@ fn assert_rejected(outcome: Outcome, registry: &str) {
     assert_eq!(
         outcome.server_connections, 0,
         "server kept serving the client"
+    );
+}
+
+fn with_previous_semantics(app: &mut App) {
+    app.insert_resource(ProtocolSemanticEpoch(PROTOCOL_SEMANTIC_EPOCH - 1));
+}
+fn with_current_semantics(app: &mut App) {
+    app.insert_resource(ProtocolSemanticEpoch(PROTOCOL_SEMANTIC_EPOCH));
+}
+
+#[test]
+fn identical_layouts_with_different_semantic_epochs_are_rejected_at_connect() {
+    assert_rejected(
+        run_pair(with_current_semantics, with_previous_semantics),
+        "message layout",
     );
 }
 
