@@ -81,6 +81,21 @@ impl WmoCollision {
     /// World heights of the walkable faces crossed by the vertical segment at
     /// world `(x, z)` from `top_y` down to `bottom_y`.
     pub fn floor_heights(&self, x: f32, z: f32, top_y: f32, bottom_y: f32, out: &mut Vec<f32>) {
+        self.column_heights((x, z, top_y, bottom_y), out, true);
+    }
+
+    /// All collidable map surfaces, without the player walkable-slope filter.
+    pub fn collision_heights(&self, x: f32, z: f32, top_y: f32, bottom_y: f32, out: &mut Vec<f32>) {
+        self.column_heights((x, z, top_y, bottom_y), out, false);
+    }
+
+    fn column_heights(
+        &self,
+        column: (f32, f32, f32, f32),
+        out: &mut Vec<f32>,
+        walkable_only: bool,
+    ) {
+        let (x, z, top_y, bottom_y) = column;
         let column = Vec2::new(x, z);
         if column.cmplt(self.world_min).any() || column.cmpgt(self.world_max).any() {
             return;
@@ -92,7 +107,7 @@ impl WmoCollision {
             .local_from_world
             .transform_point3(Vec3::new(x, bottom_y, z));
         for group in &self.groups {
-            group.walkable_hits(top, bottom, &self.world_from_local, out);
+            group.height_hits((top, bottom), &self.world_from_local, out, walkable_only);
         }
     }
 }
@@ -104,11 +119,33 @@ pub fn ground_at<'a>(
     terrain: Option<f32>,
     wmos: impl IntoIterator<Item = &'a WmoCollision>,
 ) -> Option<Ground> {
+    ground_at_with_filter(feet, terrain, wmos, true)
+}
+
+/// Creature map height (TC Object.cpp:654-685), not player slope admission.
+pub fn collision_height<'a>(
+    feet: Vec3,
+    terrain: Option<f32>,
+    wmos: impl IntoIterator<Item = &'a WmoCollision>,
+) -> Option<Ground> {
+    ground_at_with_filter(feet, terrain, wmos, false)
+}
+
+fn ground_at_with_filter<'a>(
+    feet: Vec3,
+    terrain: Option<f32>,
+    wmos: impl IntoIterator<Item = &'a WmoCollision>,
+    walkable_only: bool,
+) -> Option<Ground> {
     let mut floors = Vec::new();
     let top = feet.y + STEP_UP_HEIGHT;
     let bottom = feet.y - FLOOR_SEARCH_DEPTH;
     for wmo in wmos {
-        wmo.floor_heights(feet.x, feet.z, top, bottom, &mut floors);
+        if walkable_only {
+            wmo.floor_heights(feet.x, feet.z, top, bottom, &mut floors);
+        } else {
+            wmo.collision_heights(feet.x, feet.z, top, bottom, &mut floors);
+        }
     }
     select_ground(feet.y, terrain, floors)
 }
