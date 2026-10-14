@@ -35,6 +35,11 @@ pub struct QuestEntrySnapshot {
     pub sort_id: i32,
     /// Objective summary (`LogDescription`).
     pub objectives_text: String,
+    /// Authoritative owned story text, available without talking to a giver this session.
+    pub description: String,
+    pub rewards: crate::protocol::QuestRewards,
+    /// Server quest sharing eligibility before the client's current group check.
+    pub pushable: bool,
     /// Tracker text once objectives are done (`QuestCompletionLog`).
     pub completion_text: String,
     /// Shown in the objective tracker.
