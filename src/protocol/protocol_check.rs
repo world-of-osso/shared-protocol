@@ -15,7 +15,21 @@ use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
 use tracing::{error, warn};
 
-use super::protocol_layout::{LocalLayouts, ProtocolRegistrationExt, finish_layouts};
+use super::protocol_layout::{LocalLayouts, ProtocolRegistrationExt, finish_layouts, fnv1a};
+
+/// Bump whenever an existing field changes meaning without changing serde shape.
+/// Epoch1 replaces compact guild-right masks with pinned TC GuildRankRights values.
+pub const PROTOCOL_SEMANTIC_EPOCH: u32 = 1;
+
+/// This build's semantic epoch. Defaults to the constant; tests supply a prior build's
+/// value to exercise the actual UDP handshake with identical registries/layouts.
+#[derive(Resource, Clone, Copy, Debug)]
+pub struct ProtocolSemanticEpoch(pub u32);
+impl Default for ProtocolSemanticEpoch {
+    fn default() -> Self {
+        Self(PROTOCOL_SEMANTIC_EPOCH)
+    }
+}
 
 /// Registry hashes of one build. `messages`, `channels` and `components` cover type names
 /// in registration order (`components` is replicon's hash of the replication rules and
@@ -73,6 +87,7 @@ pub(super) fn register_protocol_check(app: &mut App) {
     app.register_protocol_message::<ProtocolFingerprint>()
         .add_direction(NetworkDirection::Bidirectional);
     app.init_resource::<ProtocolCheckTimeout>();
+    app.init_resource::<ProtocolSemanticEpoch>();
     app.add_observer(reset_check);
     app.add_systems(PostUpdate, send_fingerprints.before(MessageSystems::Send));
     app.add_systems(
@@ -94,12 +109,15 @@ fn local_fingerprint(
     channels: &mut ChannelRegistry,
     components: ProtocolHash,
     layouts: LocalLayouts,
+    semantic_epoch: u32,
 ) -> ProtocolFingerprint {
     ProtocolFingerprint {
         messages: messages.finish(),
         channels: channels.finish(),
         components,
-        message_layouts: layouts.messages,
+        // Keep the fingerprint's wire shape stable so pre-epoch peers receive and
+        // reject the differing hash, rather than failing to decode the handshake.
+        message_layouts: fnv1a(layouts.messages, &semantic_epoch.to_le_bytes()),
         component_layouts: layouts.components,
     }
 }
@@ -126,6 +144,7 @@ fn send_fingerprints(
     mut channels: ResMut<ChannelRegistry>,
     components: Res<ProtocolHash>,
     layouts: Res<LocalLayouts>,
+    semantic_epoch: Res<ProtocolSemanticEpoch>,
     time: Res<Time<Real>>,
     mut commands: Commands,
 ) {
@@ -142,6 +161,7 @@ fn send_fingerprints(
             &mut channels,
             *components,
             *layouts,
+            semantic_epoch.0,
         ));
     }
 }
@@ -152,12 +172,19 @@ fn verify_fingerprints(
     mut channels: ResMut<ChannelRegistry>,
     components: Res<ProtocolHash>,
     layouts: Res<LocalLayouts>,
+    semantic_epoch: Res<ProtocolSemanticEpoch>,
     time: Res<Time<Real>>,
     mut commands: Commands,
 ) {
     for (entity, mut receiver) in &mut receivers {
         for remote in receiver.receive() {
-            let local = local_fingerprint(&mut messages, &mut channels, *components, *layouts);
+            let local = local_fingerprint(
+                &mut messages,
+                &mut channels,
+                *components,
+                *layouts,
+                semantic_epoch.0,
+            );
             match describe_mismatch(&local, &remote) {
                 None => {
                     commands.entity(entity).insert(ProtocolVerified);

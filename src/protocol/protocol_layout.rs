@@ -127,7 +127,7 @@ fn layout_hash<T: DeserializeOwned>() -> u64 {
 const FNV_OFFSET: u64 = 0xcbf2_9ce4_8422_2325;
 
 /// FNV-1a: fixed across Rust releases, unlike `DefaultHasher`.
-fn fnv1a(mut hash: u64, bytes: &[u8]) -> u64 {
+pub(super) fn fnv1a(mut hash: u64, bytes: &[u8]) -> u64 {
     for &byte in bytes {
         hash ^= u64::from(byte);
         hash = hash.wrapping_mul(0x0000_0100_0000_01b3);
