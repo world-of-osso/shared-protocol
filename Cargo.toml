@@ -33,3 +33,5 @@ layout_v2 = { package = "layout-fixture-v2", path = "tests/fixtures/layout-v2" }
 # Consumers that run the netcode server (game-server) patch to the same copy.
 [patch.crates-io]
 lightyear_netcode = { path = "vendor/lightyear_netcode" }
+# Client UDP receive-queue provisioning; see vendor/lightyear_udp/UPSTREAM.md.
+lightyear_udp = { path = "vendor/lightyear_udp" }

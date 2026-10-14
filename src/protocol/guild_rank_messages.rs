@@ -13,15 +13,30 @@ pub const GUILD_RIGHT_OFFICER_LISTEN: u32 = 1 << 2;
 pub const GUILD_RIGHT_OFFICER_SPEAK: u32 = 1 << 3;
 pub const GUILD_RIGHT_INVITE: u32 = 1 << 4;
 pub const GUILD_RIGHT_REMOVE: u32 = 1 << 5;
-pub const GUILD_RIGHT_PROMOTE: u32 = 1 << 6;
-pub const GUILD_RIGHT_DEMOTE: u32 = 1 << 7;
-pub const GUILD_RIGHT_EDIT_MOTD: u32 = 1 << 8;
-pub const GUILD_RIGHT_EDIT_INFO: u32 = 1 << 9;
-pub const GUILD_RIGHT_EDIT_OFFICER_NOTE: u32 = 1 << 10;
-pub const GUILD_RIGHT_VIEW_OFFICER_NOTE: u32 = 1 << 11;
-pub const GUILD_RIGHT_WITHDRAW_GOLD: u32 = 1 << 12;
-pub const GUILD_RIGHT_WITHDRAW_REPAIR: u32 = 1 << 13;
-pub const GUILD_RIGHT_ALL: u32 = (1 << 14) - 1;
+// TrinityCore a352b1fa, Guild.h GuildRankRights. Checkbox IDs are NOT bit offsets.
+pub const GUILD_RIGHT_PROMOTE: u32 = 0x0000_0080;
+pub const GUILD_RIGHT_DEMOTE: u32 = 0x0000_0100;
+pub const GUILD_RIGHT_EDIT_MOTD: u32 = 0x0000_1000;
+pub const GUILD_RIGHT_EDIT_INFO: u32 = 0x0001_0000;
+pub const GUILD_RIGHT_EDIT_OFFICER_NOTE: u32 = 0x0000_8000;
+pub const GUILD_RIGHT_VIEW_OFFICER_NOTE: u32 = 0x0000_4000;
+pub const GUILD_RIGHT_WITHDRAW_GOLD: u32 = 0x0008_0000;
+pub const GUILD_RIGHT_WITHDRAW_REPAIR: u32 = 0x0004_0000;
+/// Implemented rights only; TC GR_RIGHT_ALL also contains unsupported/unnamed bits.
+pub const GUILD_RIGHT_ALL: u32 = GUILD_RIGHT_CHAT_LISTEN
+    | GUILD_RIGHT_CHAT_SPEAK
+    | GUILD_RIGHT_OFFICER_LISTEN
+    | GUILD_RIGHT_OFFICER_SPEAK
+    | GUILD_RIGHT_INVITE
+    | GUILD_RIGHT_REMOVE
+    | GUILD_RIGHT_PROMOTE
+    | GUILD_RIGHT_DEMOTE
+    | GUILD_RIGHT_EDIT_MOTD
+    | GUILD_RIGHT_EDIT_INFO
+    | GUILD_RIGHT_EDIT_OFFICER_NOTE
+    | GUILD_RIGHT_VIEW_OFFICER_NOTE
+    | GUILD_RIGHT_WITHDRAW_GOLD
+    | GUILD_RIGHT_WITHDRAW_REPAIR;
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct GuildRankTab {

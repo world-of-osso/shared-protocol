@@ -85,8 +85,8 @@ pub use pet_messages::*;
 pub use pet_stable_messages::*;
 pub use profession_messages::*;
 pub use protocol_check::{
-    ProtocolCheckChannel, ProtocolCheckTimeout, ProtocolFingerprint, ProtocolRejected,
-    ProtocolVerified, defer_lightyear_protocol_check,
+    PROTOCOL_SEMANTIC_EPOCH, ProtocolCheckChannel, ProtocolCheckTimeout, ProtocolFingerprint,
+    ProtocolRejected, ProtocolSemanticEpoch, ProtocolVerified, defer_lightyear_protocol_check,
 };
 pub use protocol_layout::ProtocolRegistrationExt;
 pub use quest_messages::*;
