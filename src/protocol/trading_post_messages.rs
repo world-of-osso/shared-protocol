@@ -18,6 +18,10 @@ pub enum TradingPostRequest {
     },
     /// Traveler's Log: balance and thresholds only, no catalog rows.
     Balance,
+    /// C_PerksProgram.RequestCartCheckout: authored vendor IDs only, never client prices.
+    Checkout {
+        vendor_item_ids: Vec<u32>,
+    },
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
@@ -153,6 +157,9 @@ mod tests {
                 vendor_item_id: None,
             },
             TradingPostRequest::Balance,
+            TradingPostRequest::Checkout {
+                vendor_item_ids: vec![4, 473],
+            },
         ] {
             let bytes = serde_json::to_vec(&command).unwrap();
             assert_eq!(
