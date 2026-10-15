@@ -13,6 +13,8 @@ pub enum EmoteKind {
     Kneel,
     /// Retail TextEmote225; EmotesText EmoteID0 (no animation).
     Love,
+    /// The mounted special action, not a social text emote or a jump.
+    MountSpecial,
 }
 
 /// Chat message type.
