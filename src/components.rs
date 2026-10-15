@@ -385,6 +385,9 @@ impl Default for UnitScale {
     Default,
 )]
 pub struct Mounted {
+    /// Authored Mount.db2 identity; zero for NPC/taxi mounts without a Mount row.
+    /// Rider/special kits belong to this row, not to the potentially shared display.
+    pub mount_id: u32,
     /// Display ID of the mount.
     pub mount_display_id: u32,
     /// Vehicle DB2 ID, zero for a mount without passenger seats.
