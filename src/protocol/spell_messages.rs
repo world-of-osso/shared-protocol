@@ -143,6 +143,9 @@ pub enum CombatLogKind {
     /// `ENVIRONMENTAL_DAMAGE` (`SMSG_ENVIRONMENTAL_DAMAGE_LOG`): no source, no spell, the
     /// amount in `amount` and the overkill in `overflow`.
     Environmental(EnvironmentalKind),
+    /// `SPELL_SUMMON`: source is the summoner, target the newly created unit,
+    /// and spell_id the actual summoning spell. Not emitted for login restoration.
+    Summon,
 }
 
 /// CLEU `environmentalType` of an `Environmental` line (TrinityCore `EnviromentalDamage`).

@@ -1,6 +1,35 @@
 use super::*;
 
 #[test]
+fn combat_log_summon_preserves_summoner_unit_and_spell_on_wire() {
+    let kind = serde_json::from_str::<CombatLogKind>("\"Summon\"");
+    assert!(kind.is_ok(), "SPELL_SUMMON is unavailable: {kind:?}");
+    let event = CombatLogEvent {
+        source: Some(42),
+        target: Some(99),
+        spell_id: Some(228562),
+        school_mask: 1,
+        amount: 0,
+        overflow: 0,
+        absorbed: 0,
+        resisted: 0,
+        blocked: 0,
+        crit: false,
+        glancing: false,
+        periodic: false,
+        extra_spell_id: None,
+        timestamp_unix_ms: 1792050000123,
+        kind: kind.unwrap(),
+    };
+    assert_wire_round_trip(&event);
+    let encoded = serde_json::to_value(event).unwrap();
+    assert_eq!(encoded["kind"], "Summon");
+    assert_eq!(encoded["source"], 42);
+    assert_eq!(encoded["target"], 99);
+    assert_eq!(encoded["spell_id"], 228562);
+}
+
+#[test]
 fn cooldown_assist_effective_costs_preserve_numbers_and_unavailable_readings_on_wire() {
     assert_wire_round_trip(&SpellCostSnapshot {
         spells: vec![
@@ -256,6 +285,11 @@ fn cooldown_and_charges_round_trip() {
 
 #[test]
 fn cast_failed_round_trips_every_reason() {
+    assert_wire_round_trip(&CastFailed {
+        spell_id: 61810,
+        reason: CastFailReason::IncorrectArea,
+        detail: Some("Requires area group1103".into()),
+    });
     let reasons = [
         CastFailReason::NoTarget,
         CastFailReason::OutOfRange,
