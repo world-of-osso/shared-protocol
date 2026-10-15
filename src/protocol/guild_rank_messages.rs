@@ -7,6 +7,12 @@ use serde::{Deserialize, Serialize};
 
 pub const GUILD_MIN_RANKS: usize = 2;
 pub const GUILD_MAX_RANKS: usize = 10;
+/// Mainline GameDialogDefs.lua SET_GUILD_COMMUNITIY_NOTE maxLetters.
+pub const GUILD_MEMBER_NOTE_MAX_LETTERS: usize = 31;
+
+pub fn valid_guild_member_note(note: &str) -> bool {
+    note.chars().count() <= GUILD_MEMBER_NOTE_MAX_LETTERS && !note.chars().any(char::is_control)
+}
 pub const GUILD_RIGHT_CHAT_LISTEN: u32 = 1 << 0;
 pub const GUILD_RIGHT_CHAT_SPEAK: u32 = 1 << 1;
 pub const GUILD_RIGHT_OFFICER_LISTEN: u32 = 1 << 2;
@@ -144,7 +150,7 @@ impl GuildRankError {
     /// Retail GlobalStrings. The client displays the same refusal as the server.
     pub fn message(self) -> &'static str {
         match self {
-            Self::NoteTooLong => "Guild notes must be at most 31 characters.",
+            Self::NoteTooLong => "Guild notes must be a single line of at most 31 characters.",
             Self::LeaderCannotLeave => {
                 "You must promote a new Guild Master using /gleader before leaving the guild."
             } // ERR_GUILD_LEADER_LEAVE
@@ -175,6 +181,16 @@ mod tests {
     fn guild_lifecycle_wire_preserves_member_and_invitation() {
         for request in [
             GuildRankRequest::Leave,
+            GuildRankRequest::SetMemberNote {
+                character_name: "Cara".into(),
+                note: "Alchemy".into(),
+                officer: false,
+            },
+            GuildRankRequest::SetMemberNote {
+                character_name: "Cara".into(),
+                note: "Raid healer".into(),
+                officer: true,
+            },
             GuildRankRequest::RemoveMember {
                 character_name: "Cara".into(),
             },
