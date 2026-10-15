@@ -456,7 +456,8 @@ fn trait_and_specialization_messages_round_trip() {
     assert_wire_round_trip(&SetSpecialization { spec_id: 65 });
     assert_wire_round_trip(&TraitLoadoutsSnapshot {
         spec_id: 70,
-        selected_id: 2,
+        selected_id: STARTER_BUILD_LOADOUT_ID,
+        starter_available: true,
         configs: vec![TraitLoadoutInfo {
             id: 2,
             name: "Raid".into(),
