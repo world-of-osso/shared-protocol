@@ -14,6 +14,8 @@ Retail epic queue metadata and reinforcement rules in `src/battleground.rs`, sou
 - [x] Isle's seven source nodes preserve one-minute contest/defense, Quarry/Refinery45-second reinforcement ticks, source WorldStates and245/246 assault/defense columns. Boss deaths award the opposing team victory; live gate breach remains a separate runtime gap.
 - [x] Isle's six sourced gates begin closed. An authoritative gate-destruction event flips that gate's open/closed WorldStates and enables its keep banner, without changing reinforcements. Building damage and native siege reachability require separate server/live proof.
 
+- [ ] VehiclePassenger.driver may identify an authored NPC vehicle as well as a player-owned mount; seat_index and seat_id remain source Vehicle/VehicleSeat identities. Semantic epoch2 rejects old mount-only consumers. Demolisher source spellclick66245/aura236 boarding, lifetime, physical input and both-skin native proof require server/client gates before coordinated landing.
+
 ## How it works
 
 - [Battleground runtime and source ledger](../../../game-engine/docs/wiki/systems/battlegrounds.md)

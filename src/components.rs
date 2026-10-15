@@ -393,7 +393,7 @@ pub struct Mounted {
     pub seats: [Option<u64>; 8],
 }
 
-/// A player riding another player's mount; removed on exit or ejection.
+/// A player riding another player's mount or a source NPC vehicle; removed on exit or ejection.
 #[derive(
     Component,
     Reflect,
@@ -408,6 +408,7 @@ pub struct Mounted {
     Eq,
 )]
 pub struct VehiclePassenger {
+    /// Server entity bits of the mount owner or NPC vehicle, not a client-local entity.
     pub driver: u64,
     pub seat_index: u8,
     /// VehicleSeat DB2 row used for the attachment, offsets and passenger animation.
