@@ -15,6 +15,7 @@ pub mod game_object_handlers;
 pub mod ground;
 pub mod group;
 pub mod guild_creation;
+pub mod guild_tabards;
 pub mod holiday;
 pub mod instance;
 pub mod instance_lockout;

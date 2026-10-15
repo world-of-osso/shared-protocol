@@ -296,6 +296,8 @@ pub struct GuildMemberSnapshot {
 pub struct GuildSnapshot {
     pub guild_id: u32,
     pub guild_name: String,
+    /// Registered guild tabard design; legacy/unregistered guilds are None.
+    pub tabard: Option<crate::guild_creation::GuildTabardDesign>,
     /// Actual creation time, Unix seconds; legacy guilds with no recorded date stay None.
     pub created_at: Option<u64>,
     pub motd: String,

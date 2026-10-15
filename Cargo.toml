@@ -9,6 +9,8 @@ bevy = { version = "0.19", default-features = false }
 lightyear = { version = "0.28", features = ["replication"] }
 serde = { version = "1", features = ["derive"] }
 bitcode = "0.6"
+# Installed guild tabard CSVs are consumed by both server validation and native previews.
+csv = "1"
 # ProtocolHash (replication rule hash) for the connect-time protocol check.
 bevy_replicon = { version = "0.41", default-features = false }
 # Protocol check rejections; already in the tree via lightyear.
