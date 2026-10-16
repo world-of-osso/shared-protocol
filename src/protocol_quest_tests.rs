@@ -59,16 +59,21 @@ fn kobold_camp_cleanup(current: u32) -> QuestEntrySnapshot {
 }
 
 #[test]
-fn world_quest_availability_round_trip_preserves_window_area_and_authentic_rewards() {
+fn world_quest_availability_round_trip_preserves_window_areas_and_reward_payloads() {
+    // Numeric values exercise codec fields; they are not realm reward-authority fixtures.
     assert_wire_round_trip(&WorldQuestAvailability {
         server_time: 1000,
         quests: vec![AvailableWorldQuest {
             quest_id: 86948,
             title: "Twilight Bonds".into(),
-            map_id: 0,
             zone_id: 4922,
-            ui_map_id: 241,
-            position: QuestPoiPoint { x: -4995, y: -4653 },
+            pois: vec![WorldQuestPoi {
+                map_id: 0,
+                ui_map_id: 241,
+                x: -4655,
+                y: -4310,
+                z: 342,
+            }],
             expires_at: 87400,
             rewards: QuestRewards {
                 money: 125,
@@ -88,6 +93,39 @@ fn world_quest_availability_round_trip_preserves_window_area_and_authentic_rewar
     assert_wire_round_trip(&WorldQuestAvailability {
         server_time: 87400,
         quests: vec![],
+    });
+}
+
+#[test]
+fn world_quest_multi_floor_areas_round_trip_as_one_task() {
+    assert_wire_round_trip(&WorldQuestAvailability {
+        server_time: 1000,
+        quests: vec![AvailableWorldQuest {
+            quest_id: 82521,
+            title: "Pawns of Dark Masters".into(),
+            zone_id: 14752,
+            pois: vec![
+                WorldQuestPoi {
+                    map_id: 2601,
+                    ui_map_id: 2256,
+                    x: -2268,
+                    y: -1960,
+                    z: -1591,
+                },
+                WorldQuestPoi {
+                    map_id: 2601,
+                    ui_map_id: 2255,
+                    x: -2275,
+                    y: -1992,
+                    z: -1607,
+                },
+            ],
+            expires_at: 87400,
+            rewards: QuestRewards::default(),
+            xp: 0,
+            currencies: vec![],
+            reputation: vec![],
+        }],
     });
 }
 
