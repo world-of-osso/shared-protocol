@@ -16,6 +16,8 @@ Retail epic queue metadata and reinforcement rules in `src/battleground.rs`, sou
 
 - [ ] VehiclePassenger.driver may identify an authored NPC vehicle as well as a player-owned mount; seat_index and seat_id remain source Vehicle/VehicleSeat identities. Semantic epoch2 rejects old mount-only consumers. Demolisher source spellclick66245/aura236 boarding, lifetime, physical input and both-skin native proof require server/client gates before coordinated landing.
 
+- `VehicleDriverMovement` publishes source Vehicle Flags/TurnSpeed and template walk/run speeds only to the controlling rider; removal follows seat/aura release. Component registration changes the protocol fingerprint, so both consumers must be rebuilt together.
+
 ## How it works
 
 - [Battleground runtime and source ledger](../../../game-engine/docs/wiki/systems/battlegrounds.md)
