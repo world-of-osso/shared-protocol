@@ -72,7 +72,7 @@ fn read_guild_perks(
     for row in &rows {
         if row.name.is_empty() || row.icon_fdid == 0 {
             return Err(format!(
-                "GuildPerkSpells row{} requires installed metadata for spell{}",
+                "GuildPerkSpells row {} requires installed metadata for spell {}",
                 row.id, row.spell_id
             ));
         }
@@ -137,6 +137,6 @@ mod tests {
         let incomplete = MISC.replace("83958,413587\n", "");
         let error = read_guild_perks(PERKS.as_bytes(), NAMES.as_bytes(), incomplete.as_bytes())
             .unwrap_err();
-        assert!(error.contains("spell83958"), "{error}");
+        assert!(error.contains("83958"), "{error}");
     }
 }
