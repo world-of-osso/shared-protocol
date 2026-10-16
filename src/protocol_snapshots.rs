@@ -289,6 +289,9 @@ pub struct GuildMemberSnapshot {
     pub rank_name: String,
     pub is_online: bool,
     pub officer_note: String,
+    pub public_note: String,
+    /// Computed for each authenticated recipient, never supplied by a client.
+    pub is_self: bool,
     pub last_online: String,
 }
 

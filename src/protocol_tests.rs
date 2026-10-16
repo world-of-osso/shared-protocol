@@ -106,6 +106,8 @@ fn guild_invite_messages_round_trip() {
                 rank_name: "Member".into(),
                 is_online: true,
                 officer_note: "Reliable healer".into(),
+                public_note: "Alchemy".into(),
+                is_self: false,
                 last_online: "Online".into(),
             }],
         }),
