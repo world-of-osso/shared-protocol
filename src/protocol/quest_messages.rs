@@ -354,6 +354,16 @@ pub struct QuestPoiPoint {
     pub y: i32,
 }
 
+/// One task area's source-XYZ representative, preserving its world and UI maps.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct WorldQuestPoi {
+    pub map_id: u32,
+    pub ui_map_id: u32,
+    pub x: i32,
+    pub y: i32,
+    pub z: i32,
+}
+
 /// Realm-authoritative active task list, not static client POI availability.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Default)]
 pub struct WorldQuestAvailability {
@@ -371,10 +381,8 @@ pub struct WorldQuestNumericReward {
 pub struct AvailableWorldQuest {
     pub quest_id: u32,
     pub title: String,
-    pub map_id: u32,
     pub zone_id: u32,
-    pub ui_map_id: u32,
-    pub position: QuestPoiPoint,
+    pub pois: Vec<WorldQuestPoi>,
     pub expires_at: i64,
     pub rewards: QuestRewards,
     pub xp: u32,
