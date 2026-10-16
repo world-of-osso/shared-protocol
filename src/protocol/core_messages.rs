@@ -15,6 +15,8 @@ pub enum EmoteKind {
     Love,
     /// The mounted special action, not a social text emote or a jump.
     MountSpecial,
+    /// Retail TextEmote56; EmotesText EmoteID0 (no animation).
+    Hug,
 }
 
 /// Chat message type.
