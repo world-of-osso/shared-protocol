@@ -541,6 +541,9 @@ pub struct WarModeSnapshot {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct PvpSnapshot {
+    /// Total earned XP, independent of spendable1792. No certified level curve yet.
+    pub lifetime_honor_xp: u64,
+    pub honor_level: Option<u32>,
     pub honor: u32,
     pub honor_max: u32,
     pub conquest: u32,

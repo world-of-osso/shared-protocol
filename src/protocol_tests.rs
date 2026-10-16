@@ -460,6 +460,8 @@ fn rest_state_update_round_trip() {
 fn pvp_state_update_round_trip() {
     let update = PvpStateUpdate {
         snapshot: Some(PvpSnapshot {
+            lifetime_honor_xp: 47,
+            honor_level: None,
             honor: 750,
             honor_max: 15_000,
             conquest: 120,
