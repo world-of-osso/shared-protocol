@@ -128,6 +128,55 @@ pub enum GuildRankRequest {
     Demote {
         character_name: String,
     },
+    /// Authenticated actor's current guild only; replies with GuildEventLog.
+    QueryEventLog,
+}
+
+/// TrinityCore a352b1fa SharedDefines.h GUILD_EVENTLOG_MAX_RECORDS.
+pub const GUILD_EVENT_LOG_MAX_RECORDS: usize = 100;
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub enum GuildEventKind {
+    Invite {
+        actor: String,
+        member: String,
+    },
+    Join {
+        member: String,
+    },
+    Promote {
+        actor: String,
+        member: String,
+        rank: String,
+    },
+    Demote {
+        actor: String,
+        member: String,
+        rank: String,
+    },
+    Remove {
+        actor: String,
+        member: String,
+    },
+    Quit {
+        member: String,
+    },
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct GuildEvent {
+    /// Unix seconds at the real mutation, not query time.
+    pub timestamp: u64,
+    /// Names/rank are captured at event time, not reconstructed from today's roster.
+    pub kind: GuildEventKind,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct GuildEventLog {
+    /// Oldest to newest insertion order; Mainline GuildInfo.lua renders in reverse.
+    pub events: Vec<GuildEvent>,
+    pub server_time: u64,
+    pub error: Option<GuildRankError>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
@@ -171,6 +220,8 @@ pub(super) fn register_guild_rank_protocol(app: &mut App) {
     app.register_protocol_message::<GuildRankRequest>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<GuildRanksState>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<GuildEventLog>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 
