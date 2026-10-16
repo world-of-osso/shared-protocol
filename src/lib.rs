@@ -5,6 +5,7 @@ pub mod battleground;
 pub mod casting;
 pub mod class_spec;
 pub mod components;
+pub mod crafting_reagents;
 pub mod currency;
 pub mod death;
 pub mod dungeon_finder;
