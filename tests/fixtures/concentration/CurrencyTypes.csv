@@ -1,0 +1,4 @@
+ID,Name_lang,Description_lang,CategoryID,InventoryIconFileID,SpellWeight,SpellCategory,MaxQty,MaxEarnablePerWeek,Quality,FactionID,ItemGroupSoundsID,XpQuestDifficulty,AwardConditionID,MaxQtyWorldStateID,RechargingAmountPerCycle,RechargingCycleDurationMS,WarbondTransferPercentage,OrderIndex,RecraftReagentCountPercentage,OrderSource,MCRCurrencyID,Flags_0,Flags_1
+1792,Honor,Used to purchase Unrated PvP equipment.,2,1455894,0,0,15000,0,3,0,10,0,0,0,0,0,80,0,0,0,0,2,0
+3041,Tailoring Concentration,,142,5747318,0,0,1000,0,0,0,0,0,0,0,1,345600,0,0,0,0,0,1572864,0
+3049,Leatherworking Concentration,,142,5747318,0,0,1000,0,0,0,0,0,0,0,1,345600,0,0,0,0,0,1572864,0
