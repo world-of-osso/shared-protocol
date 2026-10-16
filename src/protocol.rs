@@ -166,6 +166,8 @@ fn register_replicated_components(app: &mut App) {
     app.protocol_component::<Mounted>().replicate();
     app.protocol_component::<crate::components::VehiclePassenger>()
         .replicate();
+    app.protocol_component::<crate::components::VehicleDriverMovement>()
+        .replicate();
     app.protocol_component::<crate::components::TransportState>()
         .replicate();
     app.protocol_component::<crate::components::TransportPassenger>()

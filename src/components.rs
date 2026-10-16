@@ -418,6 +418,27 @@ pub struct VehiclePassenger {
     pub seat_id: u32,
 }
 
+/// Authored movement capabilities of the NPC controlled by this seated player.
+/// Present only while the controlling vehicle aura owns the seat.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+)]
+pub struct VehicleDriverMovement {
+    pub flags: u32,
+    pub turn_speed: f32,
+    pub walk_speed: f32,
+    pub run_speed: f32,
+}
+
 /// A source map-object transport's route and authoritative progress, in WoW coordinates.
 #[derive(
     Component,
