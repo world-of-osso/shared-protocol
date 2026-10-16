@@ -1,5 +1,21 @@
 //! Retail profession specialization and fixed-output crafting order operations.
-//! Numeric quality/concentration evaluation is deliberately not part of this contract.
+//! Unsupported outcome evaluation returns a named gap, never a default tier.
+
+/// Non-consuming authoritative validation of a quality-reagent allocation.
+#[derive(serde::Serialize, serde::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct CraftingOperationRequest {
+    pub spell_id: u32,
+    pub allocations: Vec<crate::crafting_reagents::ReagentAllocation>,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct CraftingOperationStateUpdate {
+    pub spell_id: u32,
+    pub allocations: Vec<crate::crafting_reagents::ReagentAllocation>,
+    pub validation_error: Option<String>,
+    /// This is an unavailable outcome, not a claim of lowest quality.
+    pub quality: Result<u32, crate::profession::CraftingOperationGap>,
+}
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]

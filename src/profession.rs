@@ -7,6 +7,31 @@
 
 use serde::{Deserialize, Serialize};
 
+/// An unavailable authored operation is not a lowest-quality craft.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum CraftingOperationGap {
+    /// The permitted sources describe inputs, not their operation composition.
+    CraftingOperationComposition,
+}
+
+impl std::fmt::Display for CraftingOperationGap {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::CraftingOperationComposition => f.write_str(
+                "CRAFTING_OPERATION_COMPOSITION: authored quality/concentration/recraft operation evaluator unavailable",
+            ),
+        }
+    }
+}
+
+/// Return a CraftingQuality ID only when an authoritative operation can assign it.
+/// TC a352b1fa SpellEffects.cpp maps CRAFT_ITEM288 and RECRAFT_ITEM297 to EffectNULL;
+/// Retail SchematicForm.lua282-286 delegates calculation to the native client API.
+/// No permitted source currently defines that composition. Never return a default tier.
+pub fn evaluate_crafted_quality() -> Result<u32, CraftingOperationGap> {
+    Err(CraftingOperationGap::CraftingOperationComposition)
+}
+
 /// Primary professions a character may know (TrinityCore `MaxPrimaryTradeSkill`).
 pub const MAX_PRIMARY_PROFESSIONS: usize = 2;
 
