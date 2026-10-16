@@ -354,12 +354,14 @@ pub struct QuestPoiPoint {
     pub y: i32,
 }
 
-/// One authored task area's representative point, preserving its world and UI maps.
+/// One task area's source-XYZ representative, preserving its world and UI maps.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct WorldQuestPoi {
     pub map_id: u32,
     pub ui_map_id: u32,
-    pub position: QuestPoiPoint,
+    pub x: i32,
+    pub y: i32,
+    pub z: i32,
 }
 
 /// Realm-authoritative active task list, not static client POI availability.

@@ -59,7 +59,8 @@ fn kobold_camp_cleanup(current: u32) -> QuestEntrySnapshot {
 }
 
 #[test]
-fn world_quest_availability_round_trip_preserves_window_area_and_authentic_rewards() {
+fn world_quest_availability_round_trip_preserves_window_areas_and_reward_payloads() {
+    // Numeric values exercise codec fields; they are not realm reward-authority fixtures.
     assert_wire_round_trip(&WorldQuestAvailability {
         server_time: 1000,
         quests: vec![AvailableWorldQuest {
@@ -69,7 +70,9 @@ fn world_quest_availability_round_trip_preserves_window_area_and_authentic_rewar
             pois: vec![WorldQuestPoi {
                 map_id: 0,
                 ui_map_id: 241,
-                position: QuestPoiPoint { x: -4995, y: -4653 },
+                x: -4655,
+                y: -4310,
+                z: 342,
             }],
             expires_at: 87400,
             rewards: QuestRewards {
@@ -105,12 +108,16 @@ fn world_quest_multi_floor_areas_round_trip_as_one_task() {
                 WorldQuestPoi {
                     map_id: 2601,
                     ui_map_id: 2256,
-                    position: QuestPoiPoint { x: -2268, y: -1960 },
+                    x: -2268,
+                    y: -1960,
+                    z: -1591,
                 },
                 WorldQuestPoi {
                     map_id: 2601,
                     ui_map_id: 2255,
-                    position: QuestPoiPoint { x: -2275, y: -1992 },
+                    x: -2275,
+                    y: -1992,
+                    z: -1607,
                 },
             ],
             expires_at: 87400,
