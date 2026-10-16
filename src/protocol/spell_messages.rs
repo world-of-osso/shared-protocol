@@ -257,11 +257,15 @@ pub struct TraitLoadoutInfo {
     pub name: String,
 }
 
+/// Built-in Starter Build selection, outside the monotonically allocated saved IDs.
+pub const STARTER_BUILD_LOADOUT_ID: u32 = u32::MAX;
+
 /// Authoritative per-spec loadout list; ID zero denotes Default Loadout.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct TraitLoadoutsSnapshot {
     pub spec_id: u32,
     pub selected_id: u32,
+    pub starter_available: bool,
     pub configs: Vec<TraitLoadoutInfo>,
 }
 
