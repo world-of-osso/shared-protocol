@@ -19,7 +19,8 @@ use super::protocol_layout::{LocalLayouts, ProtocolRegistrationExt, finish_layou
 
 /// Bump whenever an existing field changes meaning without changing serde shape.
 /// Epoch1 replaces compact guild-right masks with pinned TC GuildRankRights values.
-pub const PROTOCOL_SEMANTIC_EPOCH: u32 = 1;
+/// Epoch2 lets VehiclePassenger.driver identify a source NPC vehicle as well as a mount owner.
+pub const PROTOCOL_SEMANTIC_EPOCH: u32 = 2;
 
 /// This build's semantic epoch. Defaults to the constant; tests supply a prior build's
 /// value to exercise the actual UDP handshake with identical registries/layouts.
