@@ -312,6 +312,8 @@ pub struct UnitFlags2(pub u32);
 
 impl UnitFlags2 {
     pub const FEIGN_DEATH: u32 = 0x0000_0001;
+    /// TC UnitDefines.h: movement forced forward by aura241.
+    pub const FORCE_MOVEMENT: u32 = 0x0000_0040;
 }
 
 /// TC `UnitData::Flags3`; FAKE_DEAD displays death without killing the unit.
