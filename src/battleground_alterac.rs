@@ -268,7 +268,9 @@ impl AlteracBattle {
                 .iter()
                 .zip(NODES)
                 .filter(|(node, spec)| {
-                    spec.tower && node.owner == Some(team) && !node.contested && !node.destroyed
+                    let owned_tower = spec.tower && node.owner == Some(team);
+                    let unavailable = node.contested || node.destroyed;
+                    owned_tower && !unavailable
                 })
                 .count() as u32;
             towers + u32::from(self.captains_alive[team_index(team)])
