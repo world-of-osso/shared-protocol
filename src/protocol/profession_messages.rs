@@ -1,6 +1,19 @@
 //! Retail profession specialization and fixed-output crafting order operations.
 //! Unsupported outcome evaluation returns a named gap, never a default tier.
 
+/// Read-only concentration currency query; never initializes a wallet or recharge clock.
+#[derive(serde::Serialize, serde::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ProfessionConcentrationRequest {
+    pub skill_line: u32,
+}
+
+#[derive(serde::Serialize, serde::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ProfessionConcentrationUpdate {
+    pub skill_line: u32,
+    pub snapshot: Option<crate::concentration::ConcentrationSnapshot>,
+    pub error: Option<String>,
+}
+
 /// Non-consuming authoritative validation of a quality-reagent allocation.
 #[derive(serde::Serialize, serde::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct CraftingOperationRequest {
