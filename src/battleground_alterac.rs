@@ -260,6 +260,21 @@ impl AlteracBattle {
         self.nodes.get(node)?.banner(*NODES.get(node)?)
     }
 
+    /// TC OnEnd: controlled towers and living captains, each worth two equivalents.
+    pub fn surviving_honor_units(&self) -> [u32; 2] {
+        [BgTeam::A, BgTeam::B].map(|team| {
+            let towers = self
+                .nodes
+                .iter()
+                .zip(NODES)
+                .filter(|(node, spec)| {
+                    spec.tower && node.owner == Some(team) && !node.contested && !node.destroyed
+                })
+                .count() as u32;
+            towers + u32::from(self.captains_alive[team_index(team)])
+        })
+    }
+
     /// Completed tower destructions attributed to each assaulting team (A/B).
     pub fn destroyed_towers(&self) -> [u32; 2] {
         [BgTeam::A, BgTeam::B].map(|team| {
