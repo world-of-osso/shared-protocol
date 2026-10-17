@@ -257,6 +257,7 @@ mod tests {
             guild_id: 7,
             guild_name: "Bank Testers".into(),
             inviter_name: "Alice".into(),
+            tabard: None,
         };
         let bytes = bincode::serde::encode_to_vec(&invite, bincode::config::standard()).unwrap();
         let (decoded, used): (crate::protocol::GuildInvitation, _) =
