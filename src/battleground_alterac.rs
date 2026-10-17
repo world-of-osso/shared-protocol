@@ -260,6 +260,16 @@ impl AlteracBattle {
         self.nodes.get(node)?.banner(*NODES.get(node)?)
     }
 
+    /// Completed tower destructions attributed to each assaulting team (A/B).
+    pub fn destroyed_towers(&self) -> [u32; 2] {
+        [BgTeam::A, BgTeam::B].map(|team| {
+            self.nodes
+                .iter()
+                .filter(|node| node.destroyed && node.owner == Some(team))
+                .count() as u32
+        })
+    }
+
     pub fn advance(&mut self, delta_ms: u64, instance: &mut BgInstance) {
         if instance.bg_id != 1 || instance.phase != BgPhase::InProgress {
             return;
