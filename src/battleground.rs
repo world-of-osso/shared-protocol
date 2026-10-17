@@ -536,6 +536,65 @@ impl BgQueue {
         })
     }
 
+    /// Requested queues in first-entry order, for event-driven matchmaking updates.
+    pub fn queued_ids(&self) -> Vec<u32> {
+        let mut seen = std::collections::BTreeSet::new();
+        self.entries
+            .iter()
+            .filter(|entry| seen.insert(entry.bg_id))
+            .map(|entry| entry.bg_id)
+            .collect()
+    }
+
+    /// Fill only whole groups fitting the smaller team of an existing concrete copy.
+    /// BG_BACKFILL_WHOLE_PARTY_SMALLER_TEAM: no TC one-player-at-parity limiter.
+    pub fn fill_existing(
+        &mut self,
+        queue_id: u32,
+        instance: &mut BgInstance,
+        template: &BgTemplate,
+    ) -> Vec<u64> {
+        if instance.phase == BgPhase::Ended {
+            return Vec::new();
+        }
+        let candidates = self.existing_copy_candidates(queue_id, template, instance.bracket);
+        let (team_a, team_b, used) = fill_teams(
+            &self.entries,
+            &candidates,
+            usize::from(template.team_size),
+            instance.team_a_players.clone(),
+            instance.team_b_players.clone(),
+        );
+        let invited = used
+            .iter()
+            .flat_map(|&index| self.entries[index].members.iter().copied())
+            .collect();
+        remove_indices(&mut self.entries, &used);
+        instance.team_a_players = team_a;
+        instance.team_b_players = team_b;
+        invited
+    }
+
+    fn existing_copy_candidates(
+        &self,
+        queue_id: u32,
+        template: &BgTemplate,
+        bracket: LevelBracket,
+    ) -> Vec<usize> {
+        self.entries
+            .iter()
+            .enumerate()
+            .filter(|(_, entry)| {
+                entry.bg_id == queue_id
+                    && entry.levels.iter().all(|&level| {
+                        template.bracket.contains(level)
+                            && source_level_bracket(template.map_id, level) == Some(bracket)
+                    })
+            })
+            .map(|(index, _)| index)
+            .collect()
+    }
+
     /// Number of entries in the queue.
     pub fn len(&self) -> usize {
         self.entries.len()
@@ -582,6 +641,8 @@ impl BgQueue {
             &self.entries,
             &candidate_indices,
             usize::from(rules.capacity),
+            Vec::new(),
+            Vec::new(),
         );
         if team_a.len() < min || team_b.len() < min {
             return None;
@@ -616,22 +677,20 @@ fn fill_teams(
     entries: &[BgQueueEntry],
     candidates: &[usize],
     target: usize,
+    mut team_a: Vec<u64>,
+    mut team_b: Vec<u64>,
 ) -> (Vec<u64>, Vec<u64>, Vec<usize>) {
-    let mut team_a = Vec::new();
-    let mut team_b = Vec::new();
     let mut used = Vec::new();
 
     for &idx in candidates {
         let members = &entries[idx].members;
-        let can_fit_a = team_a.len() + members.len() <= target;
-        let can_fit_b = team_b.len() + members.len() <= target;
-        let assign_to_a = can_fit_a && (team_a.len() <= team_b.len() || !can_fit_b);
-
-        if assign_to_a {
-            team_a.extend(members);
-            used.push(idx);
-        } else if can_fit_b {
-            team_b.extend(members);
+        let smaller = if team_a.len() <= team_b.len() {
+            &mut team_a
+        } else {
+            &mut team_b
+        };
+        if smaller.len() + members.len() <= target {
+            smaller.extend(members);
             used.push(idx);
         }
         if team_a.len() >= target && team_b.len() >= target {

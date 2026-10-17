@@ -10,6 +10,10 @@ Random Battleground32 is a multi-map queue, not a concrete `BgTemplate`. Admissi
 
 `RANDOM_BG_LEVEL_ELIGIBLE_MAPS` is explicit project policy based on Retail level-banded Random BG behavior, not a TC port: the server chooses a configured map whose own bracket contains all queued levels and stores that level-matching bracket on the concrete instance. It never copies parent RangeIndex across maps. Parent matchmaking preserves original32 separately from the chosen concrete ID. Existing map payouts/start criteria stay unchanged. `RANDOM_BG_WIN_REWARD_PROFILE` remains unresolved: TC's27000/13500/4500/3500 kill-equivalent profile and06:00 server-local reset are not adopted; no new rewards/daily state.
 
+## Fill existing copies
+
+`BG_BACKFILL_WHOLE_PARTY_SMALLER_TEAM` is explicit project policy: a whole queued party joins the smaller existing team only if it fits that team's remaining concrete-map capacity. Never split a party; skip a nonfit while allowing a later smaller fitting group. Actual queued levels must match the concrete instance's own source bracket. Existing phase/score/clock are retained; Ended copies are excluded. The server applies `BG_BACKFILL_MATCH_ORDER` (ascending existing match IDs), preserves each member's original requested queue and counts outstanding/offline reservations before new instance creation. These replace TC's faction/parity and push-front choices, not map eligibility or reward rules.
+
 ## Source
 
 Bundled `scripts/reference/pvp-12.1.5.70391/PVPDifficulty.csv` is FDID1339820, layout583BCBE4,354 rows,0 unreadable. Receipt alongside it records raw/schema/CSV SHA256. The local installation advanced to70448 before extraction; the extracted table's content key0554bd932ab15021af8cd9f5eecef070 exactly matches the authenticated cached70391 root25c68dd1c7597cccd94252085c3367ed. It is therefore the pinned70391 content, not an inferred newer-build replacement. CSV SHA256:878ee3b2a6a98ce3e5c916e6aeb30b92d0d0ecaae19ad474093e01751edeb773.
