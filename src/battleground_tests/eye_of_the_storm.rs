@@ -17,6 +17,7 @@ fn started() -> (BgTemplate, BgInstance, EyeBattle) {
     let mut instance = BgInstance::from_match(
         &BgMatch {
             bg_id: 7,
+            bracket: template.bracket,
             team_a: vec![1, 3],
             team_b: vec![2],
         },

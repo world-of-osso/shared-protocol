@@ -4,6 +4,7 @@ fn wsg_instance() -> (BgInstance, BgTemplate) {
     let tmpl = warsong_gulch();
     let bg_match = BgMatch {
         bg_id: tmpl.id,
+        bracket: tmpl.bracket,
         team_a: vec![1, 2, 3, 4, 5],
         team_b: vec![6, 7, 8, 9, 10],
     };

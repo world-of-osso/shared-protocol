@@ -1,5 +1,9 @@
 use serde::{Deserialize, Serialize};
 
+#[path = "battleground_brackets.rs"]
+mod brackets;
+pub use brackets::source_level_bracket;
+
 /// Type of PvP objective for a battleground.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum BgObjective {
@@ -341,6 +345,8 @@ pub struct BgQueueEntry {
     pub members: Vec<u64>,
     /// Level of each member (index matches `members`).
     pub levels: Vec<u8>,
+    /// Shared authored PVPDifficulty range of every member.
+    pub bracket: LevelBracket,
     /// Battleground type ID.
     pub bg_id: u32,
     /// Server timestamp when queued.
@@ -370,6 +376,7 @@ pub enum BgQueueError {
 #[derive(Debug, Clone, PartialEq)]
 pub struct BgMatch {
     pub bg_id: u32,
+    pub bracket: LevelBracket,
     pub team_a: Vec<u64>,
     pub team_b: Vec<u64>,
 }
@@ -429,7 +436,13 @@ impl BgQueue {
         let Some(tmpl) = template_by_id(bg_id) else {
             return Err(BgQueueError::UnknownBg);
         };
-        if !levels.iter().all(|&lvl| tmpl.bracket.contains(lvl)) {
+        let bracket =
+            source_level_bracket(tmpl.map_id, levels[0]).ok_or(BgQueueError::OutOfBracket)?;
+        let same_bracket = levels.iter().all(|&level| {
+            tmpl.bracket.contains(level)
+                && source_level_bracket(tmpl.map_id, level) == Some(bracket)
+        });
+        if !same_bracket {
             return Err(BgQueueError::OutOfBracket);
         }
         if has_duplicate_members(&members) {
@@ -442,6 +455,7 @@ impl BgQueue {
             leader,
             members,
             levels,
+            bracket,
             bg_id,
             queued_at: now,
         });
@@ -476,8 +490,23 @@ impl BgQueue {
     /// team sizes. Returns `None` if not enough players.
     pub fn try_match(&mut self, bg_id: u32) -> Option<BgMatch> {
         let tmpl = template_by_id(bg_id)?;
-        let candidate_indices = self.candidates_for(bg_id);
+        let mut seen = std::collections::HashSet::new();
+        let brackets: Vec<_> = self
+            .entries
+            .iter()
+            .filter(|entry| entry.bg_id == bg_id && seen.insert(entry.bracket))
+            .map(|entry| entry.bracket)
+            .collect();
+        for bracket in brackets {
+            if let Some(matched) = self.try_match_bracket(&tmpl, bracket) {
+                return Some(matched);
+            }
+        }
+        None
+    }
 
+    fn try_match_bracket(&mut self, tmpl: &BgTemplate, bracket: LevelBracket) -> Option<BgMatch> {
+        let candidate_indices = self.candidates_for(tmpl.id, bracket);
         let total_players: usize = candidate_indices
             .iter()
             .map(|&i| self.entries[i].members.len())
@@ -495,17 +524,18 @@ impl BgQueue {
 
         remove_indices(&mut self.entries, &used);
         Some(BgMatch {
-            bg_id,
+            bg_id: tmpl.id,
+            bracket,
             team_a,
             team_b,
         })
     }
 
-    fn candidates_for(&self, bg_id: u32) -> Vec<usize> {
+    fn candidates_for(&self, bg_id: u32, bracket: LevelBracket) -> Vec<usize> {
         self.entries
             .iter()
             .enumerate()
-            .filter(|(_, e)| e.bg_id == bg_id)
+            .filter(|(_, e)| e.bg_id == bg_id && e.bracket == bracket)
             .map(|(i, _)| i)
             .collect()
     }
@@ -594,6 +624,7 @@ pub struct TeamScore {
 #[derive(Debug, Clone, PartialEq)]
 pub struct BgInstance {
     pub bg_id: u32,
+    pub bracket: LevelBracket,
     pub phase: BgPhase,
     pub team_a_players: Vec<u64>,
     pub team_b_players: Vec<u64>,
@@ -608,6 +639,7 @@ impl BgInstance {
     pub fn from_match(bg_match: &BgMatch, tmpl: &BgTemplate) -> Self {
         Self {
             bg_id: bg_match.bg_id,
+            bracket: bg_match.bracket,
             phase: BgPhase::Waiting,
             team_a_players: bg_match.team_a.clone(),
             team_b_players: bg_match.team_b.clone(),

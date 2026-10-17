@@ -55,6 +55,7 @@ fn reinforcement_depletion_ends_match() {
     let tmpl = alterac_valley();
     let bg_match = BgMatch {
         bg_id: tmpl.id,
+        bracket: tmpl.bracket,
         team_a: vec![1],
         team_b: vec![2],
     };
@@ -76,6 +77,7 @@ fn reinforcement_saturates_at_zero() {
     let tmpl = alterac_valley();
     let bg_match = BgMatch {
         bg_id: tmpl.id,
+        bracket: tmpl.bracket,
         team_a: vec![1],
         team_b: vec![2],
     };
@@ -263,6 +265,7 @@ fn node_tick_resources_adds_score() {
     let tmpl = arathi_basin();
     let bg_match = BgMatch {
         bg_id: 2,
+        bracket: tmpl.bracket,
         team_a: vec![1],
         team_b: vec![2],
     };
@@ -285,6 +288,7 @@ fn node_five_nodes_gives_sixty_per_two_second_tick() {
     let tmpl = arathi_basin();
     let bg_match = BgMatch {
         bg_id: 2,
+        bracket: tmpl.bracket,
         team_a: vec![1],
         team_b: vec![2],
     };
@@ -311,6 +315,7 @@ fn kill_deducts_reinforcements() {
     let tmpl = alterac_valley();
     let bg_match = BgMatch {
         bg_id: tmpl.id,
+        bracket: tmpl.bracket,
         team_a: vec![1],
         team_b: vec![2],
     };
@@ -329,6 +334,7 @@ fn kills_deplete_reinforcements_to_zero() {
     let tmpl = alterac_valley();
     let bg_match = BgMatch {
         bg_id: tmpl.id,
+        bracket: tmpl.bracket,
         team_a: vec![1],
         team_b: vec![2],
     };
