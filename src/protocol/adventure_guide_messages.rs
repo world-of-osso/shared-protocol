@@ -89,10 +89,18 @@ pub struct AdventureGuideSnapshot {
     pub source_error: Option<String>,
 }
 
+/// Clock-only update after an initial full Guide, ordered on `InstanceChannel`.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct AdventureGuideClock {
+    pub now_unix: i64,
+}
+
 pub(super) fn register(app: &mut App) {
     app.register_protocol_message::<AdventureGuideRequest>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<AdventureGuideSnapshot>()
+        .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<AdventureGuideClock>()
         .add_direction(NetworkDirection::ServerToClient);
 }
 

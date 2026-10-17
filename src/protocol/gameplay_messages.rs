@@ -437,6 +437,15 @@ pub struct AchievementStateUpdate {
     pub error: Option<String>,
 }
 
+/// Changes since this connection's last full achievement snapshot or delta.
+/// `earned_ids: Some` replaces the earned set, including removals; `None` keeps it.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct AchievementDelta {
+    pub earned_ids: Option<Vec<u32>>,
+    pub progress_upserts: Vec<super::AchievementProgressSnapshot>,
+    pub removed_progress_ids: Vec<u32>,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct WorldMapStateUpdate {
     pub snapshot: Option<WorldMapSnapshot>,
