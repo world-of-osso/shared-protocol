@@ -296,6 +296,8 @@ fn register_achievement_messages(app: &mut App) {
         .add_direction(NetworkDirection::ServerToClient);
     app.register_protocol_message::<AchievementStateUpdate>()
         .add_direction(NetworkDirection::ServerToClient);
+    app.register_protocol_message::<AchievementDelta>()
+        .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_world_map_messages(app: &mut App) {
