@@ -139,9 +139,10 @@ impl CurrencyWallet {
 
         let entry = self.entry_mut(id);
         let mut actual = amount;
+        let has_weekly_cap = def.weekly_cap > 0;
 
         // Clamp to weekly cap first.
-        if def.weekly_cap > 0 {
+        if has_weekly_cap {
             let remaining_weekly = def.weekly_cap.saturating_sub(entry.week_earned);
             actual = actual.min(remaining_weekly);
         }
@@ -153,7 +154,9 @@ impl CurrencyWallet {
         }
 
         entry.amount += actual;
-        entry.week_earned += actual;
+        if has_weekly_cap {
+            entry.week_earned += actual;
+        }
         Ok(actual)
     }
 
@@ -226,6 +229,20 @@ mod tests {
         assert_eq!(conquest.weekly_cap, 0);
         assert!(currency_by_id(1).is_none());
         assert!(currency_by_id(2).is_none());
+    }
+
+    #[test]
+    fn pvp_wallet_does_not_track_an_unsourced_weekly_allowance() {
+        // TC Player::ModifyCurrency tracks WeeklyQuantity only when weeklyCap != 0.
+        // Fixture quantities exercise arithmetic; they are not match payout policy.
+        let mut wallet = CurrencyWallet::default();
+        for (definition, amount) in [(honor(), 150), (conquest(), 500)] {
+            assert_eq!(definition.weekly_cap, 0);
+            assert_eq!(wallet.add(definition.id, amount, definition), Ok(amount));
+            assert_eq!(wallet.add(definition.id, amount, definition), Ok(amount));
+            assert_eq!(wallet.get(definition.id), amount * 2);
+            assert_eq!(wallet.week_earned(definition.id), 0);
+        }
     }
 
     #[test]
@@ -341,11 +358,11 @@ mod tests {
     #[test]
     fn reset_weekly() {
         let mut wallet = CurrencyWallet::default();
-        wallet.add(CONQUEST_CURRENCY_ID, 400, conquest()).unwrap();
-        assert_eq!(wallet.week_earned(CONQUEST_CURRENCY_ID), 400);
+        wallet.add(4, 400, valor()).unwrap();
+        assert_eq!(wallet.week_earned(4), 400);
         wallet.reset_weekly();
-        assert_eq!(wallet.week_earned(CONQUEST_CURRENCY_ID), 0);
-        assert_eq!(wallet.get(CONQUEST_CURRENCY_ID), 400); // amount preserved
+        assert_eq!(wallet.week_earned(4), 0);
+        assert_eq!(wallet.get(4), 400); // amount preserved
     }
 
     #[test]
