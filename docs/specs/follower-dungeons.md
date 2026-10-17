@@ -4,4 +4,5 @@
 - `FollowerDungeons` carries each entry's authored LFG ID, name and map ID. Only entries with prepared population and an authored entrance are published. An empty catalog is valid and must not create synthetic choices.
 - Catalog membership is not admission. Existing `QueueForLfg` carries the selected role and dungeon ID; `LfgStateUpdate` remains authoritative for acceptance/refusal and the companion match roster.
 - No skin-specific protocol or persisted NPC characters.
+- Attack admission distinguishes native PC immunity0x100 (players/player-controlled units) from NPC immunity0x200 (non-player-controlled units). Both bits together reject both attacker kinds without changing serialized `UnitFlags`.
 - Shared ground helpers distinguish player walkable-floor sampling from creature collision-height sampling. Creatures/followers use authored collidable WMO heights without the player slope filter (TC a352b1fa Object.cpp:709–746/3131–3136 and Map.h:329); players retain the existing slope admission. Surface selection stays in the shared step/search column. No geometry, coordinates or wire fields are synthesized.

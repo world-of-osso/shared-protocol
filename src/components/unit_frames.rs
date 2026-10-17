@@ -267,6 +267,8 @@ impl UnitFlags {
     pub const NON_ATTACKABLE: u32 = 0x0000_0002;
     /// TC UNIT_FLAG_IMMUNE_TO_PC: players and player-controlled units cannot attack.
     pub const IMMUNE_TO_PC: u32 = 0x0000_0100;
+    /// TC UNIT_FLAG_IMMUNE_TO_NPC: non-player-controlled units cannot attack.
+    pub const IMMUNE_TO_NPC: u32 = 0x0000_0200;
     /// `UNIT_FLAG_NOT_SELECTABLE`: no nameplate, and the unit cannot be targeted or clicked.
     pub const NOT_SELECTABLE: u32 = 0x0200_0000;
     /// `UNIT_FLAG_NON_ATTACKABLE_2` (`SPELL_AURA_MOD_UNATTACKABLE`): the unit cannot be
@@ -287,9 +289,12 @@ impl UnitFlags {
     }
 
     pub fn can_be_attacked_by(self, player_controlled: bool) -> bool {
-        self.is_selectable()
-            && self.is_attackable()
-            && (!player_controlled || self.0 & Self::IMMUNE_TO_PC == 0)
+        let immunity = if player_controlled {
+            Self::IMMUNE_TO_PC
+        } else {
+            Self::IMMUNE_TO_NPC
+        };
+        self.is_selectable() && self.is_attackable() && self.0 & immunity == 0
     }
 }
 
@@ -353,6 +358,11 @@ mod unit_flag_attack_tests {
         }
         assert!(!UnitFlags(UnitFlags::IMMUNE_TO_PC).can_be_attacked_by(true));
         assert!(UnitFlags(UnitFlags::IMMUNE_TO_PC).can_be_attacked_by(false));
+        assert!(!UnitFlags(UnitFlags::IMMUNE_TO_NPC).can_be_attacked_by(false));
+        assert!(UnitFlags(UnitFlags::IMMUNE_TO_NPC).can_be_attacked_by(true));
+        let all = UnitFlags(UnitFlags::IMMUNE_TO_PC | UnitFlags::IMMUNE_TO_NPC);
+        assert!(!all.can_be_attacked_by(true));
+        assert!(!all.can_be_attacked_by(false));
         assert!(UnitFlags(0).can_be_attacked_by(true));
         assert!(UnitFlags(0).can_be_attacked_by(false));
     }
