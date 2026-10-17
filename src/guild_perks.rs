@@ -1,4 +1,8 @@
 //! Mainline GuildPerkSpells definitions joined to installed spell names/icons.
+/// User decision2026-10-17: Mobile Banking83958 has a two-hour cooldown.
+/// Project policy overrides installed70448 SpellCooldowns.RecoveryTime3600000ms.
+pub const MOBILE_BANKING_COOLDOWN_2H: u32 = 7_200_000;
+
 use serde::Deserialize;
 use std::{collections::HashMap, io::Read, path::Path};
 
