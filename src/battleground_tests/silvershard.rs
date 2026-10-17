@@ -10,6 +10,7 @@ fn started() -> (BgInstance, BgTemplate, SilvershardBattle) {
     let mut instance = BgInstance::from_match(
         &BgMatch {
             bg_id: template.id,
+            bracket: template.bracket,
             team_a: vec![1, 3, 5],
             team_b: vec![2, 4, 6],
         },

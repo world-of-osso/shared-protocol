@@ -1,0 +1,19 @@
+{
+  "pinned_build": "12.1.5.70391",
+  "pinned_build_key": "334a36cf5f3c32a5f7a167405487fa14",
+  "pinned_root_content_key": "25c68dd1c7597cccd94252085c3367ed",
+  "fdid": 1339820,
+  "content_key": "0554bd932ab15021af8cd9f5eecef070",
+  "extraction_build": "12.1.5.70448; bytes authenticated against cached70391 root",
+  "schema_commit": "d6f50d4f351193e84226aa62a36faa0f58528afa",
+  "schema_url": "https://raw.githubusercontent.com/wowdev/WoWDBDefs/d6f50d4f351193e84226aa62a36faa0f58528afa/definitions/PVPDifficulty.dbd",
+  "details": {
+    "layout": "583BCBE4",
+    "rows": 354,
+    "unreadable_records": 0,
+    "id_column": "ID"
+  },
+  "raw_sha256": "5d6df862fe2033a7dacd82a6bd6b2e8f0b206952f814d85683a46266b003bad8",
+  "schema_sha256": "56219e45728f3bbfc81aa2facef9d1c5c92f40b5cf355bc5cb967e020f24d665",
+  "csv_sha256": "878ee3b2a6a98ce3e5c916e6aeb30b92d0d0ecaae19ad474093e01751edeb773"
+}

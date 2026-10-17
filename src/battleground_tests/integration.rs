@@ -84,6 +84,7 @@ fn av_full_pipeline_reinforcements_to_win() {
     let tmpl = alterac_valley();
     let bg_match = BgMatch {
         bg_id: tmpl.id,
+        bracket: tmpl.bracket,
         team_a: vec![1, 2],
         team_b: vec![3, 4],
     };

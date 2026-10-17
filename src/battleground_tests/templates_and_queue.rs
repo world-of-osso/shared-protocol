@@ -153,11 +153,18 @@ fn epic_source_minimum_rosters_and_level_bracket() {
         }
         assert!(queue.try_match(id).is_none());
         queue.join_solo(20, 90, id, 0).unwrap();
+        assert!(
+            queue.try_match(id).is_none(),
+            "level90 has its own source bracket"
+        );
+        queue.join_solo(21, 79, id, 0).unwrap();
         let matched = queue
             .try_match(id)
             .expect("ten per team admits source minimum");
         assert_eq!(matched.team_a.len(), 10);
         assert_eq!(matched.team_b.len(), 10);
+        assert_eq!(matched.bracket, LevelBracket::new(20, 79));
+        assert!(queue.is_queued(20));
     }
 }
 
@@ -407,6 +414,77 @@ fn match_different_bg_types_independent() {
     }
     assert!(q.try_match(warsong_gulch().id).is_some());
     assert!(q.try_match(arathi_basin().id).is_none());
+}
+
+#[test]
+fn source_bracket_preserves_authored_epic_and_max_level_boundaries() {
+    for map in [30, 628] {
+        assert_eq!(
+            source_level_bracket(map, 20),
+            Some(LevelBracket::new(20, 79))
+        );
+        assert_eq!(
+            source_level_bracket(map, 79),
+            Some(LevelBracket::new(20, 79))
+        );
+        assert_eq!(
+            source_level_bracket(map, 80),
+            Some(LevelBracket::new(80, 80))
+        );
+        assert_eq!(
+            source_level_bracket(map, 81),
+            Some(LevelBracket::new(81, 89))
+        );
+        assert_eq!(
+            source_level_bracket(map, 90),
+            Some(LevelBracket::new(90, 90))
+        );
+    }
+    assert_eq!(source_level_bracket(2656, 79), None);
+    let mut queue = BgQueue::default();
+    assert_eq!(
+        queue.join_solo(1, 79, 1110, 0),
+        Err(BgQueueError::OutOfBracket)
+    );
+    assert!(queue.join_solo(1, 80, 1110, 0).is_ok());
+    assert_eq!(source_level_bracket(999999, 30), None);
+}
+
+#[test]
+fn source_bracket_rejects_a_group_crossing_the_39_to_40_boundary() {
+    let mut queue = BgQueue::default();
+    assert_eq!(
+        queue.join_group(1, vec![1, 2], vec![39, 40], 1014, 0),
+        Err(BgQueueError::OutOfBracket)
+    );
+    assert!(queue.is_empty(), "rejected group leaves no queued members");
+}
+
+#[test]
+fn source_bracket_queue_keeps_29_separate_without_blocking_a_full_30_to_39_match() {
+    let mut queue = BgQueue::default();
+    queue.join_solo(1, 29, 1014, 0).unwrap();
+    for player in 2..=11 {
+        let level = if player % 2 == 0 { 30 } else { 39 };
+        queue.join_solo(player, level, 1014, 0).unwrap();
+    }
+    let matched = queue.try_match(1014).unwrap();
+    assert_eq!(matched.bracket, LevelBracket::new(30, 39));
+    let instance = BgInstance::from_match(&matched, &warsong_gulch());
+    assert_eq!(instance.bracket, LevelBracket::new(30, 39));
+    let mut players: Vec<_> = matched
+        .team_a
+        .iter()
+        .chain(&matched.team_b)
+        .copied()
+        .collect();
+    players.sort();
+    assert_eq!(players, (2..=11).collect::<Vec<_>>());
+    assert!(
+        queue.is_queued(1),
+        "older incomplete bracket remains queued"
+    );
+    assert!(queue.try_match(1014).is_none());
 }
 
 #[test]

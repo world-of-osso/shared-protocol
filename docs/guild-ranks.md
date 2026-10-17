@@ -10,6 +10,10 @@ and a strictly lower-ranked target; promotion never reaches the actor's rank.
 all affected online rosters, including the removed character's empty roster.
 `GuildInvitation` carries the authoritative inviter and guild on AuthChannel. It is sent
 to online targets and redelivered on world entry from the persisted invitation.
+Its optional `GuildTabardDesign` is the guild's actual registered design at delivery;
+no registered design stays `None`. Retail GuildInviteFrame.lua11 consumes this payload;
+TC a352b1fa Guild.cpp1727–1738 fills it from the inviting guild. Deploy both consumers
+with this changed wire schema; no legacy decoding path.
 `GuildDeclineInviteRequest` clears that pending invite; accept remains `GuildAcceptInviteRequest`.
 
 Snapshots contain ordered ranks/rights, member ranks, recipient rank, purchased tab names

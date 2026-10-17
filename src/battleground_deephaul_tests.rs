@@ -4,6 +4,7 @@ fn running() -> (DeephaulBattle, CartPaths, BgInstance, BgTemplate) {
     let template = deephaul_ravine();
     let matched = BgMatch {
         bg_id: template.id,
+        bracket: template.bracket,
         team_a: vec![1, 2, 3, 4, 5],
         team_b: vec![6, 7, 8, 9, 10],
     };

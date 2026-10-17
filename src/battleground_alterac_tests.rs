@@ -5,6 +5,7 @@ fn fixture() -> (AlteracBattle, BgInstance) {
     let mut instance = BgInstance::from_match(
         &BgMatch {
             bg_id: template.id,
+            bracket: template.bracket,
             team_a: vec![1],
             team_b: vec![2],
         },
