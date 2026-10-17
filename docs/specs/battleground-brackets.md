@@ -8,7 +8,7 @@ No decade arithmetic or broad template maximum substitutes for missing source ro
 
 Random Battleground32 is a multi-map queue, not a concrete `BgTemplate`. Admission uses its first source map566's PVPDifficulty rows (first20–29) intersected with BML32's10–90 bounds; a party may contain at most5 members. Parent matchmaking uses5 minimum/team and10 capacity/team, preserving the requested32 identity and whole parties. The authenticated70448 PVPDifficulty CSV is byte-identical to the bundled source below.
 
-Concrete-map selection and its leveling-range policy are deferred to current Retail research. No copied RangeIndex, concrete instance, new reward or daily state is implemented by this prerequisite. `RANDOM_BG_WIN_REWARD_PROFILE` remains unresolved: TC's27000/13500/4500/3500 kill-equivalent profile and06:00 server-local reset are not adopted.
+`RANDOM_BG_LEVEL_ELIGIBLE_MAPS` is explicit project policy based on Retail level-banded Random BG behavior, not a TC port: the server chooses a configured map whose own bracket contains all queued levels and stores that level-matching bracket on the concrete instance. It never copies parent RangeIndex across maps. Parent matchmaking preserves original32 separately from the chosen concrete ID. Existing map payouts/start criteria stay unchanged. `RANDOM_BG_WIN_REWARD_PROFILE` remains unresolved: TC's27000/13500/4500/3500 kill-equivalent profile and06:00 server-local reset are not adopted; no new rewards/daily state.
 
 ## Source
 

@@ -525,6 +525,17 @@ impl BgQueue {
         self.entries.iter().any(|e| e.members.contains(&player))
     }
 
+    /// Actual admission level retained for an individual queued member.
+    pub fn player_level(&self, player: u64) -> Option<u8> {
+        self.entries.iter().find_map(|entry| {
+            entry
+                .members
+                .iter()
+                .position(|&member| member == player)
+                .map(|index| entry.levels[index])
+        })
+    }
+
     /// Number of entries in the queue.
     pub fn len(&self) -> usize {
         self.entries.len()
