@@ -120,6 +120,8 @@ pub struct NodeBattle {
     rules: &'static NodeRules,
     nodes: Vec<NodeState>,
     tick_left_ms: u64,
+    // Unclamped points emitted by the source clock; external score changes do not enter it.
+    resource_points: [u32; 2],
 }
 
 impl NodeBattle {
@@ -136,6 +138,7 @@ impl NodeBattle {
                 })
                 .collect(),
             tick_left_ms: rules.tick_ms,
+            resource_points: [0; 2],
         }
     }
 
@@ -196,10 +199,15 @@ impl NodeBattle {
         }
     }
 
-    fn award_resources(&self, instance: &mut BgInstance, template: &BgTemplate) {
-        for team in [BgTeam::A, BgTeam::B] {
+    pub fn earned_resource_points(&self) -> [u32; 2] {
+        self.resource_points
+    }
+
+    fn award_resources(&mut self, instance: &mut BgInstance, template: &BgTemplate) {
+        for (index, team) in [BgTeam::A, BgTeam::B].into_iter().enumerate() {
             let count = self.owned_count(team);
             let points = self.rules.points[count];
+            self.resource_points[index] += points;
             instance.add_score(team, points, template);
         }
     }
