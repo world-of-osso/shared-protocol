@@ -4,6 +4,12 @@ BG admission uses the pinned Retail12.1.5.70391 PVPDifficulty range for the sele
 
 No decade arithmetic or broad template maximum substitutes for missing source rows. Examples: map2107 level30–39 retains maximum39; epic maps30/628 use20–79, then80,81–89,90; Deephaul2656 has no source bracket below80. Match pairing does not award Honor. The retained maximum is the prerequisite for TC `Battleground::GetBonusHonorFromKill`, which uses `min(instance maximum,80)`; event-specific awards remain separate work.
 
+## Random32 admission prerequisite — 70448
+
+Random Battleground32 is a multi-map queue, not a concrete `BgTemplate`. Admission uses its first source map566's PVPDifficulty rows (first20–29) intersected with BML32's10–90 bounds; a party may contain at most5 members. Parent matchmaking uses5 minimum/team and10 capacity/team, preserving the requested32 identity and whole parties. The authenticated70448 PVPDifficulty CSV is byte-identical to the bundled source below.
+
+Concrete-map selection and its leveling-range policy are deferred to current Retail research. No copied RangeIndex, concrete instance, new reward or daily state is implemented by this prerequisite. `RANDOM_BG_WIN_REWARD_PROFILE` remains unresolved: TC's27000/13500/4500/3500 kill-equivalent profile and06:00 server-local reset are not adopted.
+
 ## Source
 
 Bundled `scripts/reference/pvp-12.1.5.70391/PVPDifficulty.csv` is FDID1339820, layout583BCBE4,354 rows,0 unreadable. Receipt alongside it records raw/schema/CSV SHA256. The local installation advanced to70448 before extraction; the extracted table's content key0554bd932ab15021af8cd9f5eecef070 exactly matches the authenticated cached70391 root25c68dd1c7597cccd94252085c3367ed. It is therefore the pinned70391 content, not an inferred newer-build replacement. CSV SHA256:878ee3b2a6a98ce3e5c916e6aeb30b92d0d0ecaae19ad474093e01751edeb773.
