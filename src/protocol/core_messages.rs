@@ -340,6 +340,8 @@ pub struct GuildInvitation {
     pub guild_id: u32,
     pub guild_name: String,
     pub inviter_name: String,
+    /// Actual registered guild design; absent guild emblems remain absent.
+    pub tabard: Option<crate::guild_creation::GuildTabardDesign>,
 }
 
 /// Client declines their pending guild invitation.
