@@ -1,6 +1,71 @@
 use super::*;
 
 #[test]
+fn random_queue_admission_uses_parent_566_brackets() {
+    let mut queue = BgQueue::default();
+    assert!(queue.join_solo(1, 19, 32, 0).is_err());
+    queue
+        .join_solo(1, 20, 32, 0)
+        .expect("Random32 admits parent566 level20");
+    queue.join_solo(2, 29, 32, 0).unwrap();
+    queue.join_solo(3, 30, 32, 0).unwrap();
+    assert!(queue.join_solo(4, 91, 32, 0).is_err());
+    assert!(
+        queue.try_match(32).is_none(),
+        "different parent brackets never combine"
+    );
+}
+
+#[test]
+fn random_queue_uses_parent_five_minimum_and_ten_capacity() {
+    let mut queue = BgQueue::default();
+    queue
+        .join_group(1, (1..=5).collect(), vec![25; 5], 32, 0)
+        .unwrap();
+    for player in 6..10 {
+        queue.join_solo(player, 25, 32, 0).unwrap();
+    }
+    assert!(
+        queue.try_match(32).is_none(),
+        "nine players cannot form two teams of five"
+    );
+    queue.join_solo(10, 25, 32, 0).unwrap();
+    let first = queue.try_match(32).expect("two ordinary five-player teams");
+    assert_eq!(
+        first.bg_id, 32,
+        "matchmaking retains the requested queue identity"
+    );
+    assert_eq!(first.bracket, LevelBracket::new(20, 29));
+    assert_eq!((first.team_a.len(), first.team_b.len()), (5, 5));
+    assert_eq!(
+        first.team_a,
+        (1..=5).collect::<Vec<_>>(),
+        "party stays together"
+    );
+    for player in 11..=35 {
+        queue.join_solo(player, 25, 32, 0).unwrap();
+    }
+    let full = queue.try_match(32).unwrap();
+    assert_eq!((full.team_a.len(), full.team_b.len()), (10, 10));
+    assert_eq!(queue.len(), 5, "excess players stay queued");
+}
+
+#[test]
+fn random_queue_rejects_groups_over_five_atomically() {
+    let mut queue = BgQueue::default();
+    assert!(
+        queue
+            .join_group(1, (1..=6).collect(), vec![25; 6], 32, 0)
+            .is_err()
+    );
+    assert!(queue.is_empty());
+    queue
+        .join_group(1, (1..=5).collect(), vec![25; 5], 32, 0)
+        .expect("five-player party is admitted");
+    assert!((1..=5).all(|player| queue.is_queued(player)));
+}
+
+#[test]
 fn deephaul_source_dropped_crystal_is_usable() {
     let crystal = crate::protocol::GameObjectInfo {
         entry: 422412,
