@@ -247,7 +247,8 @@ impl ThreatTable {
             RANGED_AGGRO_THRESHOLD
         };
 
-        if top.threat >= current_threat * threshold {
+        // TC a352b1fa ThreatManager.cpp:620–626,674–681: strict comparison.
+        if top.threat > current_threat * threshold {
             Some(top.entity)
         } else {
             Some(current)
