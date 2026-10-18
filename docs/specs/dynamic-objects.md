@@ -4,10 +4,12 @@ Ordinary same-copy clients receive actual Rain of Fire86636 area geometry, match
 
 ## What it must do
 
-- [ ] Replicate the actual caster entity bits, spell and resolved effect radius with existing Position.
-- [ ] Use ordinary entity visibility and removal for area lifetime; no client expiry guesses.
-- [ ] Preserve numeric identity/geometry through wire encoding.
-- [ ] Keep other-copy clients excluded by normal server interest.
+- [x] Replicate the actual caster entity bits, spell and resolved effect radius with existing Position.
+- [x] Use ordinary entity visibility and removal for area lifetime; no client expiry guesses.
+- [x] Preserve numeric identity/geometry through wire encoding.
+- [x] Keep other-copy clients excluded by normal server interest.
+
+Backing proof combines the actual server boss/interest boundary with real UDP client decoding; fresh full-client gameplay remains the separate gap below.
 
 ## How it works
 
