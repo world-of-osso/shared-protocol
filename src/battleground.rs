@@ -353,6 +353,54 @@ pub struct BgQueueEntry {
     pub queued_at: u64,
 }
 
+/// BattlemasterList32 is a queue, not a concrete battleground template.
+pub const RANDOM_BATTLEGROUND_ID: u32 = 32;
+
+struct QueueRules {
+    id: u32,
+    name: String,
+    bracket_map: u32,
+    levels: LevelBracket,
+    minimum: u8,
+    capacity: u8,
+    max_group: u8,
+}
+
+fn queue_rules(id: u32) -> Option<QueueRules> {
+    if id == RANDOM_BATTLEGROUND_ID {
+        // Authenticated70448 BML32 and first XMap1109; TC Handler uses MapIDs.front().
+        return Some(QueueRules {
+            id,
+            name: "Random Battleground".into(),
+            bracket_map: 566,
+            levels: LevelBracket::new(10, 90),
+            minimum: 5,
+            capacity: 10,
+            max_group: 5,
+        });
+    }
+    let template = template_by_id(id)?;
+    Some(QueueRules {
+        id,
+        name: template.name,
+        bracket_map: template.map_id,
+        levels: template.bracket,
+        minimum: template.min_players_per_team,
+        capacity: template.team_size,
+        max_group: template.team_size,
+    })
+}
+
+/// Queue label, including multi-map queues that have no instance template.
+pub fn queue_name(id: u32) -> Option<String> {
+    queue_rules(id).map(|rules| rules.name)
+}
+
+/// Maximum party size allowed by the requested queue.
+pub fn queue_group_limit(id: u32) -> Option<u8> {
+    queue_rules(id).map(|rules| rules.max_group)
+}
+
 /// Why joining the BG queue failed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BgQueueError {
@@ -368,6 +416,8 @@ pub enum BgQueueError {
     LevelCountMismatch,
     /// Group listed the same player more than once.
     DuplicatePlayer,
+    /// Party exceeds the requested queue's group limit.
+    GroupTooLarge,
     /// Player has an active deserter penalty.
     Deserter,
 }
@@ -433,14 +483,15 @@ impl BgQueue {
         if members.len() != levels.len() {
             return Err(BgQueueError::LevelCountMismatch);
         }
-        let Some(tmpl) = template_by_id(bg_id) else {
-            return Err(BgQueueError::UnknownBg);
-        };
+        let rules = queue_rules(bg_id).ok_or(BgQueueError::UnknownBg)?;
+        if bg_id == RANDOM_BATTLEGROUND_ID && members.len() > usize::from(rules.max_group) {
+            return Err(BgQueueError::GroupTooLarge);
+        }
         let bracket =
-            source_level_bracket(tmpl.map_id, levels[0]).ok_or(BgQueueError::OutOfBracket)?;
+            source_level_bracket(rules.bracket_map, levels[0]).ok_or(BgQueueError::OutOfBracket)?;
         let same_bracket = levels.iter().all(|&level| {
-            tmpl.bracket.contains(level)
-                && source_level_bracket(tmpl.map_id, level) == Some(bracket)
+            rules.levels.contains(level)
+                && source_level_bracket(rules.bracket_map, level) == Some(bracket)
         });
         if !same_bracket {
             return Err(BgQueueError::OutOfBracket);
@@ -474,6 +525,76 @@ impl BgQueue {
         self.entries.iter().any(|e| e.members.contains(&player))
     }
 
+    /// Actual admission level retained for an individual queued member.
+    pub fn player_level(&self, player: u64) -> Option<u8> {
+        self.entries.iter().find_map(|entry| {
+            entry
+                .members
+                .iter()
+                .position(|&member| member == player)
+                .map(|index| entry.levels[index])
+        })
+    }
+
+    /// Requested queues in first-entry order, for event-driven matchmaking updates.
+    pub fn queued_ids(&self) -> Vec<u32> {
+        let mut seen = std::collections::BTreeSet::new();
+        self.entries
+            .iter()
+            .filter(|entry| seen.insert(entry.bg_id))
+            .map(|entry| entry.bg_id)
+            .collect()
+    }
+
+    /// Fill only whole groups fitting the smaller team of an existing concrete copy.
+    /// BG_BACKFILL_WHOLE_PARTY_SMALLER_TEAM: no TC one-player-at-parity limiter.
+    pub fn fill_existing(
+        &mut self,
+        queue_id: u32,
+        instance: &mut BgInstance,
+        template: &BgTemplate,
+    ) -> Vec<u64> {
+        if instance.phase == BgPhase::Ended {
+            return Vec::new();
+        }
+        let candidates = self.existing_copy_candidates(queue_id, template, instance.bracket);
+        let (team_a, team_b, used) = fill_teams(
+            &self.entries,
+            &candidates,
+            usize::from(template.team_size),
+            instance.team_a_players.clone(),
+            instance.team_b_players.clone(),
+        );
+        let invited = used
+            .iter()
+            .flat_map(|&index| self.entries[index].members.iter().copied())
+            .collect();
+        remove_indices(&mut self.entries, &used);
+        instance.team_a_players = team_a;
+        instance.team_b_players = team_b;
+        invited
+    }
+
+    fn existing_copy_candidates(
+        &self,
+        queue_id: u32,
+        template: &BgTemplate,
+        bracket: LevelBracket,
+    ) -> Vec<usize> {
+        self.entries
+            .iter()
+            .enumerate()
+            .filter(|(_, entry)| {
+                entry.bg_id == queue_id
+                    && entry.levels.iter().all(|&level| {
+                        template.bracket.contains(level)
+                            && source_level_bracket(template.map_id, level) == Some(bracket)
+                    })
+            })
+            .map(|(index, _)| index)
+            .collect()
+    }
+
     /// Number of entries in the queue.
     pub fn len(&self) -> usize {
         self.entries.len()
@@ -489,7 +610,7 @@ impl BgQueue {
     /// `min_players_per_team`. Players are assigned alternately to balance
     /// team sizes. Returns `None` if not enough players.
     pub fn try_match(&mut self, bg_id: u32) -> Option<BgMatch> {
-        let tmpl = template_by_id(bg_id)?;
+        let rules = queue_rules(bg_id)?;
         let mut seen = std::collections::HashSet::new();
         let brackets: Vec<_> = self
             .entries
@@ -498,33 +619,38 @@ impl BgQueue {
             .map(|entry| entry.bracket)
             .collect();
         for bracket in brackets {
-            if let Some(matched) = self.try_match_bracket(&tmpl, bracket) {
+            if let Some(matched) = self.try_match_bracket(&rules, bracket) {
                 return Some(matched);
             }
         }
         None
     }
 
-    fn try_match_bracket(&mut self, tmpl: &BgTemplate, bracket: LevelBracket) -> Option<BgMatch> {
-        let candidate_indices = self.candidates_for(tmpl.id, bracket);
+    fn try_match_bracket(&mut self, rules: &QueueRules, bracket: LevelBracket) -> Option<BgMatch> {
+        let candidate_indices = self.candidates_for(rules.id, bracket);
         let total_players: usize = candidate_indices
             .iter()
             .map(|&i| self.entries[i].members.len())
             .sum();
-        let min = tmpl.min_players_per_team as usize;
+        let min = usize::from(rules.minimum);
         if total_players < min * 2 {
             return None;
         }
 
-        let (team_a, team_b, used) =
-            fill_teams(&self.entries, &candidate_indices, tmpl.team_size as usize);
+        let (team_a, team_b, used) = fill_teams(
+            &self.entries,
+            &candidate_indices,
+            usize::from(rules.capacity),
+            Vec::new(),
+            Vec::new(),
+        );
         if team_a.len() < min || team_b.len() < min {
             return None;
         }
 
         remove_indices(&mut self.entries, &used);
         Some(BgMatch {
-            bg_id: tmpl.id,
+            bg_id: rules.id,
             bracket,
             team_a,
             team_b,
@@ -551,22 +677,20 @@ fn fill_teams(
     entries: &[BgQueueEntry],
     candidates: &[usize],
     target: usize,
+    mut team_a: Vec<u64>,
+    mut team_b: Vec<u64>,
 ) -> (Vec<u64>, Vec<u64>, Vec<usize>) {
-    let mut team_a = Vec::new();
-    let mut team_b = Vec::new();
     let mut used = Vec::new();
 
     for &idx in candidates {
         let members = &entries[idx].members;
-        let can_fit_a = team_a.len() + members.len() <= target;
-        let can_fit_b = team_b.len() + members.len() <= target;
-        let assign_to_a = can_fit_a && (team_a.len() <= team_b.len() || !can_fit_b);
-
-        if assign_to_a {
-            team_a.extend(members);
-            used.push(idx);
-        } else if can_fit_b {
-            team_b.extend(members);
+        let smaller = if team_a.len() <= team_b.len() {
+            &mut team_a
+        } else {
+            &mut team_b
+        };
+        if smaller.len() + members.len() <= target {
+            smaller.extend(members);
             used.push(idx);
         }
         if team_a.len() >= target && team_b.len() >= target {

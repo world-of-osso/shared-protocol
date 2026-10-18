@@ -2,11 +2,13 @@ use bevy::prelude::*;
 use serde::{Deserialize, Serialize};
 
 mod component_stats;
+mod dynamic_object;
 mod unit_frames;
 
 use crate::spell_data::ResourceType;
 
 pub use self::component_stats::*;
+pub use self::dynamic_object::*;
 pub use self::unit_frames::*;
 pub use crate::aura::*;
 pub use crate::casting::*;
