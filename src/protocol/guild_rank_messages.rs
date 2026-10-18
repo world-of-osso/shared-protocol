@@ -130,6 +130,12 @@ pub enum GuildRankRequest {
     },
     /// Authenticated actor's current guild only; replies with GuildEventLog.
     QueryEventLog,
+    /// Authenticated actor assigns one existing member's zero-based rank order.
+    /// No actor/guild ID; the server rechecks direction rights and strict hierarchy.
+    SetMemberRank {
+        character_name: String,
+        rank: u8,
+    },
 }
 
 /// TrinityCore a352b1fa SharedDefines.h GUILD_EVENTLOG_MAX_RECORDS.
