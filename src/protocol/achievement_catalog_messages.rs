@@ -130,12 +130,17 @@ pub struct AchievementCategoryEntry {
     pub name: String,
 }
 
+/// Retail Mainline Constants.lua127 / CriteriaTree.Flags: display a progress bar.
+pub const ACHIEVEMENT_CRITERION_FLAG_PROGRESS_BAR: u32 = 0x1;
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct AchievementCriterionLine {
     pub tree_id: u32,
     pub order_index: i32,
     pub criteria_id: u32,
     pub description: String,
+    /// Authored CriteriaTree.Flags, independent of the quantity threshold.
+    pub flags: u32,
     pub current: u64,
     pub required: u64,
     pub completed: bool,
