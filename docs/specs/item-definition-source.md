@@ -10,6 +10,8 @@ Owned-item wire records distinguish Retail definitions from fixed Forever build 
 - [x] Preserve owned source through trade views, auction sell-inventory/listing and browse items, and merchant buyback items.
 - [x] Reject missing or unknown owned source; equipment appearance must explicitly supply source or null. Never infer source from race or substitute Retail on decode.
 
+- [x] `InventoryErrorReason::ItemMaxCount` represents `EQUIP_ERR_ITEM_MAX_COUNT`, appended after existing variants without reordering. Its client-facing text is Retail GlobalStrings10918 `ERR_ITEM_MAX_COUNT`: "You can't carry any more of those items." Server ownership limits use the item's definition source; they are distinct from stack size and equipped-only limits. Coordinated server/client/protocol landing is required.
+
 ## How it works
 
 - [Protocol agreement](protocol-check.md): coordinated client/server wire updates are intentional; obsolete schemas are unsupported.

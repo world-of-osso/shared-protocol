@@ -182,6 +182,18 @@ fn equip_limit_category_error_round_trips_authored_quantity() {
 }
 
 #[test]
+fn inventory_item_max_count_error_round_trips_with_retail_wording() {
+    assert_wire_round_trip(&InventoryError {
+        reason: InventoryErrorReason::ItemMaxCount,
+        detail: Some("ownership cap includes personal bank".into()),
+    });
+    assert_eq!(
+        InventoryErrorReason::ItemMaxCount.message(),
+        "You can't carry any more of those items."
+    );
+}
+
+#[test]
 fn equipment_slots_use_retail_invslot_ids() {
     let ids: Vec<u8> = EquipmentSlot::ALL.iter().map(|s| s.inv_slot_id()).collect();
     assert_eq!(ids, (1..=19).collect::<Vec<u8>>());

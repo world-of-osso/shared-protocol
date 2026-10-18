@@ -364,6 +364,8 @@ pub enum InventoryErrorReason {
     ItemUniqueEquippable,
     /// `EQUIP_ERR_ITEM_MAX_LIMIT_CATEGORY_EQUIPPED_EXCEEDED_IS`.
     ItemMaxLimitCategoryEquippedExceeded { quantity: u8 },
+    /// `EQUIP_ERR_ITEM_MAX_COUNT`: character ownership cap, including personal bank.
+    ItemMaxCount,
 }
 
 impl InventoryErrorReason {
@@ -395,6 +397,8 @@ impl InventoryErrorReason {
             Self::ItemMaxLimitCategoryEquippedExceeded { quantity } => {
                 format!("You cannot equip more than {quantity} items in that category.")
             }
+            // Retail GlobalStrings10918, ERR_ITEM_MAX_COUNT.
+            Self::ItemMaxCount => "You can't carry any more of those items.".into(),
         }
     }
 }
