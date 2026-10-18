@@ -67,6 +67,7 @@ fn dungeon2_catalog_pages_wire_round_trip() {
         order_index: 0,
         criteria_id: 18527,
         description: "Hogger".into(),
+        flags: 0,
         current: 1,
         required: 1,
         completed: true,
@@ -113,6 +114,7 @@ fn dungeon2_maximum_category_payload_is_below_64_kib() {
         order_index: i32::MIN,
         criteria_id: u32::MAX,
         description: "x".repeat(ACHIEVEMENT_NAME_MAX_BYTES),
+        flags: u32::MAX,
         current: u64::MAX,
         required: u64::MAX,
         completed: true,
@@ -141,4 +143,42 @@ fn dungeon2_maximum_category_payload_is_below_64_kib() {
     println!("maximum category wire bytes: {}", bytes.len());
     assert!(bytes.len() < 64 * 1024);
     round_trip(page);
+}
+
+#[test]
+fn achievements_presentation_wire_preserves_flags_independently_of_quantity() {
+    for (achievement, tree, criterion, flags, required, description) in [
+        (
+            1017,
+            22151,
+            19598,
+            ACHIEVEMENT_CRITERION_FLAG_PROGRESS_BAR,
+            1,
+            "Obtain a companion pet",
+        ),
+        (
+            155,
+            4716,
+            44968,
+            0,
+            100,
+            "Complete 100 victories in Arathi Basin.",
+        ),
+    ] {
+        round_trip(AchievementCatalogPage::Criteria {
+            achievement_id: achievement,
+            criteria: vec![AchievementCriterionLine {
+                tree_id: tree,
+                order_index: 0,
+                criteria_id: criterion,
+                description: description.into(),
+                flags,
+                current: 0,
+                required,
+                completed: false,
+                progress_supported: true,
+            }],
+            next_id: None,
+        });
+    }
 }
