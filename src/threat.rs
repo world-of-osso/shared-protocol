@@ -247,7 +247,8 @@ impl ThreatTable {
             RANGED_AGGRO_THRESHOLD
         };
 
-        if top.threat >= current_threat * threshold {
+        // TC a352b1fa ThreatManager.cpp:620–626,674–681: strict comparison.
+        if top.threat > current_threat * threshold {
             Some(top.entity)
         } else {
             Some(current)
@@ -507,10 +508,13 @@ mod tests {
     }
 
     #[test]
-    fn aggro_melee_swaps_at_110_percent() {
+    fn aggro_melee_retains_at_exact_110_percent() {
+        // TC a352b1fa ThreatManager.cpp:620–622: strict CompareReferencesLT(..., 1.1f).
         let mut table = ThreatTable::default();
         table.add_damage_threat(1, 1000.0, 1.0);
         table.add_damage_threat(2, 1100.0, 1.0);
+        assert_eq!(table.aggro_target(Some(1), true), Some(1));
+        table.add_damage_threat(2, 10.0, 1.0);
         assert_eq!(table.aggro_target(Some(1), true), Some(2));
     }
 
@@ -523,10 +527,13 @@ mod tests {
     }
 
     #[test]
-    fn aggro_ranged_swaps_at_130_percent() {
+    fn aggro_ranged_retains_at_exact_130_percent() {
+        // TC a352b1fa ThreatManager.cpp:624–626: strict CompareReferencesLT(..., 1.3f).
         let mut table = ThreatTable::default();
         table.add_damage_threat(1, 1000.0, 1.0);
         table.add_damage_threat(2, 1300.0, 1.0);
+        assert_eq!(table.aggro_target(Some(1), false), Some(1));
+        table.add_damage_threat(2, 10.0, 1.0);
         assert_eq!(table.aggro_target(Some(1), false), Some(2));
     }
 
