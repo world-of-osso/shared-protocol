@@ -34,6 +34,27 @@ fn chat_message_serialization_round_trip() {
 }
 
 #[test]
+fn guild_member_rank_assignment_wire_round_trips_zero_based_target_only() {
+    for rank in [0u8, 1, 4, 255] {
+        let wire = serde_json::json!({"SetMemberRank": {"character_name": "Cara", "rank": rank}});
+        let request: GuildRankRequest = serde_json::from_value(wire.clone())
+            .expect("direct authenticated target-rank request must be representable");
+        let bytes = bincode::serde::encode_to_vec(&request, bincode::config::standard()).unwrap();
+        let (decoded, used): (GuildRankRequest, usize) =
+            bincode::serde::decode_from_slice(&bytes, bincode::config::standard()).unwrap();
+        assert_eq!(decoded, request);
+        assert_eq!(used, bytes.len());
+        assert_eq!(serde_json::to_value(request).unwrap(), wire);
+    }
+    assert!(
+        serde_json::from_value::<GuildRankRequest>(
+            serde_json::json!({"SetMemberRank": {"character_name": "Cara", "rank": 256}})
+        )
+        .is_err()
+    );
+}
+
+#[test]
 fn guild_invite_messages_round_trip() {
     let invite = GuildInviteRequest {
         target_character_name: "TargetOne".into(),

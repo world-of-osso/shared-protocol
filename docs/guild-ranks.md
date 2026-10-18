@@ -35,6 +35,14 @@ Retail source (local `~/.cache/wow-ui-sim/blizzard-ui/retail/AddOns/`):
 - `Blizzard_GuildControlUI/Blizzard_GuildControlUI.lua:420–459`: rank flags, shared repair/withdraw gold allowance.
 - `Blizzard_Communities/GuildRoster.lua:137–141`: promotion/demotion strict rank hierarchy.
 
+## Direct member-rank assignment
+
+`SetMemberRank { character_name, rank }` carries only the target and a zero-based rank order. Mainline's detail radio menu uses1..N (`GuildRoster.lua:16–56`); the native client maps display index i to wire i−1. The authenticated connection supplies actor/guild; never accept either from this payload. One request changes the target directly, not a chain of step promotions.
+
+Recheck the target/current/destination rank and choose the Promote right when destination≤current, Demote when destination>current (TC a352b1fa `Guild.cpp:1894–1930`). Reject self, existing actor-or-higher targets, actor-or-higher destinations, rank0 and out-of-range ranks. Current-value UI selection sends no request; an authorized same-rank wire request leaves ranks unchanged. Updates/normal snapshots follow the existing GuildChannel path.
+
+Pinned direct TC processing calls `SendGuildRanksUpdate`→`Member::ChangeRank`, with no lifecycle-log append. Do not manufacture intermediate step events; explicit Promote/Demote commands retain their existing logging. Leadership transfer/disband, rank create/reorder changes and authenticator-backed assignment are excluded named gaps. Upgrade both consumers with the changed request schema; no legacy decoding path.
+
 ## Lifecycle log
 
 `GuildRankRequest::QueryEventLog` carries no guild ID: the authenticated actor selects
