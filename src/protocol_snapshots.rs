@@ -183,6 +183,20 @@ pub struct CollectionPetSnapshot {
 pub struct ProfessionSnapshot {
     pub lines: Vec<crate::profession::ProfessionSkillLine>,
     pub spells: Vec<u32>,
+    /// Static tdb_trainer_spell rows for the owner's learned skill lines; not availability.
+    pub recipe_sources: Vec<ProfessionTrainerSource>,
+}
+
+/// An authored trainer row. Previewing it never teaches a recipe or authorizes payment.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ProfessionTrainerSource {
+    pub trainer_id: u32,
+    pub spell_id: u32,
+    pub cost: u64,
+    pub req_skill_line: u32,
+    pub req_skill_rank: u16,
+    pub req_abilities: Vec<u32>,
+    pub req_level: u8,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]

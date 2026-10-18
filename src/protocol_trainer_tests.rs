@@ -73,6 +73,15 @@ fn trainer_and_profession_messages_round_trip() {
             },
         ],
         spells: vec![3908, 264616, 2963],
+        recipe_sources: vec![ProfessionTrainerSource {
+            trainer_id: 56,
+            spell_id: 2153,
+            cost: 50,
+            req_skill_line: 2532,
+            req_skill_rank: 15,
+            req_abilities: vec![],
+            req_level: 0,
+        }],
     });
     assert_wire_round_trip(&CraftRecipe {
         spell_id: 2963,
