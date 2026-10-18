@@ -27,6 +27,8 @@ Owned-item wire records distinguish Retail definitions from fixed Forever build 
 
 ## Tests asserting this spec
 
+- `tests/max_count_guild_codec.rs`: after the direct-rank merge, every prior inventory-error and guild-rank bincode tag remains pinned; appended ItemMaxCount21 and SetMemberRank13 each round-trip through bincode and JSON. This is external codec/discriminant coverage, not native/server behavior.
+
 - `tests/item_definition_source.rs`: same GUID/ID with different sources, bag/equipment/delta and appearance roundtrips, trade/auction/buyback views, missing/null/unknown-source rejection.
 - Existing inventory, bank, mail and equipment appearance fixtures explicitly choose Retail.
 
