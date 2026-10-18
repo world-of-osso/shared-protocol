@@ -217,6 +217,7 @@ fn register_replicated_components(app: &mut App) {
     app.protocol_component::<UnitVignette>().replicate();
     app.protocol_component::<UnitSummonedBy>().replicate();
     app.protocol_component::<UnitIsPet>().replicate();
+    app.protocol_component::<DynamicObjectInfo>().replicate();
 }
 
 #[cfg(test)]
