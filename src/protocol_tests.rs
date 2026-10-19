@@ -55,6 +55,32 @@ fn guild_member_rank_assignment_wire_round_trips_zero_based_target_only() {
 }
 
 #[test]
+#[ignore = "behavioral RED: optional authoritative online guild zone is not represented"]
+fn guild_online_zone_wire_preserves_known_and_unavailable_labels() {
+    for zone in [Some("Elwynn Forest"), Some("Westfall"), None] {
+        let wire = serde_json::json!({
+            "character_name": "Cara", "level": 32, "class_name": "Paladin",
+            "rank_name": "Member", "is_online": true, "officer_note": "",
+            "public_note": "", "is_self": false, "last_online": "Online",
+            "online_zone": zone,
+        });
+        let member: GuildMemberSnapshot = serde_json::from_value(wire.clone()).unwrap();
+        assert_eq!(
+            serde_json::to_value(&member).unwrap()["online_zone"],
+            wire["online_zone"]
+        );
+        let bytes = bincode::serde::encode_to_vec(&member, bincode::config::standard()).unwrap();
+        let (decoded, used): (GuildMemberSnapshot, usize) =
+            bincode::serde::decode_from_slice(&bytes, bincode::config::standard()).unwrap();
+        assert_eq!(used, bytes.len());
+        assert_eq!(
+            serde_json::to_value(decoded).unwrap()["online_zone"],
+            wire["online_zone"]
+        );
+    }
+}
+
+#[test]
 fn guild_invite_messages_round_trip() {
     let invite = GuildInviteRequest {
         target_character_name: "TargetOne".into(),
