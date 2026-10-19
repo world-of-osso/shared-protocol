@@ -4,7 +4,7 @@ Represent the sourced `/gleader <member>` request on GuildChannel. Mainline `Sla
 
 ## What it must do
 
-- [ ] `TransferLeadership { character_name }` preserves only the named target through JSON/bincode; actor and guild are supplied by authenticated server state, not new packet fields.
+- [x] `TransferLeadership { character_name }` preserves only the named target through JSON/bincode; actor and guild are supplied by authenticated server state, not new packet fields.
 - [ ] Protocol and both consumers land together. No old-wire compatibility path or default transfer target.
 
 ## How it works
@@ -14,7 +14,7 @@ Represent the sourced `/gleader <member>` request on GuildChannel. Mainline `Sla
 ## Implementation inventory
 
 - `src/protocol/guild_rank_messages.rs`: target-only transfer appended to the existing GuildChannel request contract.
-- `src/protocol_tests.rs`: ignored target-only wire regression.
+- `src/protocol_tests.rs`: target-only wire regression, enabled after actual RED→GREEN.
 
 ## Tests asserting this spec
 
@@ -22,7 +22,7 @@ Represent the sourced `/gleader <member>` request on GuildChannel. Mainline `Sla
 
 ## Known gaps (current cycle)
 
-- [ ] Behavioral RED, implementation, focused GREEN and coordinated consumer gate remain pending.
+- [ ] Coordinated consumer gate remains pending. Actual unsupported-variant RED preceded implementation; focused wire GREEN passes1/1 with exact JSON/bincode target preservation.
 
 ## Out of scope
 

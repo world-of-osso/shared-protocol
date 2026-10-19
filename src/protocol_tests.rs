@@ -34,7 +34,6 @@ fn chat_message_serialization_round_trip() {
 }
 
 #[test]
-#[ignore = "guild leadership transfer RED before implementation"]
 fn guild_leadership_transfer_wire_preserves_only_the_target_name() {
     for name in ["Cara", "Dora", ""] {
         let wire = serde_json::json!({"TransferLeadership": {"character_name": name}});
