@@ -4,10 +4,11 @@ Shared `CastState` advances source millisecond cast/channel timers without accum
 
 ## What it must do
 
-- [ ] Convert replicated seconds and elapsed steps to the nearest integer millisecond, not truncation or an expiry epsilon.
-- [ ] A1500ms normal cast remains active through1450ms and completes at the thirtieth50ms step.
-- [ ] Preserve channel periods and exact total duration:3000ms/1000ms emits periods at1000/2000ms and completes at3000ms.
-- [ ] Preserve normal/channel pushback semantics and the existing replicated f32 fields, types and encoding.
+- [x] Convert replicated seconds and elapsed steps to the nearest integer millisecond, not truncation or an expiry epsilon.
+- [x] A1500ms normal cast remains active through1450ms and completes at the thirtieth50ms step.
+- [x] Preserve channel periods and exact total duration:3000ms/1000ms emits periods at1000/2000ms and completes at3000ms.
+- [x] Preserve normal/channel pushback semantics.
+- [ ] Preserve existing replicated f32 fields, types and encoding; no wire declaration changes, independent protocol gate pending.
 
 ## How it works
 
@@ -21,12 +22,12 @@ Shared `CastState` advances source millisecond cast/channel timers without accum
 
 ## Tests asserting this spec
 
-- `src/casting_tests.rs::cast_millisecond_*` — source milliseconds across real repeated50ms calls; three genuine normal/channel/pushback deadline REDs and one nearest-ms control PASS at7b09847 before the fix. Integer-ms implementation retains the f32 wire fields and unchanged pushback methods; targeted GREEN pending.
+- `src/casting_tests.rs::cast_millisecond_*` — source milliseconds across real repeated50ms calls; three genuine normal/channel/pushback deadline REDs and one nearest-ms control PASS at7b09847 before the fix. Integer-ms implementation retains the f32 wire fields and unchanged pushback methods; all53 shared casting-family cases pass atbb18da9 (including the four new cases and existing normal/channel/pushback/charge/cooldown/projectile controls),0ignored/no warnings; the three regressions are enabled. Native AI GREEN pending.
 - Server `herald_ground::encounter_coverage_herald_ground_roar_cast_1500ms_ai_deadline` — actual source-scheduled ordinary Roar must stop blocking AI at1500ms; genuine native RED39.30s precedes shared production changes.
 
 ## Known gaps (current cycle)
 
-- [ ] Prove shared RED→GREEN, then native AI GREEN, and co-land protocol/server tips.
+- [ ] Prove native AI GREEN, then co-land protocol/server tips; shared RED→GREEN53PASS is retained.
 - [ ] Independent wide player/NPC/pet/follower/channel/pushback gate remains required.
 
 ## Out of scope
