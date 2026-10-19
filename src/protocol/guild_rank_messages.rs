@@ -136,6 +136,11 @@ pub enum GuildRankRequest {
         character_name: String,
         rank: u8,
     },
+    /// Current Guild Master voluntarily transfers to another same-guild member.
+    /// Actor/guild identity comes only from the authenticated connection.
+    TransferLeadership {
+        character_name: String,
+    },
 }
 
 /// TrinityCore a352b1fa SharedDefines.h GUILD_EVENTLOG_MAX_RECORDS.

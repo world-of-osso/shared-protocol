@@ -13,7 +13,7 @@ Represent the sourced `/gleader <member>` request on GuildChannel. Mainline `Sla
 
 ## Implementation inventory
 
-- `src/protocol/guild_rank_messages.rs`: existing GuildChannel request contract; transfer pending.
+- `src/protocol/guild_rank_messages.rs`: target-only transfer appended to the existing GuildChannel request contract.
 - `src/protocol_tests.rs`: ignored target-only wire regression.
 
 ## Tests asserting this spec
