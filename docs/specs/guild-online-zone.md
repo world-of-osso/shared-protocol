@@ -4,7 +4,7 @@
 
 ## What it must do
 
-- [ ] JSON and bincode retain a known label and an unavailable value exactly.
+- [x] JSON and bincode retain a known label and an unavailable value exactly.
 - [ ] The producer uses existing GroundMap→AreaTable zone authority and the real zone-name catalog; offline/unavailable stays None.
 - [ ] Protocol and both consumers land together; no old-wire fallback or invented default label.
 
@@ -23,7 +23,7 @@
 
 ## Known gaps (current cycle)
 
-- [ ] Targeted GREEN and coordinated protocol/server/engine gate pending.
+- [ ] Coordinated protocol/server/engine gate and native proof pending; targeted wire GREEN passed.
 
 ## Out of scope
 

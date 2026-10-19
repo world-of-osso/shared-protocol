@@ -55,7 +55,6 @@ fn guild_member_rank_assignment_wire_round_trips_zero_based_target_only() {
 }
 
 #[test]
-#[ignore = "behavioral RED: optional authoritative online guild zone is not represented"]
 fn guild_online_zone_wire_preserves_known_and_unavailable_labels() {
     for zone in [Some("Elwynn Forest"), Some("Westfall"), None] {
         let wire = serde_json::json!({
