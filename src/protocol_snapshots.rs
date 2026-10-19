@@ -309,6 +309,8 @@ pub struct GuildMemberSnapshot {
     /// Computed for each authenticated recipient, never supplied by a client.
     pub is_self: bool,
     pub last_online: String,
+    /// Server-resolved top-level zone label for an online member; unavailable/offline is None.
+    pub online_zone: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]

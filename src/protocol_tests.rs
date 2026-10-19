@@ -156,6 +156,7 @@ fn guild_invite_messages_round_trip() {
                 public_note: "Alchemy".into(),
                 is_self: false,
                 last_online: "Online".into(),
+                online_zone: None,
             }],
         }),
         message: Some("guild updated".into()),
