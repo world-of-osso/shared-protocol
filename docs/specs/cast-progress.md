@@ -21,7 +21,7 @@ Shared `CastState` advances source millisecond cast/channel timers without accum
 
 ## Tests asserting this spec
 
-- `src/casting_tests.rs::cast_millisecond_*` — source milliseconds across real repeated50ms calls; three ignored RED regressions and nearest-ms control before the fix.
+- `src/casting_tests.rs::cast_millisecond_*` — source milliseconds across real repeated50ms calls; three genuine normal/channel/pushback deadline REDs and one nearest-ms control PASS at7b09847 before the fix. Integer-ms implementation retains the f32 wire fields and unchanged pushback methods; targeted GREEN pending.
 - Server `herald_ground::encounter_coverage_herald_ground_roar_cast_1500ms_ai_deadline` — actual source-scheduled ordinary Roar must stop blocking AI at1500ms; genuine native RED39.30s precedes shared production changes.
 
 ## Known gaps (current cycle)
