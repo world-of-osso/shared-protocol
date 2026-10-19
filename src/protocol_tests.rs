@@ -34,6 +34,22 @@ fn chat_message_serialization_round_trip() {
 }
 
 #[test]
+#[ignore = "guild leadership transfer RED before implementation"]
+fn guild_leadership_transfer_wire_preserves_only_the_target_name() {
+    for name in ["Cara", "Dora", ""] {
+        let wire = serde_json::json!({"TransferLeadership": {"character_name": name}});
+        let request: GuildRankRequest = serde_json::from_value(wire.clone())
+            .expect("voluntary leadership transfer must be a represented request");
+        assert_eq!(serde_json::to_value(&request).unwrap(), wire);
+        let bytes = bincode::serde::encode_to_vec(&request, bincode::config::standard()).unwrap();
+        let (decoded, used): (GuildRankRequest, usize) =
+            bincode::serde::decode_from_slice(&bytes, bincode::config::standard()).unwrap();
+        assert_eq!(decoded, request);
+        assert_eq!(used, bytes.len());
+    }
+}
+
+#[test]
 fn guild_member_rank_assignment_wire_round_trips_zero_based_target_only() {
     for rank in [0u8, 1, 4, 255] {
         let wire = serde_json::json!({"SetMemberRank": {"character_name": "Cara", "rank": rank}});
