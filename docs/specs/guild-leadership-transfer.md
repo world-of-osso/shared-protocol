@@ -5,7 +5,7 @@ Represent the sourced `/gleader <member>` request on GuildChannel. Mainline `Sla
 ## What it must do
 
 - [x] `TransferLeadership { character_name }` preserves only the named target through JSON/bincode; actor and guild are supplied by authenticated server state, not new packet fields.
-- [ ] Protocol and both consumers land together. No old-wire compatibility path or default transfer target.
+- [x] Protocol and both consumers land together. No old-wire compatibility path or default transfer target.
 
 ## How it works
 
@@ -22,7 +22,7 @@ Represent the sourced `/gleader <member>` request on GuildChannel. Mainline `Sla
 
 ## Known gaps (current cycle)
 
-- [ ] Coordinated consumer gate remains pending. Actual unsupported-variant RED preceded implementation; focused wire GREEN passes1/1 with exact JSON/bincode target preservation.
+None within this slice. gz709 passed and landed protocol724ec71 with serverb15526d95 and engine79b33ab93. Wire RED→GREEN proves exact JSON/bincode target preservation; real typed transfer and fresh-process authority were subsequently accepted in both skins. Consumer wiki pages retain native evidence and scope.
 
 ## Out of scope
 
