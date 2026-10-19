@@ -22,12 +22,12 @@ Shared `CastState` advances source millisecond cast/channel timers without accum
 
 ## Tests asserting this spec
 
-- `src/casting_tests.rs::cast_millisecond_*` — source milliseconds across real repeated50ms calls; three genuine normal/channel/pushback deadline REDs and one nearest-ms control PASS at7b09847 before the fix. Integer-ms implementation retains the f32 wire fields and unchanged pushback methods; all53 shared casting-family cases pass atbb18da9 (including the four new cases and existing normal/channel/pushback/charge/cooldown/projectile controls),0ignored/no warnings; the three regressions are enabled. Native AI GREEN pending.
+- `src/casting_tests.rs::cast_millisecond_*` — source milliseconds across real repeated50ms calls; three genuine normal/channel/pushback deadline REDs and one nearest-ms control PASS at7b09847 before the fix. Integer-ms implementation retains the f32 wire fields and unchanged pushback methods; all53 shared casting-family cases pass atbb18da9 (including the four new cases and existing normal/channel/pushback/charge/cooldown/projectile controls),0ignored/no warnings; the three regressions are enabled. Native actual1500ms AI expiry passes50.60s at server2b6397005/protocol38afb69; six retained ground/ordinary Omor pushback controls pass105.21s. The native probe waits for actual natural Roar admission, preserving initial category-cooldown refusal; its1450/1500ms assertions are unchanged.
 - Server `herald_ground::encounter_coverage_herald_ground_roar_cast_1500ms_ai_deadline` — actual source-scheduled ordinary Roar must stop blocking AI at1500ms; genuine native RED39.30s precedes shared production changes.
 
 ## Known gaps (current cycle)
 
-- [ ] Prove native AI GREEN, then co-land protocol/server tips; shared RED→GREEN53PASS is retained.
+- [ ] Co-land protocol/server tips after the independent wide gate; shared53PASS and native actual1500ms GREEN plus six retained controls are recorded above.
 - [ ] Independent wide player/NPC/pet/follower/channel/pushback gate remains required.
 
 ## Out of scope
