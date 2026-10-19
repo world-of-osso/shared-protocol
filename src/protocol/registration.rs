@@ -37,6 +37,9 @@ pub(super) fn register_messages(app: &mut App) {
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<LeaveBattleground>()
         .add_direction(NetworkDirection::ClientToServer);
+    // Append after the aa6d925 message set; existing registration IDs remain stable.
+    app.register_protocol_message::<SetRecipeFavorite>()
+        .add_direction(NetworkDirection::ClientToServer);
 }
 
 fn register_pet_battle_messages(app: &mut App) {

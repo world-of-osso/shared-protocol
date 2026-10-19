@@ -1,6 +1,13 @@
 //! Retail profession specialization and fixed-output crafting order operations.
 //! Unsupported outcome evaluation returns a named gap, never a default tier.
 
+/// Character-owned preference; the server accepts only authoritatively known spells.
+#[derive(serde::Serialize, serde::Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct SetRecipeFavorite {
+    pub spell_id: u32,
+    pub favorite: bool,
+}
+
 /// Read-only concentration currency query; never initializes a wallet or recharge clock.
 #[derive(serde::Serialize, serde::Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ProfessionConcentrationRequest {

@@ -185,6 +185,8 @@ pub struct ProfessionSnapshot {
     pub spells: Vec<u32>,
     /// Static tdb_trainer_spell rows for the owner's learned skill lines; not availability.
     pub recipe_sources: Vec<ProfessionTrainerSource>,
+    /// Character-owned favorite recipe spell IDs; no account-wide or client-only preference.
+    pub favorites: Vec<u32>,
 }
 
 /// An authored trainer row. Previewing it never teaches a recipe or authorizes payment.

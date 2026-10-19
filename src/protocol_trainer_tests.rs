@@ -73,6 +73,7 @@ fn trainer_and_profession_messages_round_trip() {
             },
         ],
         spells: vec![3908, 264616, 2963],
+        favorites: vec![2963],
         recipe_sources: vec![ProfessionTrainerSource {
             trainer_id: 56,
             spell_id: 2153,
@@ -82,6 +83,10 @@ fn trainer_and_profession_messages_round_trip() {
             req_abilities: vec![],
             req_level: 0,
         }],
+    });
+    assert_wire_round_trip(&SetRecipeFavorite {
+        spell_id: 2963,
+        favorite: true,
     });
     assert_wire_round_trip(&CraftRecipe {
         spell_id: 2963,
@@ -111,6 +116,7 @@ fn protocol_plugin_registers_trainer_and_profession_messages() {
     assert!(app.is_message_registered::<TrainerBuyFailed>());
     assert!(app.is_message_registered::<ProfessionSnapshot>());
     assert!(app.is_message_registered::<CraftRecipe>());
+    assert!(app.is_message_registered::<SetRecipeFavorite>());
     assert!(app.is_message_registered::<ProfessionSpecializationRequest>());
     assert!(app.is_message_registered::<ProfessionSpecializationStateUpdate>());
     assert!(app.is_message_registered::<CraftingOrderRequest>());
