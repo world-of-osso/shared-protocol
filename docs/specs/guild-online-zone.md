@@ -5,8 +5,8 @@
 ## What it must do
 
 - [x] JSON and bincode retain a known label and an unavailable value exactly.
-- [ ] The producer uses existing GroundMap→AreaTable zone authority and the real zone-name catalog; offline/unavailable stays None.
-- [ ] Protocol and both consumers land together; no old-wire fallback or invented default label.
+- [x] The producer uses existing GroundMap→AreaTable zone authority and real names loaded with AreaTable; offline/unavailable stays None.
+- [x] Protocol and both consumers land together; no old-wire fallback or invented default label.
 
 ## How it works
 
@@ -23,7 +23,7 @@
 
 ## Known gaps (current cycle)
 
-- [ ] Coordinated protocol/server/engine gate and native proof pending; targeted wire GREEN passed.
+- [x] Targeted wire GREEN and coordinated gz689 passed; protocol b3a34fe/server e3f3f86c6/engine d802433d9 landed together. Accepted two authenticated members prove real-zone display, refresh and normal disconnect in both skins; engine `docs/wiki/systems/guilds.md#online-member-zone` owns native artifact/PNG provenance and proof limits.
 
 ## Out of scope
 
