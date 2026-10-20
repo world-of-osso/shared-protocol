@@ -24,6 +24,7 @@ fn linen(count: u32) -> ItemStack {
         count,
         durability: None,
         soulbound: false,
+        crafting_origin: None,
     }
 }
 
@@ -59,6 +60,7 @@ fn inventory_snapshots_and_delta_round_trip() {
                     max: 35,
                 }),
                 soulbound: true,
+                crafting_origin: None,
             },
         }],
     });

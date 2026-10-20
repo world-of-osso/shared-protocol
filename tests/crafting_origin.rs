@@ -1,7 +1,6 @@
 use shared::protocol::ItemStack;
 
 #[test]
-#[ignore = "RED: owner item wire drops authoritative crafting origin"]
 fn crafting_origin_item_wire_preserves_ability_and_recipe_identity() {
     let origin = serde_json::json!({
         "skill_line_ability_id": 1355,
@@ -18,6 +17,12 @@ fn crafting_origin_item_wire_preserves_ability_and_recipe_identity() {
         "crafting_origin": origin
     });
     let decoded: ItemStack = serde_json::from_value(item).unwrap();
+    let config = bincode::config::standard();
+    let bytes = bincode::serde::encode_to_vec(&decoded, config).unwrap();
+    let (wire, read): (ItemStack, usize) =
+        bincode::serde::decode_from_slice(&bytes, config).unwrap();
+    assert_eq!(read, bytes.len());
+    assert_eq!(wire, decoded);
     let encoded = serde_json::to_value(decoded).unwrap();
     assert_eq!(
         encoded.get("crafting_origin"),
