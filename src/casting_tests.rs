@@ -1,6 +1,52 @@
 use super::*;
 
 #[test]
+fn cast_millisecond_normal_expires_at_thirtieth_50ms_step() {
+    let mut cast = CastState::normal(39427, 1, 1.5, true);
+    for _ in 0..29 {
+        assert_eq!(cast.tick(0.05), CastTickResult::InProgress);
+    }
+    assert_eq!(cast.tick(0.05), CastTickResult::Completed);
+    assert_eq!(cast.elapsed, 1.5);
+}
+
+#[test]
+fn cast_millisecond_channel_keeps_periods_and_expires_at_sixtieth_step() {
+    let mut cast = CastState::channel(5143, 1, 3.0, 1.0, true);
+    for frame in 1..=60 {
+        let expected = match frame {
+            20 | 40 => CastTickResult::ChannelTick,
+            60 => CastTickResult::ChannelComplete,
+            _ => CastTickResult::InProgress,
+        };
+        assert_eq!(cast.tick(0.05), expected, "actual50ms frame{frame}");
+    }
+    assert_eq!(cast.elapsed, 3.0);
+}
+
+#[test]
+fn cast_millisecond_normal_retains_pushback_deadline() {
+    let mut cast = CastState::normal(133, 1, 1.5, true);
+    for _ in 0..10 {
+        assert_eq!(cast.tick(0.05), CastTickResult::InProgress);
+    }
+    assert!(cast.apply_pushback());
+    assert_eq!((cast.duration, cast.pushback_count), (2.0, 1));
+    for _ in 0..29 {
+        assert_eq!(cast.tick(0.05), CastTickResult::InProgress);
+    }
+    assert_eq!(cast.tick(0.05), CastTickResult::Completed);
+}
+
+#[test]
+fn cast_millisecond_recovers_nearest_ms_from_replicated_seconds() {
+    let mut cast = CastState::normal(133, 1, 1.010, true);
+    assert_eq!(cast.tick(1.009), CastTickResult::InProgress);
+    assert_eq!(cast.elapsed, 1.009);
+    assert_eq!(cast.tick(0.001), CastTickResult::Completed);
+}
+
+#[test]
 fn normal_cast_in_progress() {
     let mut cast = CastState::normal(133, 1, 2.0, true);
     assert_eq!(cast.tick(0.5), CastTickResult::InProgress);
