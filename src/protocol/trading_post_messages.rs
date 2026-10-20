@@ -24,6 +24,30 @@ pub enum TradingPostRequest {
     },
 }
 
+/// The request whose authoritative reply this snapshot carries, not a request ID.
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+pub enum TradingPostReplyKind {
+    Query,
+    Purchase,
+    Refund,
+    Freeze,
+    Balance,
+    Checkout,
+}
+
+impl TradingPostRequest {
+    pub fn reply_kind(&self) -> TradingPostReplyKind {
+        match self {
+            Self::Query => TradingPostReplyKind::Query,
+            Self::Purchase { .. } => TradingPostReplyKind::Purchase,
+            Self::Refund { .. } => TradingPostReplyKind::Refund,
+            Self::Freeze { .. } => TradingPostReplyKind::Freeze,
+            Self::Balance => TradingPostReplyKind::Balance,
+            Self::Checkout { .. } => TradingPostReplyKind::Checkout,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct TradingPostCategory {
     pub id: u32,
@@ -80,6 +104,8 @@ pub struct TradingPostSnapshot {
     /// `items` is the whole catalog (vendor Query). Otherwise it holds only rows whose
     /// purchase/collection state changed; `merge` applies them to the last full catalog.
     pub catalog_complete: bool,
+    /// Supplied by the server even for a refusal; catalog refresh is not purchase completion.
+    pub reply_kind: TradingPostReplyKind,
 }
 
 impl TradingPostSnapshot {
@@ -177,7 +203,12 @@ mod tests {
         }
     }
 
-    fn snapshot(tender: u32, items: Vec<TradingPostItem>, complete: bool) -> TradingPostSnapshot {
+    fn snapshot(
+        tender: u32,
+        items: Vec<TradingPostItem>,
+        reply_kind: TradingPostReplyKind,
+    ) -> TradingPostSnapshot {
+        let complete = reply_kind == TradingPostReplyKind::Query;
         TradingPostSnapshot {
             npc_net_id: Some(9),
             tender,
@@ -199,7 +230,60 @@ mod tests {
             source_gaps: Vec::new(),
             error: None,
             catalog_complete: complete,
+            reply_kind,
         }
+    }
+
+    #[test]
+    fn trading_post_reply_kinds_round_trip_and_survive_snapshot_merge() {
+        let cases = [
+            (TradingPostRequest::Query, TradingPostReplyKind::Query),
+            (
+                TradingPostRequest::Purchase { vendor_item_id: 4 },
+                TradingPostReplyKind::Purchase,
+            ),
+            (
+                TradingPostRequest::Refund { vendor_item_id: 4 },
+                TradingPostReplyKind::Refund,
+            ),
+            (
+                TradingPostRequest::Freeze {
+                    vendor_item_id: Some(4),
+                },
+                TradingPostReplyKind::Freeze,
+            ),
+            (
+                TradingPostRequest::Freeze {
+                    vendor_item_id: None,
+                },
+                TradingPostReplyKind::Freeze,
+            ),
+            (TradingPostRequest::Balance, TradingPostReplyKind::Balance),
+            (
+                TradingPostRequest::Checkout {
+                    vendor_item_ids: vec![4, 5],
+                },
+                TradingPostReplyKind::Checkout,
+            ),
+        ];
+        for (request, kind) in cases {
+            assert_eq!(request.reply_kind(), kind);
+            let update = snapshot(500, Vec::new(), kind);
+            let bytes = serde_json::to_vec(&update).unwrap();
+            let received: TradingPostSnapshot = serde_json::from_slice(&bytes).unwrap();
+            assert_eq!(received, update);
+            let previous = snapshot(600, vec![item(4, false)], TradingPostReplyKind::Query);
+            let merged = TradingPostSnapshot::merge(Some(&previous), received);
+            assert_eq!(merged.reply_kind, kind);
+        }
+    }
+
+    #[test]
+    fn trading_post_snapshot_rejects_missing_reply_kind() {
+        let data = snapshot(500, Vec::new(), TradingPostReplyKind::Query);
+        let mut value = serde_json::to_value(data).unwrap();
+        value.as_object_mut().unwrap().remove("reply_kind");
+        assert!(serde_json::from_value::<TradingPostSnapshot>(value).is_err());
     }
 
     fn item(id: u32, purchased: bool) -> TradingPostItem {
@@ -227,10 +311,14 @@ mod tests {
 
     #[test]
     fn trading_post_partial_update_keeps_retained_refund_expiry_on_the_server_clock() {
-        let mut full = snapshot(1000, vec![item(4, true), item(5, false)], true);
+        let mut full = snapshot(
+            1000,
+            vec![item(4, true), item(5, false)],
+            TradingPostReplyKind::Query,
+        );
         full.now_unix = 1790812900;
         full.items[0].refund_seconds = 60;
-        let mut delta = snapshot(925, vec![item(5, true)], false);
+        let mut delta = snapshot(925, vec![item(5, true)], TradingPostReplyKind::Purchase);
         delta.now_unix = 1790812920;
         delta.items[0].refund_seconds = 600;
         let merged = TradingPostSnapshot::merge(Some(&full), delta);
@@ -242,13 +330,13 @@ mod tests {
             merged.items[1].refund_seconds, 600,
             "new row's duration is already relative to new server time"
         );
-        let mut freeze = snapshot(925, Vec::new(), false);
+        let mut freeze = snapshot(925, Vec::new(), TradingPostReplyKind::Freeze);
         freeze.now_unix = 1790812959;
         freeze.frozen_item_id = Some(4);
         let merged = TradingPostSnapshot::merge(Some(&merged), freeze);
         assert_eq!(merged.items[0].refund_seconds, 1);
         assert_eq!(merged.items[1].refund_seconds, 561);
-        let mut balance = snapshot(925, Vec::new(), false);
+        let mut balance = snapshot(925, Vec::new(), TradingPostReplyKind::Balance);
         balance.now_unix = 1790812960;
         let expired = TradingPostSnapshot::merge(Some(&merged), balance);
         assert_eq!(expired.items[0].refund_seconds, 0);
@@ -257,23 +345,36 @@ mod tests {
 
     #[test]
     fn trading_post_partial_update_replaces_only_changed_rows_of_full_catalog() {
-        let full = snapshot(4000, vec![item(1, false), item(2, false)], true);
-        let merged =
-            TradingPostSnapshot::merge(Some(&full), snapshot(3350, vec![item(2, true)], false));
+        let full = snapshot(
+            4000,
+            vec![item(1, false), item(2, false)],
+            TradingPostReplyKind::Query,
+        );
+        let merged = TradingPostSnapshot::merge(
+            Some(&full),
+            snapshot(3350, vec![item(2, true)], TradingPostReplyKind::Purchase),
+        );
         assert_eq!(merged.tender, 3350);
         assert!(merged.catalog_complete);
         assert_eq!(merged.categories, full.categories);
         assert_eq!(merged.items, vec![item(1, false), item(2, true)]);
-        let balance = TradingPostSnapshot::merge(Some(&merged), snapshot(3350, Vec::new(), false));
+        let balance = TradingPostSnapshot::merge(
+            Some(&merged),
+            snapshot(3350, Vec::new(), TradingPostReplyKind::Balance),
+        );
         assert_eq!(balance.items, merged.items);
-        let without_base =
-            TradingPostSnapshot::merge(None, snapshot(3350, vec![item(2, true)], false));
+        let without_base = TradingPostSnapshot::merge(
+            None,
+            snapshot(3350, vec![item(2, true)], TradingPostReplyKind::Purchase),
+        );
         assert!(
             !without_base.catalog_complete,
             "a partial update never poses as the catalog"
         );
-        let replaced =
-            TradingPostSnapshot::merge(Some(&merged), snapshot(100, vec![item(1, true)], true));
+        let replaced = TradingPostSnapshot::merge(
+            Some(&merged),
+            snapshot(100, vec![item(1, true)], TradingPostReplyKind::Query),
+        );
         assert_eq!(replaced.items, vec![item(1, true)]);
     }
 }
