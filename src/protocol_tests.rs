@@ -75,7 +75,7 @@ fn guild_online_zone_wire_preserves_known_and_unavailable_labels() {
         let wire = serde_json::json!({
             "character_name": "Cara", "level": 32, "class_name": "Paladin",
             "rank_name": "Member", "is_online": true, "officer_note": "",
-            "public_note": "", "is_self": false, "last_online": "Online",
+            "public_note": "", "is_self": false, "last_logout_unix_secs": null,
             "online_zone": zone,
         });
         let member: GuildMemberSnapshot = serde_json::from_value(wire.clone()).unwrap();
@@ -169,7 +169,7 @@ fn guild_invite_messages_round_trip() {
                 officer_note: "Reliable healer".into(),
                 public_note: "Alchemy".into(),
                 is_self: false,
-                last_online: "Online".into(),
+                last_logout_unix_secs: None,
                 online_zone: None,
             }],
         }),
@@ -703,7 +703,7 @@ fn guild_last_online_wire_preserves_observed_timestamp_and_unknown_without_statu
             "character_name": "Cara", "level": 32, "class_name": "Warrior",
             "rank_name": "Member", "is_online": false, "officer_note": "",
             "public_note": "", "is_self": false, "online_zone": null,
-            "last_online": "Offline", "last_logout_unix_secs": observed
+            "last_logout_unix_secs": observed
         }))
         .unwrap();
         let encoded = bincode::serde::encode_to_vec(&member, bincode::config::standard()).unwrap();
