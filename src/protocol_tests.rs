@@ -3,6 +3,22 @@ use crate::components::CharacterAppearance;
 use crate::components::{EquipmentVisualSlot, EquippedAppearanceEntry};
 
 #[test]
+fn skirmish_requeue_wire_carries_only_the_finished_match_identity() {
+    for match_id in [0, 71, u64::MAX] {
+        let request = RequeueSkirmish { match_id };
+        assert_eq!(
+            serde_json::to_value(&request).unwrap(),
+            serde_json::json!({"match_id":match_id})
+        );
+        let bytes = bincode::serde::encode_to_vec(&request, bincode::config::standard()).unwrap();
+        let (decoded, used): (RequeueSkirmish, usize) =
+            bincode::serde::decode_from_slice(&bytes, bincode::config::standard()).unwrap();
+        assert_eq!(decoded, request);
+        assert_eq!(used, bytes.len());
+    }
+}
+
+#[test]
 fn chat_type_serialization_round_trip() {
     let types = vec![
         ChatType::Say,

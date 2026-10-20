@@ -40,6 +40,9 @@ pub(super) fn register_messages(app: &mut App) {
     // Append after the aa6d925 message set; existing registration IDs remain stable.
     app.register_protocol_message::<SetRecipeFavorite>()
         .add_direction(NetworkDirection::ClientToServer);
+    // Append the new request without renumbering any existing message registration.
+    app.register_protocol_message::<RequeueSkirmish>()
+        .add_direction(NetworkDirection::ClientToServer);
 }
 
 fn register_pet_battle_messages(app: &mut App) {

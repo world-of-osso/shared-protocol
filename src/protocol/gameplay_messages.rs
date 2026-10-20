@@ -616,6 +616,12 @@ pub struct LeaveBattleground {
     pub match_id: u64,
 }
 
+/// Requeue only the caller's completed skirmish; the server owns the played mode.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct RequeueSkirmish {
+    pub match_id: u64,
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct QueueForRatedPvp {
     pub bracket: PvpBracketSnapshot,
