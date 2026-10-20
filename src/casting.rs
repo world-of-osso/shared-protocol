@@ -98,26 +98,37 @@ impl CastState {
         }
     }
 
-    /// Advance the cast by `dt` seconds. Returns what happened.
+    /// Advance source integer-ms timers, projecting seconds back to the wire fields.
+    /// Round seconds to the nearest ms: truncation would lose encoded milliseconds.
     pub fn tick(&mut self, dt: f32) -> CastTickResult {
-        self.elapsed += dt;
+        let diff_ms = round_seconds_to_ms(dt);
+        let elapsed_ms = round_seconds_to_ms(self.elapsed) + diff_ms;
+        let finished = elapsed_ms >= round_seconds_to_ms(self.duration);
+        self.elapsed = elapsed_ms as f32 / 1000.0;
 
         match self.cast_type {
             CastType::Normal => {
-                if self.elapsed >= self.duration {
+                if finished {
                     CastTickResult::Completed
                 } else {
                     CastTickResult::InProgress
                 }
             }
             CastType::Channel => {
-                if self.elapsed >= self.duration {
+                if finished {
                     return CastTickResult::ChannelComplete;
                 }
-                if self.channel_tick_interval > 0.0 {
-                    self.channel_tick_timer += dt;
-                    if self.channel_tick_timer >= self.channel_tick_interval {
-                        self.channel_tick_timer -= self.channel_tick_interval;
+                let interval_ms = round_seconds_to_ms(self.channel_tick_interval);
+                if interval_ms > 0 {
+                    let timer_ms = round_seconds_to_ms(self.channel_tick_timer) + diff_ms;
+                    let tick = timer_ms >= interval_ms;
+                    let remaining_ms = if tick {
+                        timer_ms - interval_ms
+                    } else {
+                        timer_ms
+                    };
+                    self.channel_tick_timer = remaining_ms as f32 / 1000.0;
+                    if tick {
                         return CastTickResult::ChannelTick;
                     }
                 }
@@ -159,6 +170,11 @@ impl CastState {
         }
         true
     }
+}
+
+/// TC Spell::update advances integer milliseconds; f32 fields are seconds views.
+fn round_seconds_to_ms(seconds: f32) -> u64 {
+    (f64::from(seconds) * 1000.0).round() as u64
 }
 
 /// Maximum pushbacks per cast before the caster becomes immune.
