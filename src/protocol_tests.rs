@@ -75,7 +75,7 @@ fn guild_online_zone_wire_preserves_known_and_unavailable_labels() {
         let wire = serde_json::json!({
             "character_name": "Cara", "level": 32, "class_name": "Paladin",
             "rank_name": "Member", "is_online": true, "officer_note": "",
-            "public_note": "", "is_self": false, "last_online": "Online",
+            "public_note": "", "is_self": false, "last_logout_unix_secs": null,
             "online_zone": zone,
         });
         let member: GuildMemberSnapshot = serde_json::from_value(wire.clone()).unwrap();
@@ -169,7 +169,7 @@ fn guild_invite_messages_round_trip() {
                 officer_note: "Reliable healer".into(),
                 public_note: "Alchemy".into(),
                 is_self: false,
-                last_online: "Online".into(),
+                last_logout_unix_secs: None,
                 online_zone: None,
             }],
         }),
@@ -693,4 +693,30 @@ fn combat_event_round_trip() {
     assert_eq!(decoded.amount, 1500.0);
     assert_eq!(decoded.spell_id, 12345);
     assert_eq!(decoded.event_type, CombatEventType::SpellDamage);
+}
+
+#[test]
+fn guild_last_online_wire_preserves_observed_timestamp_and_unknown_without_status_text() {
+    for observed in [Some(1_792_455_000_u64), None] {
+        let member: GuildMemberSnapshot = serde_json::from_value(serde_json::json!({
+            "character_name": "Cara", "level": 32, "class_name": "Warrior",
+            "rank_name": "Member", "is_online": false, "officer_note": "",
+            "public_note": "", "is_self": false, "online_zone": null,
+            "last_logout_unix_secs": observed
+        }))
+        .unwrap();
+        let encoded = bincode::serde::encode_to_vec(&member, bincode::config::standard()).unwrap();
+        let (decoded, _): (GuildMemberSnapshot, usize) =
+            bincode::serde::decode_from_slice(&encoded, bincode::config::standard()).unwrap();
+        let json = serde_json::to_value(decoded).unwrap();
+        assert_eq!(
+            json["last_logout_unix_secs"],
+            serde_json::json!(observed),
+            "real time authority survives JSON and binary consumers"
+        );
+        assert!(
+            json.get("last_online").is_none(),
+            "opaque display text is not duplicate presence authority"
+        );
+    }
 }
