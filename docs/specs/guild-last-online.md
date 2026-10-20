@@ -5,7 +5,7 @@ Guild members carry optional actually observed logout time, not opaque display t
 ## What it must do
 
 - [x] GuildMemberSnapshot preserves optional `last_logout_unix_secs` through JSON/bincode. Unknown is None; remove the duplicate `last_online` display-string authority.
-- [ ] Protocol field change lands with server and engine consumers, then canonical protocol movement is announced. No old-wire compatibility path.
+- [x] Protocol field change lands with server and engine consumers, then canonical protocol movement is announced. No old-wire compatibility path.
 
 ## How it works
 
@@ -22,7 +22,7 @@ Guild members carry optional actually observed logout time, not opaque display t
 
 ## Known gaps (current cycle)
 
-- [ ] Actual wire RED→GREEN1/1 observed (88s compile, no warnings); proven test enabled without changing its assertions. Synchronized consumers and coordinated landing remain pending.
+None within this slice. gl728 passed and landed protocol50517c9 with server1a2f13fd4 and engine51f1af4f8; canonical protocol was fast-forwarded and announced only with its consumers. Wire RED→GREEN preserves optional time authority; real both-skin disconnect/reconnect/fresh-process recency readback was subsequently accepted. Consumer wiki pages retain exact native evidence and limits.
 
 ## Out of scope
 
