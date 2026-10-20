@@ -696,7 +696,6 @@ fn combat_event_round_trip() {
 }
 
 #[test]
-#[ignore = "RED first: guild presence must retain optional observed logout authority"]
 fn guild_last_online_wire_preserves_observed_timestamp_and_unknown_without_status_text() {
     for observed in [Some(1_792_455_000_u64), None] {
         let member: GuildMemberSnapshot = serde_json::from_value(serde_json::json!({

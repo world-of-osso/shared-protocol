@@ -18,11 +18,11 @@ Guild members carry optional actually observed logout time, not opaque display t
 
 ## Tests asserting this spec
 
-- `guild_last_online_wire_preserves_observed_timestamp_and_unknown_without_status_text` (ignored RED pushed first).
+- `guild_last_online_wire_preserves_observed_timestamp_and_unknown_without_status_text` (enabled after actual wire RED→GREEN).
 
 ## Known gaps (current cycle)
 
-- [ ] Actual wire RED observed (missing timestamp after JSON/bincode). Optional authority implemented; focused GREEN, synchronized consumers and coordinated landing pending.
+- [ ] Actual wire RED→GREEN1/1 observed (88s compile, no warnings); proven test enabled without changing its assertions. Synchronized consumers and coordinated landing remain pending.
 
 ## Out of scope
 
