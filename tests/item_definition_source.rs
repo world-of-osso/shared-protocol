@@ -84,7 +84,8 @@ fn item_definition_source_buyback_requires_known_source() {
 fn stack_json(source: &str) -> Value {
     json!({
         "item_guid": 50, "item_id": 2947, "definition_source": source,
-        "count": 1, "durability": null, "soulbound": false
+        "count": 1, "durability": null, "soulbound": false,
+        "crafting_origin": null
     })
 }
 

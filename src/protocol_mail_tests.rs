@@ -42,6 +42,7 @@ fn linen_attachment() -> MailAttachment {
             count: 20,
             durability: None,
             soulbound: false,
+            crafting_origin: None,
         },
         name: "Linen Cloth".into(),
         quality: 1,
