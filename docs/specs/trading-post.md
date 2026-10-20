@@ -7,6 +7,7 @@ Local Mainline PerksProgram API documentation defines categories, authored price
 - [x] Query, purchase, refund, freeze/clear and cart checkout requests carry only authored vendor IDs; never client-provided balance, price or grant. `Checkout.vendor_item_ids` preserves the Retail RequestCartCheckout list.
 - [ ] Snapshot carries actual active-vendor identity, balance, points, monthly expiry/clock, thresholds, categories, authored item/preview/UI group metadata, owned/receipt state, zero refundable seconds when disabled and explicit source/grant gaps.
 - [ ] Registered messages travel server/client through existing channels.
+- [ ] Each snapshot carries a required server-supplied reply kind for the actual Query/Purchase/Refund/Freeze/Balance/Checkout operation, including refusals. Partial merge retains the incoming kind, not the old catalog's kind. No request ID, inferred FIFO tag or missing-kind compatibility default.
 - [x] Partial replies advance retained rows' refund durations by elapsed server time before replacing updated rows. A balance/freeze delta must not renew an earlier purchase's refund window.
 - [x] `TradingPostItem.usable` carries the querying player's evaluated class/race/level item restrictions for Retail's Useable Only filter. `None` preserves unavailable source/player facts; it is not inferred from grant availability and does not prohibit account-wide purchases.
 
@@ -22,6 +23,8 @@ Local Mainline PerksProgram API documentation defines categories, authored price
 ## Tests asserting this spec
 
 - `trading_post_wire_preserves_authored_price_and_unavailable_refund`: JSON round-trip.
+- `trading_post_reply_kinds_round_trip_and_survive_snapshot_merge`: all actual kinds, request classification and snapshot serialization/merge.
+- `trading_post_snapshot_rejects_missing_reply_kind`: explicit metadata required.
 
 ## Known gaps (current cycle)
 
