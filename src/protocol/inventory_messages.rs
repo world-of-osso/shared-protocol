@@ -218,6 +218,18 @@ pub struct ItemDurability {
     pub max: u32,
 }
 
+/// Server-recorded craft provenance. Ability identity is TC modifier39; its
+/// authored Spell join identifies the recipe, not the item template.
+#[derive(
+    Serialize, Deserialize, bitcode::Encode, bitcode::Decode, Clone, Copy, Debug, PartialEq, Eq,
+)]
+pub struct CraftingOrigin {
+    pub skill_line_ability_id: u32,
+    pub recipe_spell_id: u32,
+    /// An authoritative known result only; never item rarity or a default tier.
+    pub crafting_quality_id: Option<u32>,
+}
+
 /// One item instance (stack) as the owner sees it.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct ItemStack {
@@ -228,6 +240,8 @@ pub struct ItemStack {
     /// `None` when the item has no durability or the server does not track it.
     pub durability: Option<ItemDurability>,
     pub soulbound: bool,
+    /// Unknown for items without an authoritative recorded craft.
+    pub crafting_origin: Option<CraftingOrigin>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
