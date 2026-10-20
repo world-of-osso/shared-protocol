@@ -7,6 +7,7 @@ Owner item instances carry server-recorded crafting provenance. TC a352b1fa `Ite
 - [ ] Existing ItemStack owner messages preserve additive optional `crafting_origin`: authored skill-line-ability identity, its joined recipe spell and an optional actual known crafting quality ID.
 - [ ] Ability1355 and recipe2153 remain distinct through JSON and binary serialization.
 - [ ] Missing origin remains unknown. Unknown crafting quality is not rarity, zero or a default tier.
+- [ ] Unknown origin serializes as explicit JSON `null`, like `durability`; bincode stays positional, so the field is never skipped.
 
 ## How it works
 
@@ -19,6 +20,7 @@ Owner item instances carry server-recorded crafting provenance. TC a352b1fa `Ite
 ## Tests asserting this spec
 
 - `tests/crafting_origin.rs` — owner serialization preserves concrete identities and unknown quality.
+- `tests/item_definition_source.rs` — exact owner JSON includes `crafting_origin: null` after bincode round trips.
 
 ## Known gaps (current cycle)
 
