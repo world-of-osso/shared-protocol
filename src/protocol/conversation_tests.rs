@@ -1,5 +1,4 @@
 use super::*;
-use bevy::prelude::*;
 use bevy_replicon::shared::{
     protocol::ProtocolHasher,
     replication::{registry::ReplicationRegistry, rules::ReplicationRules},
