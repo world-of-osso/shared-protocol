@@ -94,7 +94,6 @@ pub struct GroupPortraitAppearance {
 
 #[cfg(test)]
 #[test]
-#[ignore = "party follower portrait RED; enable after headless GREEN"]
 fn party_follower_portrait_preserves_creature_display_on_the_roster_wire() {
     let mut received = serde_json::to_value(GroupPortraitAppearance::default()).unwrap();
     received["creature_display_id"] = serde_json::json!(113753);
