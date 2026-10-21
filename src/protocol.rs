@@ -16,6 +16,9 @@ mod adventure_guide_messages;
 mod bank_messages;
 mod challenge_messages;
 mod channels;
+mod conversation_messages;
+#[cfg(test)]
+mod conversation_tests;
 mod core_messages;
 mod damage_meter_messages;
 mod encounter_messages;
@@ -64,6 +67,7 @@ pub use adventure_guide_messages::*;
 pub use bank_messages::*;
 pub use challenge_messages::*;
 pub use channels::*;
+pub use conversation_messages::*;
 pub use core_messages::*;
 pub use damage_meter_messages::*;
 pub use encounter_messages::*;

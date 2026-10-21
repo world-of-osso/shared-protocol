@@ -43,6 +43,8 @@ pub(super) fn register_messages(app: &mut App) {
     // Append the new request without renumbering any existing message registration.
     app.register_protocol_message::<RequeueSkirmish>()
         .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<ConversationUpdate>()
+        .add_direction(NetworkDirection::ServerToClient);
 }
 
 fn register_pet_battle_messages(app: &mut App) {
