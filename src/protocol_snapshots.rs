@@ -81,10 +81,12 @@ pub struct GroupRosterSnapshot {
     pub loot_threshold: u8,
 }
 
-/// Canonical head customization and only the equipped head visual, independent of
-/// entity replication. Stable customization IDs cannot be classified by the server.
+/// A creature's actual display, or canonical player head customization/equipment,
+/// independent of entity replication. Stable customization IDs stay client-resolved.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Default)]
 pub struct GroupPortraitAppearance {
+    /// Present for NPC party members; selected from their authored template at spawn.
+    pub creature_display_id: Option<u32>,
     pub race: u8,
     pub appearance: crate::components::CharacterAppearance,
     pub head: Option<crate::components::EquippedAppearanceEntry>,
