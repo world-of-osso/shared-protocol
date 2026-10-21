@@ -90,6 +90,17 @@ pub struct GroupPortraitAppearance {
     pub head: Option<crate::components::EquippedAppearanceEntry>,
 }
 
+#[cfg(test)]
+#[test]
+#[ignore = "party follower portrait RED; enable after headless GREEN"]
+fn party_follower_portrait_preserves_creature_display_on_the_roster_wire() {
+    let mut received = serde_json::to_value(GroupPortraitAppearance::default()).unwrap();
+    received["creature_display_id"] = serde_json::json!(113753);
+    let portrait: GroupPortraitAppearance = serde_json::from_value(received).unwrap();
+    let roundtrip = serde_json::to_value(portrait).unwrap();
+    assert_eq!(roundtrip["creature_display_id"], 113753);
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct GroupMemberSnapshot {
     /// Stable identity for tap eligibility, including offline/out-of-interest members.
