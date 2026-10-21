@@ -173,6 +173,13 @@ pub struct WitnessRay {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct StopSpellCast;
 
+/// Release the matching active empower; never cancels an ordinary cast/channel.
+/// CastState has no cast-instance ID; server validates current spell and ownership.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct ReleaseEmpowerSpell {
+    pub spell_id: u32,
+}
+
 /// Client requests to invite a player to the group.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct GroupInviteIntent {

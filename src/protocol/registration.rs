@@ -91,6 +91,8 @@ fn register_core_messages(app: &mut App) {
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<StopSpellCast>()
         .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<ReleaseEmpowerSpell>()
+        .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<EmoteIntent>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<EmoteEvent>()
