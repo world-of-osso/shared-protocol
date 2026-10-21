@@ -59,6 +59,16 @@ fn taxi_messages_round_trip() {
 }
 
 #[test]
+fn unit_charm_round_trips_charmer_identity_and_both_control_modes() {
+    for possessed in [false, true] {
+        assert_wire_round_trip(&crate::components::UnitCharm {
+            charmer: 4_294_967_301,
+            possessed,
+        });
+    }
+}
+
+#[test]
 fn forced_facing_round_trips_exact_epoch_and_yaw() {
     assert_wire_round_trip(&crate::components::ForcedFacing {
         epoch: 42,

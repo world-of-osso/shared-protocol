@@ -480,9 +480,30 @@ pub struct TransportPassenger {
 )]
 pub struct WorldArrival(pub u32);
 
-/// Server-authoritative repositioning of a player (graveyard release, taxi, knockback).
-/// The owning client adopts `Position` when `epoch` changes and follows it while
-/// `controlled`, sending no movement input.
+/// Active charm/possession on a unit (TC Unit::SetCharmedBy). Removal releases control.
+/// A player's aura2 switches its mover/camera; ordinary aura6 leaves its body active.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Default,
+)]
+pub struct UnitCharm {
+    /// Server entity bits of the unit controlling this unit. Not a summon owner.
+    pub charmer: u64,
+    /// True for aura2 cast by a player: movement and camera belong to this unit.
+    pub possessed: bool,
+}
+
+/// Server movement epoch and whether input is disabled for this unit.
 #[derive(
     Component,
     Reflect,
