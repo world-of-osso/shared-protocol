@@ -1,6 +1,13 @@
 use super::*;
 
 #[test]
+fn empower_release_round_trips_native_base_and_font_spell_ids() {
+    for spell_id in [357208, 359073, 382266, 382411] {
+        assert_wire_round_trip(&ReleaseEmpowerSpell { spell_id });
+    }
+}
+
+#[test]
 fn combat_log_summon_preserves_summoner_unit_and_spell_on_wire() {
     let kind = serde_json::from_str::<CombatLogKind>("\"Summon\"");
     assert!(kind.is_ok(), "SPELL_SUMMON is unavailable: {kind:?}");

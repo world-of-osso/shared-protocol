@@ -137,6 +137,7 @@ fn roster_portrait_round_trips_on_the_wire() {
             level: 80,
             entity: Some(42),
             portrait: GroupPortraitAppearance {
+                creature_display_id: None,
                 race: 52,
                 appearance: crate::components::CharacterAppearance {
                     sex: 1,
@@ -180,6 +181,21 @@ fn roster_portrait_round_trips_on_the_wire() {
     };
     let config = bincode::config::standard();
     let mut roster = roster;
+    roster.members.push(GroupMemberSnapshot {
+        character_id: 43,
+        name: "Captain Garrick".into(),
+        role: GroupRoleSnapshot::Tank,
+        is_leader: false,
+        online: false,
+        subgroup: 1,
+        class: 2,
+        level: 80,
+        entity: None,
+        portrait: GroupPortraitAppearance {
+            creature_display_id: Some(113753),
+            ..Default::default()
+        },
+    });
     for head in [roster.members[0].portrait.head.clone(), None] {
         roster.members[0].portrait.head = head;
         let bytes = bincode::serde::encode_to_vec(&roster, config).unwrap();
