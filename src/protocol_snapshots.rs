@@ -81,13 +81,25 @@ pub struct GroupRosterSnapshot {
     pub loot_threshold: u8,
 }
 
-/// Canonical head customization and only the equipped head visual, independent of
-/// entity replication. Stable customization IDs cannot be classified by the server.
+/// A creature's actual display, or canonical player head customization/equipment,
+/// independent of entity replication. Stable customization IDs stay client-resolved.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Default)]
 pub struct GroupPortraitAppearance {
+    /// Present for NPC party members; selected from their authored template at spawn.
+    pub creature_display_id: Option<u32>,
     pub race: u8,
     pub appearance: crate::components::CharacterAppearance,
     pub head: Option<crate::components::EquippedAppearanceEntry>,
+}
+
+#[cfg(test)]
+#[test]
+fn party_follower_portrait_preserves_creature_display_on_the_roster_wire() {
+    let mut received = serde_json::to_value(GroupPortraitAppearance::default()).unwrap();
+    received["creature_display_id"] = serde_json::json!(113753);
+    let portrait: GroupPortraitAppearance = serde_json::from_value(received).unwrap();
+    let roundtrip = serde_json::to_value(portrait).unwrap();
+    assert_eq!(roundtrip["creature_display_id"], 113753);
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
