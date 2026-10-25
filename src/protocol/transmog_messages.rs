@@ -2,10 +2,13 @@
 //! visuals are ItemAppearance IDs, never ItemDisplayInfo IDs. A quote names each
 //! equipped GUID so a pending change cannot silently apply to replacement gear.
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
-use super::{EquipmentSlot, ProtocolRegistrationExt};
+use super::{EquipmentSlot};
+#[cfg(feature = "transport")]
+use super::ProtocolRegistrationExt;
 
 pub struct TransmogChannel;
 
@@ -93,6 +96,7 @@ pub struct TransmogFailed {
     pub error: TransmogError,
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_transmog_protocol(app: &mut App) {
     app.add_channel::<TransmogChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),

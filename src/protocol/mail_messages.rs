@@ -8,8 +8,10 @@
 //! `UPDATE_PENDING_MAIL`) is sent on entering the world and whenever the unread
 //! delivered mail changes, open mailbox or not. All messages use `MailChannel`.
 
+#[cfg(feature = "transport")]
 use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -174,6 +176,7 @@ pub struct PendingMail {
     pub senders: Vec<String>,
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_mail_protocol(app: &mut App) {
     app.add_channel::<MailChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),

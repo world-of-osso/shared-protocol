@@ -2,9 +2,11 @@
 //! Static DB2 membership is never ownership. References: Retail C_Housing,
 //! C_HousingNeighborhood, C_HousingCatalog and C_HousingBasicMode documentation.
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "transport")]
 use super::ProtocolRegistrationExt;
 
 pub struct HousingChannel;
@@ -240,6 +242,7 @@ pub struct HousingReply {
     pub error: Option<String>,
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_housing_protocol(app: &mut App) {
     app.register_protocol_message::<HousingRequest>()
         .add_direction(NetworkDirection::ClientToServer);

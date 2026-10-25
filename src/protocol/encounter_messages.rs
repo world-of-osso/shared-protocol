@@ -6,8 +6,10 @@
 //! boss is a `boss1..5` unit for the client's boss frames (Retail
 //! `INSTANCE_ENCOUNTER_ENGAGE_UNIT`).
 
+#[cfg(feature = "transport")]
 use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -95,6 +97,7 @@ pub fn read_encounter_unix_ms() -> u64 {
         .as_millis() as u64
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_encounter_protocol(app: &mut App) {
     app.add_channel::<EncounterChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),

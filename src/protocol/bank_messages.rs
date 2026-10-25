@@ -10,8 +10,10 @@
 //! `InventoryDelta` and `Gold`; refusals come back as `BankFailed`. All messages use
 //! `BankChannel`.
 
+#[cfg(feature = "transport")]
 use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -166,6 +168,7 @@ pub struct BankFailed {
     pub error: BankError,
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_bank_protocol(app: &mut App) {
     app.add_channel::<BankChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),

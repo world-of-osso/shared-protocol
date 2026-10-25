@@ -3,8 +3,10 @@
 //! `PlayerXpUpdate` on enter world, after every gain and after a level-up, and
 //! `LogXpGain` for each gain. Both use `ExperienceChannel`.
 
+#[cfg(feature = "transport")]
 use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -42,6 +44,7 @@ pub struct LogXpGain {
     pub reason: XpGainReason,
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_experience_protocol(app: &mut App) {
     app.add_channel::<ExperienceChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),

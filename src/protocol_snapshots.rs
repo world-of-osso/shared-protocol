@@ -1,6 +1,9 @@
 use crate::components::{CharacterAppearance, EquipmentVisualSlot};
-use crate::protocol::{ArenaQueueMode, ProtocolRegistrationExt};
+use crate::protocol::{ArenaQueueMode};
+#[cfg(feature = "transport")]
+use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::*;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -633,6 +636,7 @@ pub struct DurabilitySnapshot {
     pub slots: Vec<DurabilitySlotSnapshot>,
 }
 
+#[cfg(feature = "transport")]
 pub fn register_snapshot_messages(app: &mut App) {
     register_server_snapshot::<QuestLogSnapshot>(app);
     register_server_snapshot::<GroupRosterSnapshot>(app);
@@ -660,6 +664,7 @@ pub fn register_snapshot_messages(app: &mut App) {
     register_server_snapshot::<crate::protocol::ThreatUpdate>(app);
 }
 
+#[cfg(feature = "transport")]
 fn register_server_snapshot<M>(app: &mut App)
 where
     M: lightyear::prelude::Message + Serialize + DeserializeOwned,

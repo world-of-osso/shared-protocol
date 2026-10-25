@@ -1,7 +1,9 @@
 //! Retail registrar and owned Guild Charter flow on the reliable GuildChannel.
 //! NPC, account, inventory, signature and guild authority remain server-owned.
+#[cfg(feature = "transport")]
 use super::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::NetworkDirection;
 use serde::{Deserialize, Serialize};
 
@@ -64,6 +66,7 @@ pub enum GuildCharterReply {
     Failed { message: String },
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_guild_charter_protocol(app: &mut App) {
     app.register_protocol_message::<GuildCharterRequest>()
         .add_direction(NetworkDirection::ClientToServer);

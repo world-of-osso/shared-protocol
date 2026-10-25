@@ -1,7 +1,9 @@
 //! Retail Stable UI: zero-based slots, 5 active + 200 stable (including secondary).
 //! Capacity from installed PetConstantsDocumentation.lua; all mutations are owner scoped.
+#[cfg(feature = "transport")]
 use super::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -83,6 +85,7 @@ pub struct PetStableFailed {
     pub error: PetStableError,
 }
 
+#[cfg(feature = "transport")]
 pub(crate) fn register_pet_stable_protocol(app: &mut App) {
     app.add_channel::<PetStableChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(Default::default()),

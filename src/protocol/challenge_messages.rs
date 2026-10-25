@@ -1,7 +1,10 @@
 //! Retail ChallengesKeystoneFrame and ScenarioObjectiveTracker snapshots.
 //! Unsourced policy is represented by absence, never a fabricated rating/rotation.
-use super::{InstanceChannel, ProtocolRegistrationExt};
+use super::{InstanceChannel};
+#[cfg(feature = "transport")]
+use super::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -87,6 +90,7 @@ pub struct PartyKeystone {
     pub time_limit_ms: u64,
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register(app: &mut App) {
     app.register_protocol_message::<ChallengeRequest>()
         .add_direction(NetworkDirection::ClientToServer);

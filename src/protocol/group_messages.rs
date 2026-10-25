@@ -5,8 +5,10 @@
 //! from any channel. The roster itself is `GroupRosterSnapshot` and results are
 //! `GroupCommandResponse` (protocol snapshots).
 
+#[cfg(feature = "transport")]
 use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -365,6 +367,7 @@ impl GroupMessageCode {
     }
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_group_messages(app: &mut App) {
     for_client::<RespondGroupInvite>(app);
     for_client::<LeaveGroup>(app);
@@ -404,6 +407,7 @@ pub(super) fn register_group_messages(app: &mut App) {
     .add_direction(NetworkDirection::Bidirectional);
 }
 
+#[cfg(feature = "transport")]
 fn for_client<M: lightyear::prelude::Message + Serialize + serde::de::DeserializeOwned>(
     app: &mut App,
 ) {

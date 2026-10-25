@@ -8,8 +8,10 @@
 //! destination map. A teleport the destination refuses is answered with
 //! `TransferAborted` (`SMSG_TRANSFER_ABORTED`) and the player stays where it was.
 
+#[cfg(feature = "transport")]
 use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -81,6 +83,7 @@ pub struct TransferAborted {
     pub reason: TransferAbortReason,
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_transfer_protocol(app: &mut App) {
     app.add_channel::<TransferChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),

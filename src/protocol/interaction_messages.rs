@@ -19,8 +19,10 @@
 //! StaticPopup `CONFIRM_SUMMON`), answered by `SummonResponse`
 //! (`CMSG_SUMMON_RESPONSE`).
 
+#[cfg(feature = "transport")]
 use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -426,6 +428,7 @@ mod transmog_tests {
     }
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_interaction_protocol(app: &mut App) {
     app.protocol_component::<NpcFlags>().replicate();
     app.protocol_component::<GameObjectInfo>().replicate();

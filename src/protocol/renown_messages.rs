@@ -1,7 +1,9 @@
 //! Realm-backed Mainline Journeys renown (Retail 12.1.0.69933 Covenant/RenownRewards).
 //! Unevaluated unlock conditions are explicit, never encoded as unlocked.
+#[cfg(feature = "transport")]
 use super::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -74,6 +76,7 @@ pub struct RenownSnapshot {
     pub watch_error: Option<String>,
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register(app: &mut App) {
     app.register_protocol_message::<RenownRequest>()
         .add_direction(NetworkDirection::ClientToServer);

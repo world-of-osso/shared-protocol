@@ -2,8 +2,10 @@
 //! sent by `Player::SendInitialPacketsBeforeAddToMap`, Player.cpp:24988-24996): the client's
 //! time of day, which selects the LightData keyframes of the sky, fog and scene light.
 
+#[cfg(feature = "transport")]
 use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -31,6 +33,7 @@ impl LoginSetTimeSpeed {
     }
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_world_time_protocol(app: &mut App) {
     app.add_channel::<WorldTimeChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),

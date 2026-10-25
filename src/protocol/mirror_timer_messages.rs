@@ -6,8 +6,10 @@
 //! and the client counts a running bar between messages (`GetMirrorTimerProgress`). All
 //! three use `MirrorTimerChannel`, so a stop never overtakes the start before it.
 
+#[cfg(feature = "transport")]
 use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -48,6 +50,7 @@ pub struct MirrorTimerStop {
     pub timer: u8,
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_mirror_timer_protocol(app: &mut App) {
     app.add_channel::<MirrorTimerChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),

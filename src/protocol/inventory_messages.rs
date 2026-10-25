@@ -5,8 +5,10 @@
 //! `ItemLocation`; rejected requests answer with `InventoryError`. All messages use
 //! `InventoryChannel`.
 
+#[cfg(feature = "transport")]
 use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -425,6 +427,7 @@ pub struct InventoryError {
     pub detail: Option<String>,
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_inventory_protocol(app: &mut App) {
     app.add_channel::<InventoryChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),

@@ -9,8 +9,10 @@
 //! difficulty with a reset schedule saves the copy's players to it until the daily or
 //! weekly reset; the saved instances are listed by `InstanceInfo`.
 
+#[cfg(feature = "transport")]
 use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -134,6 +136,7 @@ pub struct RaidInstanceMessage {
     pub difficulty_id: u32,
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_instance_protocol(app: &mut App) {
     app.add_channel::<InstanceChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),

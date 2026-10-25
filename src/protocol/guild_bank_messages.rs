@@ -9,8 +9,10 @@
 //! refused unless its guild bank frame is open; refusals come back as
 //! `GuildBankFailed`. All messages use `GuildBankChannel`.
 
+#[cfg(feature = "transport")]
 use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -188,6 +190,7 @@ pub struct GuildBankFailed {
     pub error: GuildBankError,
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_guild_bank_protocol(app: &mut App) {
     app.add_channel::<GuildBankChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),

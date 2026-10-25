@@ -1,7 +1,9 @@
 //! Retail GuildTabardVendor operations on ordered-reliable GuildChannel.
+#[cfg(feature = "transport")]
 use super::ProtocolRegistrationExt;
 use crate::guild_creation::GuildTabardDesign;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::NetworkDirection;
 use serde::{Deserialize, Serialize};
 
@@ -27,6 +29,7 @@ pub enum GuildTabardReply {
     Failed { message: String },
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_guild_tabard_protocol(app: &mut App) {
     app.register_protocol_message::<GuildTabardRequest>()
         .add_direction(NetworkDirection::ClientToServer);

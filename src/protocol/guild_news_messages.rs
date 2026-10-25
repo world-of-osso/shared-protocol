@@ -1,6 +1,8 @@
 //! Mainline GuildNews.lua/ GuildUtil.lua, separate from guild lifecycle history.
+#[cfg(feature = "transport")]
 use super::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::NetworkDirection;
 use serde::{Deserialize, Serialize};
 
@@ -62,6 +64,7 @@ pub struct GuildNewsState {
     pub error: Option<GuildNewsError>,
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_guild_news_protocol(app: &mut App) {
     app.register_protocol_message::<GuildNewsRequest>()
         .add_direction(NetworkDirection::ClientToServer);

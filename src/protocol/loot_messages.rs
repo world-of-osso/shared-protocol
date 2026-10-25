@@ -9,8 +9,10 @@
 //! does not fit. The window ends with `LootClosed`. Items and money reach the
 //! player through `InventoryDelta` and `Gold`. All messages use `LootChannel`.
 
+#[cfg(feature = "transport")]
 use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -152,6 +154,7 @@ pub struct GroupLootRoll {
     pub delivered: bool,
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_loot_protocol(app: &mut App) {
     app.add_channel::<LootChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),

@@ -1,7 +1,9 @@
 //! Player-owned guild controls, on `GuildChannel` (ordered reliable).
 //! Retail: Blizzard_GuildControlUI rank order, flags, money/day and bank tab controls.
+#[cfg(feature = "transport")]
 use super::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::NetworkDirection;
 use serde::{Deserialize, Serialize};
 
@@ -227,6 +229,7 @@ impl GuildRankError {
     }
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_guild_rank_protocol(app: &mut App) {
     app.register_protocol_message::<GuildRankRequest>()
         .add_direction(NetworkDirection::ClientToServer);

@@ -10,8 +10,10 @@
 //! `DurabilityStateUpdate`; refusals come back as `MerchantFailed`. All messages use
 //! `MerchantChannel`.
 
+#[cfg(feature = "transport")]
 use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -183,6 +185,7 @@ pub struct MerchantFailed {
     pub error: MerchantError,
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_merchant_protocol(app: &mut App) {
     app.add_channel::<MerchantChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),

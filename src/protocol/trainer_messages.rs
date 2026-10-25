@@ -7,8 +7,10 @@
 //! spells change through `Gold` and `ProfessionSnapshot`; refusals come back as
 //! `TrainerBuyFailed`. All messages use `TrainerChannel`.
 
+#[cfg(feature = "transport")]
 use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -82,6 +84,7 @@ pub struct TrainerBuyFailed {
     pub reason: TrainerFailReason,
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_trainer_protocol(app: &mut App) {
     app.add_channel::<TrainerChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),

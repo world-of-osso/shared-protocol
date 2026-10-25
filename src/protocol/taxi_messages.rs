@@ -8,8 +8,10 @@
 //! back as `TaxiFailed`. The flight itself is `MovementControl` on the player.
 //! All messages use `TaxiChannel`.
 
+#[cfg(feature = "transport")]
 use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -94,6 +96,7 @@ pub struct TaxiFailed {
     pub error: TaxiError,
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_taxi_protocol(app: &mut App) {
     app.add_channel::<TaxiChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),

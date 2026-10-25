@@ -13,8 +13,10 @@
 //! Rejected requests answer with `QuestFailed`. NPCs are addressed by server entity
 //! bits. All messages use `QuestChannel`.
 
+#[cfg(feature = "transport")]
 use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -390,6 +392,7 @@ pub struct AvailableWorldQuest {
     pub reputation: Vec<WorldQuestNumericReward>,
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_quest_protocol(app: &mut App) {
     app.add_channel::<QuestChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
@@ -400,6 +403,7 @@ pub(super) fn register_quest_protocol(app: &mut App) {
     register_server_messages(app);
 }
 
+#[cfg(feature = "transport")]
 fn register_client_messages(app: &mut App) {
     app.register_protocol_message::<PushQuestToParty>()
         .add_direction(NetworkDirection::ClientToServer);
@@ -423,6 +427,7 @@ fn register_client_messages(app: &mut App) {
         .add_direction(NetworkDirection::ClientToServer);
 }
 
+#[cfg(feature = "transport")]
 fn register_server_messages(app: &mut App) {
     app.register_protocol_message::<WorldQuestAvailability>()
         .add_direction(NetworkDirection::ServerToClient);

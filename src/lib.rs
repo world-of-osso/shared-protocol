@@ -51,6 +51,7 @@ pub mod xp;
 
 pub use components::GuildMembership;
 pub use protocol::{
-    ChatChannel, ChatMessage, ChatType, InputChannel, LoadTerrain, PlayerInput, ProtocolPlugin,
-    TerrainChannel,
+    ChatChannel, ChatMessage, ChatType, InputChannel, LoadTerrain, PlayerInput, TerrainChannel,
 };
+#[cfg(feature = "transport")]
+pub use protocol::ProtocolPlugin;

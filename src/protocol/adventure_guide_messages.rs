@@ -1,7 +1,10 @@
 //! Realm-backed Mainline Suggested Content and Traveler's Log.
 //! Unsupported criteria are explicitly unavailable; never encoded as zero progress.
-use super::{AchievementCriterionLine, ProtocolRegistrationExt};
+use super::{AchievementCriterionLine};
+#[cfg(feature = "transport")]
+use super::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -95,6 +98,7 @@ pub struct AdventureGuideClock {
     pub now_unix: i64,
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register(app: &mut App) {
     app.register_protocol_message::<AdventureGuideRequest>()
         .add_direction(NetworkDirection::ClientToServer);

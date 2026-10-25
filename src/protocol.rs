@@ -1,7 +1,9 @@
+#[cfg(feature = "transport")]
 use bevy::prelude::*;
 
 pub use crate::protocol_snapshots::*;
 
+#[cfg(feature = "transport")]
 use crate::components::{
     ActiveSpec, CombatRatings, CombatStatus, CreatureClassification, CreatureMotion, DerivedStats,
     EquipmentAppearance, FeatherFall, Gold, GuildMembership, Health, Mana, ModelDisplay, Mounted,
@@ -33,6 +35,7 @@ mod housing_messages_tests;
 mod instance_messages;
 mod interaction_messages;
 mod inventory_messages;
+#[cfg(feature = "transport")]
 mod layout_tracer;
 mod loot_messages;
 mod mail_messages;
@@ -43,9 +46,12 @@ mod pet_battle_messages;
 mod pet_messages;
 mod pet_stable_messages;
 mod profession_messages;
+#[cfg(feature = "transport")]
 mod protocol_check;
+#[cfg(feature = "transport")]
 mod protocol_layout;
 mod quest_messages;
+#[cfg(feature = "transport")]
 mod registration;
 mod renown_messages;
 mod spell_messages;
@@ -88,10 +94,12 @@ pub use pet_battle_messages::*;
 pub use pet_messages::*;
 pub use pet_stable_messages::*;
 pub use profession_messages::*;
+#[cfg(feature = "transport")]
 pub use protocol_check::{
     PROTOCOL_SEMANTIC_EPOCH, ProtocolCheckChannel, ProtocolCheckTimeout, ProtocolFingerprint,
     ProtocolRejected, ProtocolSemanticEpoch, ProtocolVerified, defer_lightyear_protocol_check,
 };
+#[cfg(feature = "transport")]
 pub use protocol_layout::ProtocolRegistrationExt;
 pub use quest_messages::*;
 pub use renown_messages::*;
@@ -106,12 +114,15 @@ pub use transmog_catalogue::*;
 pub use transmog_messages::*;
 pub use world_time_messages::*;
 
+#[cfg(feature = "transport")]
 use registration::{register_channels, register_messages};
 
 /// Registers shared protocol: components for replication and channels.
 /// Must be added AFTER `ServerPlugins`/`ClientPlugins` but BEFORE any entity is spawned.
+#[cfg(feature = "transport")]
 pub struct ProtocolPlugin;
 
+#[cfg(feature = "transport")]
 impl Plugin for ProtocolPlugin {
     fn build(&self, app: &mut App) {
         // First, so the check's message and channel ids match across differing registries.
@@ -154,6 +165,7 @@ impl Plugin for ProtocolPlugin {
     }
 }
 
+#[cfg(feature = "transport")]
 fn register_replicated_components(app: &mut App) {
     app.protocol_component::<Position>().replicate();
     app.protocol_component::<Health>().replicate();

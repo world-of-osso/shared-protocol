@@ -1,6 +1,8 @@
 //! Mainline Trading Post authority; no client balance, price or collection grants.
+#[cfg(feature = "transport")]
 use super::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -143,6 +145,7 @@ impl TradingPostSnapshot {
     }
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register(app: &mut App) {
     app.register_protocol_message::<TradingPostRequest>()
         .add_direction(NetworkDirection::ClientToServer);

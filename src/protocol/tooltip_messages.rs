@@ -12,8 +12,10 @@
 //! sent in full to the owning client when a character enters the world and after
 //! every newly learned appearance. All messages use `TooltipChannel`.
 
+#[cfg(feature = "transport")]
 use crate::protocol::ProtocolRegistrationExt;
 use bevy::prelude::*;
+#[cfg(feature = "transport")]
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
@@ -67,6 +69,7 @@ pub struct AppearanceCollectionUpdate {
     pub appearances: Vec<u32>,
 }
 
+#[cfg(feature = "transport")]
 pub(super) fn register_tooltip_protocol(app: &mut App) {
     app.add_channel::<TooltipChannel>(ChannelSettings {
         mode: ChannelMode::OrderedReliable(default()),
