@@ -90,6 +90,11 @@ impl PetitionManager {
         self.taken_names.insert(name.to_lowercase());
     }
 
+    /// Release the destroyed guild's name without changing other guild reservations.
+    pub fn release_name(&mut self, name: &str) {
+        self.taken_names.remove(&name.to_lowercase());
+    }
+
     /// Purchase a guild charter. Validates funds, guild membership, and name.
     pub fn purchase_charter(
         &mut self,

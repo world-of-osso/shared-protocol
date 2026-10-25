@@ -55,5 +55,11 @@ retained history to100. Mainline `GuildInfo.lua:158–195` renders newest first.
 Empty actual history stays empty; refused operations never create events, and
 mutations commit their event atomically. Bank logs and news are separate histories.
 
+## Confirmed guild disband
+
+`GuildRankRequest::Disband` is an appended unit variant on GuildChannel. It carries no actor or guild identity: the authenticated current guild is the only target, and the server rechecks rank0. Native `/gdisband` and `/guilddisband` open Yes/No first; No/Escape never send this variant. Retail `SlashCommands.lua:805–809` and `GameDialogDefs.lua:662–673` define that confirmation; TC a352b1fa `Guild.cpp:1199–1265,2140–2148` allows the master to destroy a guild with other members present.
+
+Success uses existing empty `GuildRanksState` snapshots for removed online members; there is no fabricated per-member quit history for a destroyed guild. `PetitionManager::release_name` removes only the destroyed guild's case-insensitive reservation; the server writes this manager state in the same transaction as durable guild deletion. Wire/name-release behavioral tests live in `guild_rank_messages.rs` and `guild_creation_tests.rs`; coordinated server/native acceptance is separate.
+
 Protocol additions change the connect-time fingerprint; clients and servers must use the
 same protocol revision. No legacy wire fallback.

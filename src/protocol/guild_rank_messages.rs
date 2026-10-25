@@ -141,6 +141,9 @@ pub enum GuildRankRequest {
     TransferLeadership {
         character_name: String,
     },
+    /// Confirmed Guild Master destruction of the authenticated actor's current guild.
+    /// No caller-supplied actor or guild ID; authority is rechecked by the server.
+    Disband,
 }
 
 /// TrinityCore a352b1fa SharedDefines.h GUILD_EVENTLOG_MAX_RECORDS.
