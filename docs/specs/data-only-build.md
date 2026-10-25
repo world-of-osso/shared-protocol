@@ -10,7 +10,7 @@ The canonical shared records and payloads remain usable by headless combat consu
 
 ## How it works
 
-- Network imports and registration functions use the default-enabled `transport` feature.
+- [Data-only protocol boundary](../wiki/systems/data-only-build.md).
 
 ## Implementation inventory
 
@@ -26,7 +26,7 @@ The canonical shared records and payloads remain usable by headless combat consu
 
 ## Known gaps (current cycle)
 
-- [ ] Run data-only and default consumer checks.
+No remaining API-compilation gap in this change.
 
 ## Out of scope
 
