@@ -240,6 +240,20 @@ pub(super) fn register_guild_rank_protocol(app: &mut App) {
 mod tests {
     use super::*;
     #[test]
+    fn guild_disband_wire_roundtrip_has_no_caller_supplied_identity() {
+        let request: GuildRankRequest =
+            serde_json::from_str("\"Disband\"").expect("guild disband must be represented");
+        let bytes = bincode::serde::encode_to_vec(&request, bincode::config::standard()).unwrap();
+        let (decoded, used): (GuildRankRequest, _) =
+            bincode::serde::decode_from_slice(&bytes, bincode::config::standard()).unwrap();
+        assert_eq!(
+            serde_json::to_value(decoded).unwrap(),
+            serde_json::json!("Disband")
+        );
+        assert_eq!(used, bytes.len());
+    }
+
+    #[test]
     fn guild_lifecycle_wire_preserves_member_and_invitation() {
         for request in [
             GuildRankRequest::Leave,
