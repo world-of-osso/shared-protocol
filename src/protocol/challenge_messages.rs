@@ -1,6 +1,5 @@
 //! Retail ChallengesKeystoneFrame and ScenarioObjectiveTracker snapshots.
 //! Unsourced policy is represented by absence, never a fabricated rating/rotation.
-#[cfg(feature = "transport")]
 use super::InstanceChannel;
 #[cfg(feature = "transport")]
 use super::ProtocolRegistrationExt;
