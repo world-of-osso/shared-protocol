@@ -91,6 +91,27 @@ fn purchase_name_taken_by_existing_guild() {
 }
 
 #[test]
+fn guild_disband_releases_only_the_destroyed_guild_name() {
+    let mut manager = PetitionManager::new();
+    manager.reserve_name("Disband Guild");
+    manager.reserve_name("Retained Guild");
+    assert_eq!(
+        manager.purchase_charter(100, "Disband Guild", 5000, false, 1000),
+        Err(PetitionError::NameTaken)
+    );
+    manager.release_name("DISBAND GUILD");
+    assert!(
+        manager
+            .purchase_charter(100, "Disband Guild", 5000, false, 1001)
+            .is_ok()
+    );
+    assert_eq!(
+        manager.purchase_charter(200, "Retained Guild", 5000, false, 1001),
+        Err(PetitionError::NameTaken)
+    );
+}
+
+#[test]
 fn pending_charters_share_a_title_until_an_actual_guild_reserves_it() {
     let mut mgr = PetitionManager::new();
     mgr.purchase_charter(100, "Cool Guild", 5000, false, 1000)
