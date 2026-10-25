@@ -2,6 +2,7 @@
 //! NPC, account, inventory, signature and guild authority remain server-owned.
 #[cfg(feature = "transport")]
 use super::ProtocolRegistrationExt;
+#[cfg(feature = "transport")]
 use bevy::prelude::*;
 #[cfg(feature = "transport")]
 use lightyear::prelude::NetworkDirection;

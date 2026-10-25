@@ -2,6 +2,7 @@
 //! Unevaluated unlock conditions are explicit, never encoded as unlocked.
 #[cfg(feature = "transport")]
 use super::ProtocolRegistrationExt;
+#[cfg(feature = "transport")]
 use bevy::prelude::*;
 #[cfg(feature = "transport")]
 use lightyear::prelude::*;

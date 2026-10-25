@@ -1,8 +1,9 @@
 //! Realm-backed Mainline Suggested Content and Traveler's Log.
 //! Unsupported criteria are explicitly unavailable; never encoded as zero progress.
-use super::{AchievementCriterionLine};
+use super::AchievementCriterionLine;
 #[cfg(feature = "transport")]
 use super::ProtocolRegistrationExt;
+#[cfg(feature = "transport")]
 use bevy::prelude::*;
 #[cfg(feature = "transport")]
 use lightyear::prelude::*;

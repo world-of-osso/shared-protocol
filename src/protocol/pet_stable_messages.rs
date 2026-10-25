@@ -2,6 +2,7 @@
 //! Capacity from installed PetConstantsDocumentation.lua; all mutations are owner scoped.
 #[cfg(feature = "transport")]
 use super::ProtocolRegistrationExt;
+#[cfg(feature = "transport")]
 use bevy::prelude::*;
 #[cfg(feature = "transport")]
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};

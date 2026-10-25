@@ -1,6 +1,7 @@
 //! Housing authority, plots, account storage and basic decor edits.
 //! Static DB2 membership is never ownership. References: Retail C_Housing,
 //! C_HousingNeighborhood, C_HousingCatalog and C_HousingBasicMode documentation.
+#[cfg(feature = "transport")]
 use bevy::prelude::*;
 #[cfg(feature = "transport")]
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};

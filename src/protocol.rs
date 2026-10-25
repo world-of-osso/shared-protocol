@@ -233,90 +233,90 @@ fn register_replicated_components(app: &mut App) {
         .replicate();
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_tests.rs"]
 mod tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_spell_tests.rs"]
 mod spell_tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_group_tests.rs"]
 mod group_tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_inventory_tests.rs"]
 mod inventory_tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_quest_tests.rs"]
 mod quest_tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_interaction_tests.rs"]
 mod interaction_tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_merchant_tests.rs"]
 mod merchant_tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_trainer_tests.rs"]
 mod trainer_tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_experience_tests.rs"]
 mod experience_tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_bank_tests.rs"]
 mod bank_tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_loot_tests.rs"]
 mod loot_tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_taxi_tests.rs"]
 mod taxi_tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_mail_tests.rs"]
 mod mail_tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_tooltip_tests.rs"]
 mod tooltip_tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_transfer_tests.rs"]
 mod transfer_tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_encounter_tests.rs"]
 mod encounter_tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_instance_tests.rs"]
 mod instance_tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_mirror_timer_tests.rs"]
 mod mirror_timer_tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_world_time_tests.rs"]
 mod world_time_tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_damage_meter_tests.rs"]
 mod damage_meter_tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_pet_tests.rs"]
 mod pet_tests;
 
-#[cfg(test)]
+#[cfg(all(test, feature = "transport"))]
 #[path = "protocol_player_motion_tests.rs"]
 mod player_motion_tests;

@@ -1,10 +1,12 @@
 use crate::components::{CharacterAppearance, EquipmentVisualSlot};
-use crate::protocol::{ArenaQueueMode};
+use crate::protocol::ArenaQueueMode;
 #[cfg(feature = "transport")]
 use crate::protocol::ProtocolRegistrationExt;
+#[cfg(feature = "transport")]
 use bevy::prelude::*;
 #[cfg(feature = "transport")]
 use lightyear::prelude::*;
+#[cfg(feature = "transport")]
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 

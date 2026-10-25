@@ -2,6 +2,7 @@
 #[cfg(feature = "transport")]
 use super::ProtocolRegistrationExt;
 use crate::guild_creation::GuildTabardDesign;
+#[cfg(feature = "transport")]
 use bevy::prelude::*;
 #[cfg(feature = "transport")]
 use lightyear::prelude::NetworkDirection;

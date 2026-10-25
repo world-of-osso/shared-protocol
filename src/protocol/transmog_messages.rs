@@ -1,12 +1,13 @@
 //! Authoritative Transmogrifier service. Sources are ItemModifiedAppearance IDs;
 //! visuals are ItemAppearance IDs, never ItemDisplayInfo IDs. A quote names each
 //! equipped GUID so a pending change cannot silently apply to replacement gear.
+#[cfg(feature = "transport")]
 use bevy::prelude::*;
 #[cfg(feature = "transport")]
 use lightyear::prelude::{AppChannelExt, ChannelMode, ChannelSettings, NetworkDirection};
 use serde::{Deserialize, Serialize};
 
-use super::{EquipmentSlot};
+use super::EquipmentSlot;
 #[cfg(feature = "transport")]
 use super::ProtocolRegistrationExt;
 

@@ -2,6 +2,7 @@
 //! Retail: Blizzard_GuildControlUI rank order, flags, money/day and bank tab controls.
 #[cfg(feature = "transport")]
 use super::ProtocolRegistrationExt;
+#[cfg(feature = "transport")]
 use bevy::prelude::*;
 #[cfg(feature = "transport")]
 use lightyear::prelude::NetworkDirection;

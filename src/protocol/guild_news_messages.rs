@@ -1,6 +1,7 @@
 //! Mainline GuildNews.lua/ GuildUtil.lua, separate from guild lifecycle history.
 #[cfg(feature = "transport")]
 use super::ProtocolRegistrationExt;
+#[cfg(feature = "transport")]
 use bevy::prelude::*;
 #[cfg(feature = "transport")]
 use lightyear::prelude::NetworkDirection;
