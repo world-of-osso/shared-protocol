@@ -115,6 +115,16 @@ fn guild_bank_messages_round_trip() {
         tab: 0,
         slot: 0,
     });
+    for count in [0, 3] {
+        assert_wire_round_trip(&GuildBankMove {
+            object: 9,
+            from_tab: 0,
+            from_slot: 4,
+            to_tab: 1,
+            to_slot: 12,
+            count,
+        });
+    }
     assert_wire_round_trip(&GuildBankMoneyTransfer {
         object: 9,
         copper: 500,
@@ -261,6 +271,7 @@ fn protocol_plugin_registers_bank_messages() {
     assert!(app.is_message_registered::<GuildBankFailed>());
     assert!(app.is_message_registered::<GuildBankDeposit>());
     assert!(app.is_message_registered::<GuildBankWithdraw>());
+    assert!(app.is_message_registered::<GuildBankMove>());
     assert!(app.is_message_registered::<GuildBankMoneyTransfer>());
     assert!(app.is_message_registered::<GuildBankBuyTab>());
     assert!(app.is_message_registered::<GuildBankSetTabInfo>());

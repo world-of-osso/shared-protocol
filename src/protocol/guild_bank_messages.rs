@@ -75,6 +75,17 @@ pub struct GuildBankWithdraw {
     pub slot: u8,
 }
 
+/// Move or swap a stack between guild-bank slots; zero count means the whole stack.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
+pub struct GuildBankMove {
+    pub object: u64,
+    pub from_tab: u8,
+    pub from_slot: u8,
+    pub to_tab: u8,
+    pub to_slot: u8,
+    pub count: u32,
+}
+
 /// `DepositGuildBankMoney` / `WithdrawGuildBankMoney`.
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct GuildBankMoneyTransfer {
@@ -213,5 +224,7 @@ pub(super) fn register_guild_bank_protocol(app: &mut App) {
     app.register_protocol_message::<GuildBankSetTabText>()
         .add_direction(NetworkDirection::ClientToServer);
     app.register_protocol_message::<GuildBankQueryLog>()
+        .add_direction(NetworkDirection::ClientToServer);
+    app.register_protocol_message::<GuildBankMove>()
         .add_direction(NetworkDirection::ClientToServer);
 }
