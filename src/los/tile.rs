@@ -110,6 +110,42 @@ impl LosTile {
             .map(|t| top.lerp(bottom, t).y)
     }
 
+    /// Every walkable face intersecting the vertical column, in world height units.
+    pub fn floor_heights(&self, x: f32, z: f32) -> Vec<f32> {
+        let Some((min, max)) = self.bounds() else {
+            return Vec::new();
+        };
+        let top = Vec3::new(x, max.y + 1.0, z);
+        let bottom = Vec3::new(x, min.y - 1.0, z);
+        let dir = bottom - top;
+        let inv = Vec3::new(1e30, dir.y.recip(), 1e30);
+        let mut heights = Vec::new();
+        let mut stack = vec![0usize];
+        while let Some(index) = stack.pop() {
+            let node = self.nodes[index];
+            if !slab_hit(node.min, node.max, top, inv, 1.0) {
+                continue;
+            }
+            if node.count == 0 {
+                stack.push(node.start as usize);
+                stack.push(node.start as usize + 1);
+                continue;
+            }
+            for triangle in &self.triangles[node.start as usize..(node.start + node.count) as usize]
+            {
+                let corners = triangle.map(|index| self.vertices[index as usize]);
+                if accepts_normal(HitKind::Floor, corners) {
+                    if let Some(t) = segment_triangle(top, dir, corners, 1.0, HitKind::Floor) {
+                        heights.push(top.lerp(bottom, t).y);
+                    }
+                }
+            }
+        }
+        heights.sort_by(f32::total_cmp);
+        heights.dedup_by(|a, b| (*a - *b).abs() < 0.001);
+        heights
+    }
+
     fn hit(&self, a: Vec3, b: Vec3, kind: HitKind) -> Option<f32> {
         if self.nodes.is_empty() {
             return None;

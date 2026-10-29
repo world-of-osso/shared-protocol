@@ -83,6 +83,20 @@ impl LosMap {
             .max_by(f32::total_cmp))
     }
 
+    /// All walkable faces in a vertical column, including tile overhangs.
+    pub fn floor_heights(&mut self, x: f32, z: f32) -> Result<Vec<f32>, String> {
+        let point = Vec3::new(x, 0.0, z);
+        self.load_around(point, point)?;
+        let mut heights: Vec<_> = self
+            .tiles_around(point, point)
+            .filter_map(|tile| self.tiles.get(&tile)?.as_ref())
+            .flat_map(|tile| tile.floor_heights(x, z))
+            .collect();
+        heights.sort_by(f32::total_cmp);
+        heights.dedup_by(|a, b| (*a - *b).abs() < 0.001);
+        Ok(heights)
+    }
+
     /// Highest solid face under the feet, including steep faces and tile overhangs.
     pub fn solid_height(&mut self, feet: Vec3) -> Result<Option<f32>, String> {
         self.load_around(feet, feet)?;

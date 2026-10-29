@@ -19,6 +19,8 @@ fn m2_floor_query_keeps_reachable_floor_and_skips_steep_faces_and_roof() {
     ];
     let baked = LosTile::build(32, 32, vertices, vec![[0, 1, 2], [3, 4, 5], [6, 7, 8]]);
     let tile = LosTile::from_bytes(&baked.to_bytes()).unwrap();
+    assert_eq!(tile.floor_heights(0.0, 0.0), vec![12.0, 20.0]);
+    assert!(tile.floor_heights(20.0, 0.0).is_empty());
     assert_eq!(tile.floor_height(Vec3::new(0.0, 13.0, 0.0)), Some(12.0));
     assert_eq!(tile.solid_height(Vec3::new(0.0, 13.0, 0.0)), Some(14.0));
     assert_eq!(tile.solid_height(Vec3::new(20.0, 13.0, 0.0)), None);
