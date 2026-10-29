@@ -83,6 +83,15 @@ impl LosMap {
             .max_by(f32::total_cmp))
     }
 
+    /// Highest solid face under the feet, including steep faces and tile overhangs.
+    pub fn solid_height(&mut self, feet: Vec3) -> Result<Option<f32>, String> {
+        self.load_around(feet, feet)?;
+        Ok(self
+            .tiles_around(feet, feet)
+            .filter_map(|tile| self.tiles.get(&tile)?.as_ref()?.solid_height(feet))
+            .max_by(f32::total_cmp))
+    }
+
     /// The loaded tile `(row, col)`, if its file exists.
     pub fn tile(&mut self, tile: (u32, u32)) -> Result<Option<&LosTile>, String> {
         self.load(tile)?;

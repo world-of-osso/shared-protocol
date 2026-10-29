@@ -29,6 +29,7 @@ enum HitKind {
     Any,
     Nearest,
     Floor,
+    Solid,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -101,6 +102,14 @@ impl LosTile {
             .map(|t| top.lerp(bottom, t).y)
     }
 
+    /// Highest solid collision face in the shared step/search interval, regardless of slope.
+    pub fn solid_height(&self, feet: Vec3) -> Option<f32> {
+        let top = feet + Vec3::Y * crate::ground::STEP_UP_HEIGHT;
+        let bottom = feet - Vec3::Y * crate::ground::FLOOR_SEARCH_DEPTH;
+        self.hit(top, bottom, HitKind::Solid)
+            .map(|t| top.lerp(bottom, t).y)
+    }
+
     fn hit(&self, a: Vec3, b: Vec3, kind: HitKind) -> Option<f32> {
         if self.nodes.is_empty() {
             return None;
@@ -109,7 +118,7 @@ impl LosTile {
         // A zero component gives a huge, finite inverse: no 0 * inf NaN in the slab test.
         let safe = Vec3::select(dir.abs().cmplt(Vec3::splat(1e-30)), Vec3::splat(1e-30), dir);
         let inv = safe.recip();
-        let mut best = if matches!(kind, HitKind::Floor) {
+        let mut best = if matches!(kind, HitKind::Floor | HitKind::Solid) {
             1.0
         } else {
             1.0 - END_EPSILON
@@ -315,7 +324,7 @@ fn segment_triangle(
         return None;
     }
     let t = edge2.dot(q) * inv_det;
-    let within_segment = if matches!(kind, HitKind::Floor) {
+    let within_segment = if matches!(kind, HitKind::Floor | HitKind::Solid) {
         t >= 0.0 && t <= t_max
     } else {
         t > END_EPSILON && t < t_max
