@@ -125,6 +125,18 @@ fn guild_bank_messages_round_trip() {
             count,
         });
     }
+    assert_wire_round_trip(&GuildBankLog {
+        tab: Some(0),
+        entries: vec![GuildBankLogEntry {
+            kind: GuildBankLogKind::MoveItem { to_tab: 1 },
+            actor: "Bankalt".into(),
+            item_id: 2589,
+            item_name: "Linen Cloth".into(),
+            count: 3,
+            copper: 0,
+            seconds_ago: 90,
+        }],
+    });
     assert_wire_round_trip(&GuildBankMoneyTransfer {
         object: 9,
         copper: 500,

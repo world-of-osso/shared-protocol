@@ -134,6 +134,10 @@ pub enum GuildBankLogKind {
     BuyTab,
     /// Guild money spent on a member's repairs (`GUILD_BANK_LOG_REPAIR_MONEY`, Retail "repair").
     RepairMoney,
+    /// A bank-to-bank move recorded in the source tab's log.
+    MoveItem {
+        to_tab: u8,
+    },
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
