@@ -155,6 +155,8 @@ pub enum MerchantError {
     GuildPermissions,
     /// A guild repair the guild money left for the player covers nothing of.
     GuildNotEnoughMoney,
+    /// A guild reward below its required guild standing.
+    GuildReputationTooLow,
 }
 
 impl MerchantError {
@@ -173,6 +175,7 @@ impl MerchantError {
             Self::CantStack => "This item cannot stack.",                  // ERR_CANT_STACK
             Self::GuildPermissions => "You don't have permission to do that.", // ERR_GUILD_PERMISSIONS
             Self::GuildNotEnoughMoney => "The guild bank does not have enough money", // ERR_GUILD_NOT_ENOUGH_MONEY
+            Self::GuildReputationTooLow => "Your guild reputation isn't high enough to do that.", // ERR_GUILD_REP_TOO_LOW
         }
     }
 }

@@ -27,6 +27,7 @@ fn mount_vendor_authored_turnin_and_requirement_errors_round_trip() {
     for error in [
         MerchantError::MissingTurnins,
         MerchantError::ReputationRequired,
+        MerchantError::GuildReputationTooLow,
     ] {
         assert_wire_round_trip(&MerchantFailed {
             npc: 4294967301,
