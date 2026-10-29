@@ -17,8 +17,9 @@ const CONTROL_RADIUS: f32 = 25.0;
 // All three templates: neutralPercent 2, min/maxSuperiority 1, min/maxTime 50s.
 const ZONE_START: i32 = 50;
 const ZONE_RATE: i32 = 100 / 50;
-const ALLIANCE_ABOVE: i32 = ZONE_START + 2 / 2;
-const HORDE_BELOW: i32 = ZONE_START - 2 / 2;
+const NEUTRAL_PERCENT: i32 = 2;
+const ALLIANCE_ABOVE: i32 = ZONE_START + NEUTRAL_PERCENT / 2;
+const HORDE_BELOW: i32 = ZONE_START - NEUTRAL_PERCENT / 2;
 // TDB paths MoveType Walk, Velocity NULL; creature 60140 speed_walk 0.8.
 // TC baseMoveSpeed[MOVE_WALK] 2.5; exact ground spline is linear, not smoothed.
 const CART_SPEED: f32 = 2.5 * 0.8;
