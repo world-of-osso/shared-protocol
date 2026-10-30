@@ -583,6 +583,59 @@ mod tests {
         assert!(route.events_between(2000, 4999).is_empty());
     }
 
+    #[test]
+    fn dawnbreaker_9456_stops_and_arrival_events_use_authored_timing() {
+        let knots = vec![
+            [1328.02954, -288.486115, -5.55551004],
+            [1352.09375, -312.458344, -5.55551004],
+            [1397.0365, -356.236115, 0.660000026],
+            [1548.42358, -502.171875, 24.7210655],
+            [1702.54346, -531.375, 18.5674305],
+            [1873.7865, -450.5, 26.3964939],
+            [1925.78296, -123.309029, 100.0],
+            [1982.25354, 299.253479, 323.298523],
+            [2145.12988, 498.600006, 373.299988],
+            [2338.52075, 701.890625, 373.298737],
+            [2380.22998, 952.929993, 373.299988],
+            [2203.53003, 1173.47998, 373.299988],
+            [1858.13, 1187.92004, 373.299988],
+            [1645.10071, 1168.92017, 309.86676],
+            [1425.97571, 1095.53479, 297.813995],
+            [1331.38538, 1087.29858, 255.973709],
+            [1171.6875, 1121.8125, 167.217072],
+        ];
+        let mut nodes = vec![TransportNodeEvents::default(); knots.len()];
+        for (index, delay_ms, event) in [(2, 10000, 87451), (9, 5000, 87452), (14, 5000, 91446)] {
+            nodes[index] = TransportNodeEvents {
+                stop: true,
+                delay_ms,
+                arrival_event: event,
+                departure_event: 0,
+            };
+        }
+        let route = TransportRoute::with_nodes(knots.clone(), 20.0, 5.0, nodes).unwrap();
+        assert_position(route.pose_at(0).position, knots[1], 0.001);
+        let events = route.events_between(0, u64::from(route.period_ms()));
+        assert_eq!(events.len(), 3);
+        for (event, (id, expected_ms, node)) in
+            events
+                .iter()
+                .zip([(87451, 5152, 2), (87452, 116325, 9), (91446, 193078, 14)])
+        {
+            assert_eq!(event.id, id);
+            assert!(
+                (event.elapsed_ms as i64 - expected_ms).abs() <= 5,
+                "{event:?}"
+            );
+            assert_position(route.pose_at(event.elapsed_ms).position, knots[node], 0.02);
+            assert_position(
+                route.pose_at(event.elapsed_ms + 1000).position,
+                knots[node],
+                0.02,
+            );
+        }
+    }
+
     fn straight_route() -> TransportRoute {
         let knots = vec![
             [0.0, 0.0, 5.0],
