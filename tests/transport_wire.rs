@@ -14,6 +14,18 @@ fn transport_route_and_local_passenger_frame_survive_the_replication_wire() {
             [1235.5313, 2874.0051, 297.08862],
         ],
         speed: 4.0,
+        acceleration: 5.0,
+        nodes: vec![
+            shared::transport_route::TransportNodeEvents::default(),
+            shared::transport_route::TransportNodeEvents {
+                stop: true,
+                delay_ms: 10_000,
+                arrival_event: 87451,
+                departure_event: 7,
+            },
+            shared::transport_route::TransportNodeEvents::default(),
+            shared::transport_route::TransportNodeEvents::default(),
+        ],
         elapsed_ms: 30_000,
     };
     let decoded: TransportState = bitcode::decode(&bitcode::encode(&state)).unwrap();

@@ -438,6 +438,10 @@ pub struct TransportState {
     pub interior_map: u32,
     pub knots: Vec<[f32; 3]>,
     pub speed: f32,
+    /// Source acceleration in yards per second squared.
+    pub acceleration: f32,
+    /// One entry per knot, including tangent-only endpoints.
+    pub nodes: Vec<crate::transport_route::TransportNodeEvents>,
     pub elapsed_ms: u64,
 }
 

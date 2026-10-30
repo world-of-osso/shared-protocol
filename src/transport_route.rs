@@ -1,13 +1,57 @@
-//! Looping transport route math for constant-speed, no-stop taxi paths.
+//! Looping transport routes with source stop timing and node events.
 //!
 //! Mirrors TrinityCore a352b1fa `TransportMgr.cpp` (`SplineRawInitializer`,
 //! `InitializeLeg`, `TransportTemplate::ComputePosition`) together with
 //! `Movement::Spline<double>` (`Spline.cpp`, `SplineImpl.h`) and the
 //! `Position::RelocateOffset` / `GetPositionOffsetTo` passenger transforms.
-//! Pause (`TAXI_PATH_NODE_FLAG_STOP`), teleport and event nodes are outside
-//! this model; callers validate them before building a route.
+//! A route covers one map leg; teleport and cross-map legs remain unsupported.
 
+use bevy::prelude::Reflect;
+use serde::{Deserialize, Serialize};
 use std::f32::consts::PI;
+
+/// Source behavior for one TaxiPath node; timing is in milliseconds.
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    Default,
+    PartialEq,
+    Eq,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+)]
+pub struct TransportNodeEvents {
+    pub stop: bool,
+    pub delay_ms: u32,
+    pub arrival_event: u32,
+    pub departure_event: u32,
+}
+
+/// One authored arrival or departure event in the traversed interval.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TransportEvent {
+    pub id: u32,
+    pub elapsed_ms: u64,
+}
+
+#[derive(Debug, Clone)]
+struct Segment {
+    start_ms: u32,
+    arrival_ms: u32,
+    delay_ms: u32,
+    start_distance: f64,
+    end_distance: f64,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct TimedEvent {
+    timestamp_ms: u32,
+    id: u32,
+}
 
 /// `InitializeLeg` calls `set_steps_per_segment(20)` before `initLengths()`.
 pub const STEPS_PER_SEGMENT: u32 = 20;
@@ -38,6 +82,16 @@ pub enum TransportRouteError {
     },
     /// `uint32(length / speed * 1000)` truncated to zero milliseconds.
     ZeroPeriod,
+    NodeCountMismatch {
+        knots: usize,
+        nodes: usize,
+    },
+    NonPositiveAcceleration {
+        acceleration: f32,
+    },
+    DelayWithoutStop {
+        index: usize,
+    },
 }
 
 #[derive(Debug, Clone)]
@@ -46,6 +100,9 @@ pub struct TransportRoute {
     /// Cumulative spline length at knot `i`; entries 0 and 1 are zero.
     lengths: Vec<f64>,
     speed: f64,
+    acceleration: f64,
+    segments: Vec<Segment>,
+    events: Vec<TimedEvent>,
     period_ms: u32,
 }
 
@@ -60,9 +117,42 @@ impl TransportRoute {
         if speed.is_nan() || speed <= 0.0 {
             return Err(TransportRouteError::NonPositiveSpeed { speed });
         }
+        let nodes = vec![TransportNodeEvents::default(); knots.len()];
+        Self::with_nodes(knots, speed, speed, nodes)
+    }
+
+    /// Build the source leg, including pauses, acceleration and node events.
+    pub fn with_nodes(
+        knots: Vec<[f32; 3]>,
+        speed: f32,
+        acceleration: f32,
+        nodes: Vec<TransportNodeEvents>,
+    ) -> Result<Self, TransportRouteError> {
+        if knots.len() < 4 {
+            return Err(TransportRouteError::TooFewKnots { count: knots.len() });
+        }
+        if !speed.is_finite() || speed <= 0.0 {
+            return Err(TransportRouteError::NonPositiveSpeed { speed });
+        }
+        if !acceleration.is_finite() || acceleration <= 0.0 {
+            return Err(TransportRouteError::NonPositiveAcceleration { acceleration });
+        }
+        if knots.len() != nodes.len() {
+            return Err(TransportRouteError::NodeCountMismatch {
+                knots: knots.len(),
+                nodes: nodes.len(),
+            });
+        }
+        if let Some(index) = nodes
+            .iter()
+            .position(|node| node.delay_ms != 0 && !node.stop)
+        {
+            return Err(TransportRouteError::DelayWithoutStop { index });
+        }
         let lengths = segment_lengths(&knots);
         let speed = f64::from(speed);
-        let period_ms = (lengths[knots.len() - 2] / speed * 1000.0) as u32;
+        let acceleration = f64::from(acceleration);
+        let (segments, events, period_ms) = build_timeline(&lengths, &nodes, speed, acceleration);
         if period_ms == 0 {
             return Err(TransportRouteError::ZeroPeriod);
         }
@@ -70,8 +160,33 @@ impl TransportRoute {
             knots,
             lengths,
             speed,
+            acceleration,
+            segments,
+            events,
             period_ms,
         })
+    }
+
+    /// Events crossed in (previous_ms, elapsed_ms], including loop boundaries.
+    pub fn events_between(&self, previous_ms: u64, elapsed_ms: u64) -> Vec<TransportEvent> {
+        if elapsed_ms <= previous_ms {
+            return Vec::new();
+        }
+        let period = u64::from(self.period_ms);
+        let mut result = Vec::new();
+        for cycle in (previous_ms / period)..=(elapsed_ms / period) {
+            for event in &self.events {
+                let at = cycle * period + u64::from(event.timestamp_ms);
+                if at > previous_ms && at <= elapsed_ms {
+                    result.push(TransportEvent {
+                        id: event.id,
+                        elapsed_ms: at,
+                    });
+                }
+            }
+        }
+        result.sort_by_key(|event| event.elapsed_ms);
+        result
     }
 
     pub fn period_ms(&self) -> u32 {
@@ -86,7 +201,7 @@ impl TransportRoute {
     /// looping every `period_ms`.
     pub fn pose_at(&self, elapsed_ms: u64) -> TransportPose {
         let time_ms = elapsed_ms % u64::from(self.period_ms);
-        let distance = time_ms as f64 * 0.001 * self.speed;
+        let distance = self.distance_at(time_ms as u32);
         let percent = (distance / self.length()).min(1.0) as f32;
         let (index, u) = self.compute_index(percent);
         let control = self.control_points(index);
@@ -96,6 +211,28 @@ impl TransportRoute {
             position,
             orientation: normalize_orientation(direction[1].atan2(direction[0]) + PI),
         }
+    }
+
+    fn distance_at(&self, time_ms: u32) -> f64 {
+        for (index, segment) in self.segments.iter().enumerate() {
+            if time_ms < segment.arrival_ms {
+                let duration = f64::from(segment.arrival_ms - segment.start_ms) * 0.001;
+                let time = f64::from(time_ms - segment.start_ms) * 0.001;
+                return segment.start_distance
+                    + distance_moved(
+                        time,
+                        duration,
+                        index == 0,
+                        index + 1 == self.segments.len(),
+                        self.speed,
+                        self.acceleration,
+                    );
+            }
+            if time_ms < segment.arrival_ms + segment.delay_ms {
+                return segment.end_distance;
+            }
+        }
+        self.length()
     }
 
     fn index_hi(&self) -> usize {
@@ -156,6 +293,145 @@ pub fn normalize_orientation(orientation: f32) -> f32 {
     let wrapped = orientation.rem_euclid(2.0 * PI);
     // rem_euclid can round a tiny negative input up to exactly 2π.
     if wrapped >= 2.0 * PI { 0.0 } else { wrapped }
+}
+
+fn travel_ms(distance: f64, speed: f64, acceleration: f64, both_ends: bool) -> u32 {
+    let accel_distance = 0.5 * speed * speed / acceleration;
+    let seconds = if both_ends {
+        if accel_distance >= distance * 0.5 {
+            (distance / acceleration).sqrt() * 2.0
+        } else {
+            (distance - 2.0 * accel_distance) / speed + 2.0 * speed / acceleration
+        }
+    } else if accel_distance >= distance {
+        (2.0 * distance / acceleration).sqrt()
+    } else {
+        (distance - accel_distance) / speed + speed / acceleration
+    };
+    (seconds * 1000.0) as u32
+}
+
+fn build_timeline(
+    lengths: &[f64],
+    nodes: &[TransportNodeEvents],
+    speed: f64,
+    acceleration: f64,
+) -> (Vec<Segment>, Vec<TimedEvent>, u32) {
+    let last = nodes.len() - 2;
+    let stops: Vec<_> = (1..=last).filter(|&i| nodes[i].stop).collect();
+    let mut segments = Vec::new();
+    let mut events = Vec::new();
+    let mut previous_index = 1;
+    let mut next_event = 0;
+    let mut start_ms = 0u32;
+    for (stop_number, &index) in stops.iter().enumerate() {
+        for event_index in next_event..=index {
+            let distance = (lengths[event_index] - lengths[previous_index]).max(0.0);
+            let at = start_ms + travel_ms(distance, speed, acceleration, stop_number != 0);
+            push_events(&mut events, nodes[event_index], at, event_index == index);
+        }
+        next_event = index + 1;
+        let distance = lengths[index] - lengths[previous_index];
+        let arrival_ms = start_ms + travel_ms(distance, speed, acceleration, stop_number != 0);
+        let delay_ms = nodes[index].delay_ms;
+        segments.push(Segment {
+            start_ms,
+            arrival_ms,
+            delay_ms,
+            start_distance: lengths[previous_index],
+            end_distance: lengths[index],
+        });
+        start_ms = arrival_ms + delay_ms;
+        previous_index = index;
+    }
+    for event_index in next_event..=last {
+        let distance = (lengths[event_index] - lengths[previous_index]).max(0.0);
+        let travel = if stops.is_empty() {
+            (distance / speed * 1000.0) as u32
+        } else {
+            travel_ms(distance, speed, acceleration, false)
+        };
+        push_events(&mut events, nodes[event_index], start_ms + travel, false);
+    }
+    let distance = lengths[last] - lengths[previous_index];
+    let travel = if stops.is_empty() {
+        (distance / speed * 1000.0) as u32
+    } else {
+        travel_ms(distance, speed, acceleration, false)
+    };
+    let period = start_ms + travel;
+    segments.push(Segment {
+        start_ms,
+        arrival_ms: period,
+        delay_ms: 0,
+        start_distance: lengths[previous_index],
+        end_distance: lengths[last],
+    });
+    (segments, events, period)
+}
+
+fn push_events(
+    events: &mut Vec<TimedEvent>,
+    node: TransportNodeEvents,
+    arrival: u32,
+    paused: bool,
+) {
+    if node.arrival_event != 0 {
+        events.push(TimedEvent {
+            timestamp_ms: arrival,
+            id: node.arrival_event,
+        });
+    }
+    if node.departure_event != 0 {
+        events.push(TimedEvent {
+            timestamp_ms: arrival + if paused { node.delay_ms } else { 0 },
+            id: node.departure_event,
+        });
+    }
+}
+
+fn distance_moved(
+    time: f64,
+    duration: f64,
+    first: bool,
+    last: bool,
+    speed: f64,
+    accel: f64,
+) -> f64 {
+    let accel_time = speed / accel;
+    let accel_distance = 0.5 * speed * speed / accel;
+    if first && last {
+        return time * speed;
+    }
+    if first {
+        let acceleration_time = accel_time.min(duration);
+        let full_speed_time = duration - acceleration_time;
+        if time <= full_speed_time {
+            return time * speed;
+        }
+        let t = time - full_speed_time;
+        return (2.0 * accel * acceleration_time - t * accel) * 0.5 * t + full_speed_time * speed;
+    }
+    if last {
+        return if time <= accel_time.min(duration) {
+            0.5 * accel * time * time
+        } else {
+            (time - accel_time) * speed + accel_distance
+        };
+    }
+    let acceleration_time = (duration * 0.5).min(accel_time);
+    if time <= duration - acceleration_time {
+        if time <= acceleration_time {
+            0.5 * accel * time * time
+        } else {
+            (time - accel_time) * speed + accel_distance
+        }
+    } else {
+        let t = time - (duration - acceleration_time);
+        (duration - 2.0 * acceleration_time) * speed
+            + 0.5 * accel * acceleration_time * acceleration_time
+            + (2.0 * accel * acceleration_time - t * accel) * 0.5 * t
+    }
 }
 
 /// `Spline::initLengths` with `SegLengthCatmullRom`: cumulative lengths for
@@ -254,6 +530,57 @@ mod tests {
         for axis in 0..3 {
             assert_close(actual[axis], expected[axis], tolerance);
         }
+    }
+
+    #[test]
+    fn source_stops_accelerate_pause_and_emit_events_once_across_loops() {
+        let knots: Vec<_> = (0..6).map(|x| [x as f32 * 10.0, 0.0, 5.0]).collect();
+        let mut nodes = vec![TransportNodeEvents::default(); knots.len()];
+        nodes[2] = TransportNodeEvents {
+            stop: true,
+            delay_ms: 3000,
+            arrival_event: 87451,
+            departure_event: 99,
+        };
+        nodes[3] = TransportNodeEvents {
+            stop: true,
+            delay_ms: 2000,
+            arrival_event: 87452,
+            departure_event: 0,
+        };
+        let route = TransportRoute::with_nodes(knots, 10.0, 5.0, nodes).unwrap();
+        assert_eq!(route.period_ms(), 11828);
+        assert_position(route.pose_at(0).position, [10.0, 0.0, 5.0], 0.001);
+        assert_position(route.pose_at(1000).position, [17.5, 0.0, 5.0], 0.001);
+        assert_position(route.pose_at(2000).position, [20.0, 0.0, 5.0], 0.001);
+        assert_position(route.pose_at(4999).position, [20.0, 0.0, 5.0], 0.001);
+        assert_position(route.pose_at(6000).position, [22.5, 0.0, 5.0], 0.001);
+        assert_position(route.pose_at(7828).position, [30.0, 0.0, 5.0], 0.001);
+        assert_eq!(
+            route.events_between(0, 11828),
+            vec![
+                TransportEvent {
+                    id: 87451,
+                    elapsed_ms: 2000
+                },
+                TransportEvent {
+                    id: 99,
+                    elapsed_ms: 5000
+                },
+                TransportEvent {
+                    id: 87452,
+                    elapsed_ms: 7828
+                },
+            ]
+        );
+        assert_eq!(
+            route.events_between(11828, 13828),
+            vec![TransportEvent {
+                id: 87451,
+                elapsed_ms: 13828
+            }]
+        );
+        assert!(route.events_between(2000, 4999).is_empty());
     }
 
     fn straight_route() -> TransportRoute {
