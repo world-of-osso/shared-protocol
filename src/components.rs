@@ -523,6 +523,26 @@ pub struct Player {
     pub appearance: CharacterAppearance,
 }
 
+/// Replicated character-model identity independent of player-session ownership.
+/// `appearance.sex` is the shared sex for both primary and visage forms.
+#[derive(
+    Component,
+    Reflect,
+    Serialize,
+    Deserialize,
+    bitcode::Encode,
+    bitcode::Decode,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+)]
+pub struct CharacterVisual {
+    pub race: u8,
+    pub class: u8,
+    pub appearance: CharacterAppearance,
+}
+
 /// One-shot server facing for the matching MovementControl epoch. Unlike an ordinary
 /// Rotation snapshot, the owning client must adopt this yaw before sending new input.
 #[derive(

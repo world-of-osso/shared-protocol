@@ -222,11 +222,17 @@ fn register_replicated_components(app: &mut App) {
     app.protocol_component::<UnitIsPet>().replicate();
     app.protocol_component::<crate::components::DynamicObjectInfo>()
         .replicate();
+    app.protocol_component::<crate::components::CharacterVisual>()
+        .replicate();
 }
 
 #[cfg(test)]
 #[path = "protocol_tests.rs"]
 mod tests;
+
+#[cfg(test)]
+#[path = "protocol_character_visual_tests.rs"]
+mod character_visual_tests;
 
 #[cfg(test)]
 #[path = "protocol_spell_tests.rs"]
