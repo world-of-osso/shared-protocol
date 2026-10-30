@@ -543,6 +543,16 @@ pub struct CharacterVisual {
     pub appearance: CharacterAppearance,
 }
 
+impl From<&Player> for CharacterVisual {
+    fn from(player: &Player) -> Self {
+        Self {
+            race: player.race,
+            class: player.class,
+            appearance: player.appearance.clone(),
+        }
+    }
+}
+
 /// One-shot server facing for the matching MovementControl epoch. Unlike an ordinary
 /// Rotation snapshot, the owning client must adopt this yaw before sending new input.
 #[derive(
