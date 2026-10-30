@@ -167,6 +167,18 @@ impl TransportRoute {
         })
     }
 
+    /// Events at route start; dispatch once when the transport is created.
+    pub fn initial_events(&self) -> Vec<TransportEvent> {
+        self.events
+            .iter()
+            .filter(|event| event.timestamp_ms == 0)
+            .map(|event| TransportEvent {
+                id: event.id,
+                elapsed_ms: 0,
+            })
+            .collect()
+    }
+
     /// Events crossed in (previous_ms, elapsed_ms], including loop boundaries.
     pub fn events_between(&self, previous_ms: u64, elapsed_ms: u64) -> Vec<TransportEvent> {
         if elapsed_ms <= previous_ms {
@@ -581,6 +593,34 @@ mod tests {
             }]
         );
         assert!(route.events_between(2000, 4999).is_empty());
+    }
+
+    #[test]
+    fn first_playable_stop_emits_initial_event_once_and_delays_departure() {
+        let knots: Vec<_> = (0..5).map(|x| [x as f32 * 10.0, 0.0, 0.0]).collect();
+        let mut nodes = vec![TransportNodeEvents::default(); knots.len()];
+        nodes[1] = TransportNodeEvents {
+            stop: true,
+            delay_ms: 5000,
+            arrival_event: 87496,
+            departure_event: 17,
+        };
+        let route = TransportRoute::with_nodes(knots, 20.0, 10.0, nodes).unwrap();
+        assert_eq!(
+            route.initial_events(),
+            vec![TransportEvent {
+                id: 87496,
+                elapsed_ms: 0
+            }]
+        );
+        assert_position(route.pose_at(4999).position, [10.0, 0.0, 0.0], 0.001);
+        assert_eq!(
+            route.events_between(0, 5000),
+            vec![TransportEvent {
+                id: 17,
+                elapsed_ms: 5000
+            }]
+        );
     }
 
     #[test]
