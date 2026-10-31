@@ -3,8 +3,8 @@
 /// Max walkable slope angle (radians). WoW uses ~50°.
 pub const MAX_SLOPE_ANGLE: f32 = 50.0 * std::f32::consts::PI / 180.0;
 
-/// Gravity in yards/s² (~2g for snappy game feel).
-pub const GRAVITY: f32 = 19.6;
+/// TrinityCore 15e0ed76 MovementTypedefs.h `Movement::gravity` (yards/s²).
+pub const GRAVITY: f32 = 19.291_103;
 
 /// TrinityCore MovementUtil.cpp terminalSafefallVelocity (Retail feather fall).
 pub const FEATHER_FALL_SPEED: f32 = 7.0;
@@ -40,8 +40,9 @@ pub const BACKPEDAL_MULTIPLIER: f32 = 0.6;
 /// Strafing movement speed multiplier.
 pub const STRAFE_MULTIPLIER: f32 = 0.8;
 
-/// Jump impulse velocity in yards/sec.
-pub const JUMP_IMPULSE: f32 = 9.0;
+/// Retail CMSG_MOVE_JUMP packet, 2018: downward-positive velocity -7.955547 yd/s.
+/// Source: https://www.noob-club.ru/index.php?topic=58503.90
+pub const JUMP_IMPULSE: f32 = 7.955_547;
 
 /// Water depth over the feet at which a player swims; a swimmer floats with its feet this
 /// far under the surface (game-engine `player_physics_data::SWIM_DEPTH`).
